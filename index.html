@@ -190,7 +190,7 @@
             box-sizing: border-box; border: 2px solid #334155;
         }
 
-        /* 🔍 搜尋列樣式 */
+        /* 🔍 智慧搜尋列樣式 */
         .search-container {
             position: relative;
             width: 100%;
@@ -228,7 +228,7 @@
             background: #ffffff;
             border: 2px solid var(--border-color);
             border-radius: 8px;
-            max-height: 240px;
+            max-height: 280px;
             overflow-y: auto;
             z-index: 100;
             box-shadow: var(--shadow);
@@ -265,6 +265,8 @@
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: bold;
+            white-space: nowrap;
+            margin-left: 8px;
         }
 
         select {
@@ -339,7 +341,6 @@
         .card-back::-webkit-scrollbar { width: 6px; }
         .card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* 正面漢字與讀音字體調整 */
         .front-kanji-title {
             font-size: 38px;
             font-weight: 800;
@@ -560,10 +561,10 @@
     </header>
 
     <div class="control-panel">
-        <!-- 🔍 搜尋框 -->
+        <!-- 🔍 智慧語意搜尋框 -->
         <div class="search-container">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="搜尋單字（中 / 日 / 漢字）..." oninput="handleSearch(this.value)">
+            <input type="text" id="searchInput" class="search-input" placeholder="智慧搜尋（例：只/僅僅、因為、交通、假名...）" oninput="handleSearch(this.value)">
             <div class="search-results-dropdown" id="searchResultsDropdown"></div>
         </div>
 
@@ -607,7 +608,6 @@
     <div id="review-section">
         <div class="card-container" id="flashcard" onclick="flipCard()">
             <div class="card-inner">
-                <!-- 正面：漢字/外來語 + 假名讀音 -->
                 <div class="card-face card-front">
                     <span class="badge" id="card-badge-front">載入中...</span>
                     <div class="front-kanji-title" id="card-kanji-front"></div>
@@ -616,7 +616,6 @@
                     <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
                     <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
                 </div>
-                <!-- 背面：頂部顯示完整 漢字+(假名) + 詳解內容 -->
                 <div class="card-face card-back" id="card-back-content"></div>
             </div>
         </div>
@@ -881,6 +880,19 @@
         sheet25: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=219719106&single=true&output=csv'
     };
 
+    // 🧠 內建日語語意同義聯想辭典（擴充性極高）
+    const SEMANTIC_SYNONYMS = [
+        { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
+        { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげで', 'によって', 'つき'] },
+        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', 'が', 'けれども', 'ものの', 'としても'] },
+        { triggers: ['打算', '計畫', '準備', '想要'], targets: ['つもり', '予定', 'ようとする', 'たい', 'ほしい'] },
+        { triggers: ['好像', '似乎', '聽說', '看起來'], targets: ['そう', 'よう', 'らしい', 'みたい'] },
+        { triggers: ['必須', '一定要', '非得'], targets: ['なければならない', 'ないと', 'ざるを得ない', 'べき'] },
+        { triggers: ['可以', '能夠', '能力', '會'], targets: ['できる', 'れる', 'られる', 'こと'] },
+        { triggers: ['一邊', '同時'], targets: ['ながら', 'つつ'] },
+        { triggers: ['越...越...', '隨著'], targets: ['ば...ほど', 'につれて', 'とともに'] }
+    ];
+
     let currentList = [];
     let currentIndex = 0;
     let currentMode = 'review';
@@ -891,7 +903,7 @@
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
-    let allSearchableWords = []; // 全域可搜尋單字庫
+    let allSearchableWords = [];
 
     function getProgress(wordJp) {
         const key = `jp_progress_${wordJp}`;
@@ -1031,7 +1043,6 @@
         return true;
     }
 
-    // 📢 預載入所有分類建立全域搜尋庫
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const promises = [];
@@ -1102,40 +1113,82 @@
         }
     }
 
-    // 🔍 搜尋核心處理
-    function handleSearch(keyword) {
+    // 🔍 智慧語意與多詞關聯搜尋處理
+    function handleSearch(inputText) {
         const dropdown = document.getElementById('searchResultsDropdown');
-        const query = keyword.trim().toLowerCase();
+        const rawInput = inputText.trim();
 
-        if (!query) {
+        if (!rawInput) {
             dropdown.style.display = 'none';
             dropdown.innerHTML = '';
             return;
         }
 
-        const matches = allSearchableWords.filter(item => {
-            const jpMatch = item.jp.toLowerCase().includes(query);
-            const kanjiMatch = item.kanji && item.kanji.toLowerCase().includes(query);
-            const zhText = getWordZhText(item).toLowerCase();
-            const zhMatch = zhText.includes(query);
-            return jpMatch || kanjiMatch || zhMatch;
+        // 1. 拆解空白關鍵字
+        const tokens = rawInput.toLowerCase().split(/\s+/).filter(Boolean);
+
+        // 2. 擴展語意同義關鍵字
+        let expandedTargets = [];
+        tokens.forEach(token => {
+            SEMANTIC_SYNONYMS.forEach(syn => {
+                if (syn.triggers.some(t => token.includes(t) || t.includes(token))) {
+                    expandedTargets.push(...syn.targets);
+                }
+            });
+        });
+        expandedTargets = [...new Set(expandedTargets)]; // 去重複
+
+        // 3. 評分與匹配運算
+        let scoredMatches = [];
+
+        allSearchableWords.forEach(item => {
+            let score = 0;
+            const jp = item.jp.toLowerCase();
+            const kanji = (item.kanji || '').toLowerCase();
+            const zh = getWordZhText(item).toLowerCase();
+            const fullContent = (item.rawCols || []).join(' ').toLowerCase();
+
+            tokens.forEach(tok => {
+                // 完全命中標題
+                if (jp === tok || kanji === tok) score += 100;
+                // 部分命中標題
+                else if (jp.includes(tok) || kanji.includes(tok)) score += 50;
+                // 命中中文意思
+                if (zh.includes(tok)) score += 40;
+                // 命中全欄位（包含例句與備註）
+                else if (fullContent.includes(tok)) score += 15;
+            });
+
+            // 語意同義關聯加分
+            expandedTargets.forEach(tgt => {
+                if (jp.includes(tgt) || kanji.includes(tgt) || fullContent.includes(tgt)) {
+                    score += 30;
+                }
+            });
+
+            if (score > 0) {
+                scoredMatches.push({ item, score });
+            }
         });
 
-        if (matches.length === 0) {
-            dropdown.innerHTML = `<div style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">查無符合「${keyword}」的單字 🍃</div>`;
+        // 依照相關度評分降序排序
+        scoredMatches.sort((a, b) => b.score - a.score);
+
+        if (scoredMatches.length === 0) {
+            dropdown.innerHTML = `<div style="padding: 14px; font-size: 13px; color: #64748b; text-align: center;">查無符合「${rawInput}」的項目 🍃<br><span style="font-size:11px; color:#94a3b8;">可嘗試輸入近義詞或假名喔！</span></div>`;
             dropdown.style.display = 'block';
             return;
         }
 
-        // 最多展示前 15 筆結果
-        const resultsHtml = matches.slice(0, 15).map(item => {
+        // 最多展示前 15 筆最相關結果
+        const resultsHtml = scoredMatches.slice(0, 15).map(({ item }) => {
             const zhText = getWordZhText(item);
             const mainDisplay = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
             const safeJp = item.jp.replace(/'/g, "\\'");
 
             return `
                 <div class="search-result-item" onclick="selectSearchResult('${item.catKey}', '${safeJp}')">
-                    <div>
+                    <div style="overflow:hidden; text-overflow:ellipsis;">
                         <div class="search-result-word">${mainDisplay}</div>
                         <div class="search-result-sub">${zhText}</div>
                     </div>
@@ -1156,7 +1209,6 @@
         jumpToCategory(sheetKey, wordJp);
     }
 
-    // 點擊空白處關閉搜尋下拉清單
     document.addEventListener('click', (e) => {
         const searchBox = document.querySelector('.search-container');
         if (searchBox && !searchBox.contains(e.target)) {
@@ -1439,7 +1491,6 @@
         }
     }
 
-    // 📇 字卡渲染：正面顯示 漢字/外來語 + 假名；背面頂部顯示完整對照
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -1452,7 +1503,6 @@
         const frontKanjiEl = document.getElementById('card-kanji-front');
         const frontKanaEl = document.getElementById('card-kana-front');
 
-        // 正面渲染
         if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
             frontKanjiEl.textContent = current.kanji;
             frontKanjiEl.style.display = 'block';
@@ -1463,7 +1513,6 @@
             frontKanaEl.textContent = current.jp;
         }
         
-        // 背面渲染
         const backContainer = document.getElementById('card-back-content');
         let backHTML = '';
 
