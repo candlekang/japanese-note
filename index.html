@@ -19,13 +19,10 @@
             --card-bg: #ffffff;         
             --primary: #38bdf8;        
             --primary-dark: #0284c7;
-            
             --pixel-pink: #ec4899;     
             --pixel-pink-bg: rgba(236, 72, 153, 0.12);
-            
             --pixel-yellow: #f59e0b;   
             --pixel-yellow-bg: rgba(245, 158, 11, 0.15);
-            
             --accent: #0d9488;         
             --text-main: #0f172a;
             --text-sub: #64748b;
@@ -315,7 +312,7 @@
         }
         .btn-tts-micro:hover { transform: scale(1.25); }
 
-        /* 📇 字卡外框與內置箭頭、數字 */
+        /* 📇 字卡樣式優化（左右文字留白，箭頭縮小） */
         .card-container { 
             perspective: 1000px; 
             width: 100%; 
@@ -333,7 +330,9 @@
         .card-face {
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
             border-radius: 20px; box-shadow: var(--shadow); background: var(--card-bg);
-            display: flex; flex-direction: column; padding: 24px; box-sizing: border-box;
+            display: flex; flex-direction: column; 
+            padding: 24px 38px; /* 💡 左右留白加大，避免內容與兩側箭頭重疊 */
+            box-sizing: border-box;
             border: 2px solid #334155;
         }
         
@@ -341,13 +340,12 @@
         .card-back { 
             transform: rotateY(180deg); background: #f8fafc; border: 2px solid #334155;
             justify-content: flex-start; align-items: flex-start; overflow-y: auto; text-align: left;
-            padding-top: 46px; /* 留空間給頂部頁數 */
+            padding-top: 46px; 
         }
         
         .card-back::-webkit-scrollbar { width: 6px; }
         .card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* 內建頂部頁數指示器 */
         .card-counter-inside {
             position: absolute;
             top: 14px;
@@ -365,18 +363,18 @@
             pointer-events: none;
         }
 
-        /* 內建左右翻頁箭頭按鈕 */
+        /* 💡 微型化導覽箭頭 */
         .card-nav-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: rgba(15, 23, 42, 0.55);
-            border: 1.5px solid rgba(255, 255, 255, 0.35);
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: #ffffff;
-            font-size: 14px;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -389,13 +387,13 @@
         .card-nav-arrow:hover {
             background: var(--primary-dark);
             border-color: var(--primary);
-            transform: translateY(-50%) scale(1.1);
+            transform: translateY(-50%) scale(1.15);
         }
-        .card-nav-arrow.left { left: 10px; }
-        .card-nav-arrow.right { right: 10px; }
+        .card-nav-arrow.left { left: 8px; }
+        .card-nav-arrow.right { right: 8px; }
 
         .front-kanji-title {
-            font-size: 38px;
+            font-size: 36px;
             font-weight: 800;
             color: var(--text-main);
             margin-bottom: 6px;
@@ -403,7 +401,7 @@
             white-space: pre-wrap;
         }
         .front-kana-sub {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
             color: var(--primary-dark);
             margin-bottom: 14px;
@@ -411,7 +409,7 @@
         }
 
         .kanji-title {
-            font-size: 28px; font-weight: 700; color: var(--text-main);
+            font-size: 26px; font-weight: 700; color: var(--text-main);
             text-align: center; width: 100%; margin-bottom: 16px; 
             padding-bottom: 16px; border-bottom: 2px dashed #cbd5e1;
             white-space: pre-wrap;
@@ -478,7 +476,6 @@
         #btn-next-quiz { background: var(--pixel-pink); color: #ffffff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35); }
         #btn-next-quiz:hover { background: #db2777; }
 
-        /* 📊 學習進度面板與 5x5 網格 */
         #stats-section {
             background: var(--card-bg); padding: 24px; border-radius: 20px;
             box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
@@ -655,7 +652,6 @@
     <!-- 1. 翻卡模式 (左右箭頭與數字皆內建於字卡中) -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
-            <!-- 內建左右導覽箭頭 -->
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
             <div class="card-nav-arrow right" onclick="nextCard(event)" title="下一張">▶</div>
 
@@ -1537,7 +1533,6 @@
         document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
         document.getElementById('card-badge-front').textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字'; 
         
-        // 更新卡片內置頂部數字
         const counterText = `${currentIndex + 1} / ${currentList.length}`;
         const frontCounter = document.getElementById('card-counter-front');
         const backCounter = document.getElementById('card-counter-back');
