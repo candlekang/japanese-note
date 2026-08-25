@@ -127,7 +127,7 @@
             background: rgba(56, 189, 248, 0.1);
         }
 
-        /* 📢 超悠閒慢速無縫跑馬燈 */
+        /* 📢 慢速跑馬燈 */
         .marquee-box {
             width: 100%;
             background: rgba(245, 158, 11, 0.12);
@@ -188,6 +188,83 @@
             background: var(--card-bg); padding: 16px; border-radius: 16px;
             box-shadow: var(--shadow); margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;
             box-sizing: border-box; border: 2px solid #334155;
+        }
+
+        /* 🔍 搜尋列樣式 */
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #f8fafc;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+            font-weight: 600;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--primary-dark);
+            background: #ffffff;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15px;
+            pointer-events: none;
+        }
+        .search-results-dropdown {
+            position: absolute;
+            top: 105%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+        .search-result-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        .search-result-item:hover {
+            background: #f0f9ff;
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        .search-result-word {
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .search-result-sub {
+            font-size: 12px;
+            color: var(--pixel-pink);
+            margin-top: 2px;
+        }
+        .search-result-cat {
+            font-size: 11px;
+            background: var(--pixel-yellow-bg);
+            color: #b45309;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
         select {
@@ -262,8 +339,25 @@
         .card-back::-webkit-scrollbar { width: 6px; }
         .card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
+        /* 正面漢字與讀音字體調整 */
+        .front-kanji-title {
+            font-size: 38px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            line-height: 1.2;
+            white-space: pre-wrap;
+        }
+        .front-kana-sub {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 14px;
+            white-space: pre-wrap;
+        }
+
         .kanji-title {
-            font-size: 32px; font-weight: 700; color: var(--text-main);
+            font-size: 28px; font-weight: 700; color: var(--text-main);
             text-align: center; width: 100%; margin-bottom: 16px; 
             padding-bottom: 16px; border-bottom: 2px dashed #cbd5e1;
             white-space: pre-wrap;
@@ -283,7 +377,6 @@
             margin-bottom: 12px; border: 1px solid rgba(245, 158, 11, 0.4);
             font-weight: 700;
         }
-        .word-jp { font-size: 40px; font-weight: 700; margin-bottom: 16px; color: var(--text-main); line-height: 1.3; white-space: pre-wrap; }
         .hint { font-size: 12px; color: var(--text-sub); position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; }
         
         .progress-text {
@@ -455,7 +548,7 @@
             </button>
         </div>
 
-        <!-- 📢 最新單字跑馬燈 (支援點擊直接精確跳轉到該單字) -->
+        <!-- 📢 最新單字跑馬燈 -->
         <div class="marquee-box" id="marquee-box">
             <span class="marquee-tag" id="marquee-date-tag">最新收錄</span>
             <div class="marquee-viewport">
@@ -467,6 +560,13 @@
     </header>
 
     <div class="control-panel">
+        <!-- 🔍 搜尋框 -->
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="搜尋單字（中 / 日 / 漢字）..." oninput="handleSearch(this.value)">
+            <div class="search-results-dropdown" id="searchResultsDropdown"></div>
+        </div>
+
         <select id="sheetSelect" onchange="changeSheet()">
             <option value="sheet1">名詞</option>
             <option value="sheet2">形式名詞</option>
@@ -507,13 +607,16 @@
     <div id="review-section">
         <div class="card-container" id="flashcard" onclick="flipCard()">
             <div class="card-inner">
+                <!-- 正面：漢字/外來語 + 假名讀音 -->
                 <div class="card-face card-front">
                     <span class="badge" id="card-badge-front">載入中...</span>
-                    <div class="word-jp" id="card-jp">載入中...</div>
-                    <button class="btn-tts" onclick="speakJP(event, 'card-jp')">🔊 發音</button>
+                    <div class="front-kanji-title" id="card-kanji-front"></div>
+                    <div class="front-kana-sub" id="card-kana-front">載入中...</div>
+                    <button class="btn-tts" onclick="speakJP(event, 'card-kana-front')">🔊 發音</button>
                     <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
                     <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
                 </div>
+                <!-- 背面：頂部顯示完整 漢字+(假名) + 詳解內容 -->
                 <div class="card-face card-back" id="card-back-content"></div>
             </div>
         </div>
@@ -788,6 +891,7 @@
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
+    let allSearchableWords = []; // 全域可搜尋單字庫
 
     function getProgress(wordJp) {
         const key = `jp_progress_${wordJp}`;
@@ -927,10 +1031,12 @@
         return true;
     }
 
+    // 📢 預載入所有分類建立全域搜尋庫
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const promises = [];
         let collectedLatest = [];
+        allSearchableWords = [];
 
         const now = new Date();
         const year = now.getFullYear();
@@ -961,20 +1067,21 @@
                     parsedData.slice(1).forEach(cols => {
                         const jp = cols[0] || '';
                         if (jp && jp.length <= 15 && !/[。，、！？,,]/.test(jp)) {
-                            globalWordCategoryMap[jp] = catName;
-                            globalWordDataMap[jp] = {
+                            const wordObj = {
+                                jp: jp,
                                 kanji: cols[1] || '',
+                                level: cols[2] || '',
+                                type: cols[3] || '',
                                 rawCols: cols,
                                 rawHeaders: headers,
                                 catKey: sheetKey,
                                 catName: catName
                             };
-                            validRows.push({
-                                jp: jp,
-                                kanji: cols[1] || '',
-                                catKey: sheetKey,
-                                catName: catName
-                            });
+
+                            globalWordCategoryMap[jp] = catName;
+                            globalWordDataMap[jp] = wordObj;
+                            validRows.push(wordObj);
+                            allSearchableWords.push(wordObj);
                         }
                     });
 
@@ -995,6 +1102,68 @@
         }
     }
 
+    // 🔍 搜尋核心處理
+    function handleSearch(keyword) {
+        const dropdown = document.getElementById('searchResultsDropdown');
+        const query = keyword.trim().toLowerCase();
+
+        if (!query) {
+            dropdown.style.display = 'none';
+            dropdown.innerHTML = '';
+            return;
+        }
+
+        const matches = allSearchableWords.filter(item => {
+            const jpMatch = item.jp.toLowerCase().includes(query);
+            const kanjiMatch = item.kanji && item.kanji.toLowerCase().includes(query);
+            const zhText = getWordZhText(item).toLowerCase();
+            const zhMatch = zhText.includes(query);
+            return jpMatch || kanjiMatch || zhMatch;
+        });
+
+        if (matches.length === 0) {
+            dropdown.innerHTML = `<div style="padding: 12px; font-size: 13px; color: #64748b; text-align: center;">查無符合「${keyword}」的單字 🍃</div>`;
+            dropdown.style.display = 'block';
+            return;
+        }
+
+        // 最多展示前 15 筆結果
+        const resultsHtml = matches.slice(0, 15).map(item => {
+            const zhText = getWordZhText(item);
+            const mainDisplay = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
+            const safeJp = item.jp.replace(/'/g, "\\'");
+
+            return `
+                <div class="search-result-item" onclick="selectSearchResult('${item.catKey}', '${safeJp}')">
+                    <div>
+                        <div class="search-result-word">${mainDisplay}</div>
+                        <div class="search-result-sub">${zhText}</div>
+                    </div>
+                    <span class="search-result-cat">${item.catName}</span>
+                </div>
+            `;
+        }).join('');
+
+        dropdown.innerHTML = resultsHtml;
+        dropdown.style.display = 'block';
+    }
+
+    function selectSearchResult(sheetKey, wordJp) {
+        playClickSound();
+        const dropdown = document.getElementById('searchResultsDropdown');
+        dropdown.style.display = 'none';
+        document.getElementById('searchInput').value = '';
+        jumpToCategory(sheetKey, wordJp);
+    }
+
+    // 點擊空白處關閉搜尋下拉清單
+    document.addEventListener('click', (e) => {
+        const searchBox = document.querySelector('.search-container');
+        if (searchBox && !searchBox.contains(e.target)) {
+            document.getElementById('searchResultsDropdown').style.display = 'none';
+        }
+    });
+
     function renderMarquee(items, dateString) {
         const marqueeEl = document.getElementById('marquee-content');
         if (!marqueeEl) return;
@@ -1008,7 +1177,6 @@
         marqueeEl.innerHTML = `${itemsHtml} &nbsp;&nbsp;&nbsp;&nbsp; ${itemsHtml}`;
     }
 
-    // 🌟 核心修正：接收指定單字並精準定位
     function jumpToCategory(sheetKey, targetWordJp = null) {
         playClickSound();
         setMode('review');
@@ -1019,7 +1187,8 @@
     }
 
     async function loadSheetData(urlKey, targetWordJp = null) {
-        document.getElementById('card-jp').textContent = '資料載入中...';
+        document.getElementById('card-kana-front').textContent = '資料載入中...';
+        document.getElementById('card-kanji-front').textContent = '';
         
         try {
             if (urlKey === 'all') {
@@ -1071,10 +1240,8 @@
                 }
             }
             
-            // 隨機洗牌
             currentList.sort(() => Math.random() - 0.5);
 
-            // 如果有指定特定單字，精準定位其索引
             if (targetWordJp) {
                 const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
                 currentIndex = (foundIndex !== -1) ? foundIndex : 0;
@@ -1085,7 +1252,7 @@
             initMode(targetWordJp ? true : false);
             
         } catch (e) {
-            document.getElementById('card-jp').textContent = '載入失敗 (請檢查網路)';
+            document.getElementById('card-kana-front').textContent = '載入失敗 (請檢查網路)';
             console.log(e);
         }
     }
@@ -1272,6 +1439,7 @@
         }
     }
 
+    // 📇 字卡渲染：正面顯示 漢字/外來語 + 假名；背面頂部顯示完整對照
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -1279,15 +1447,31 @@
         
         const progress = getProgress(current.jp);
         document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
-        
-        document.getElementById('card-jp').textContent = current.jp;
         document.getElementById('card-badge-front').textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字'; 
         
+        const frontKanjiEl = document.getElementById('card-kanji-front');
+        const frontKanaEl = document.getElementById('card-kana-front');
+
+        // 正面渲染
+        if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+            frontKanjiEl.textContent = current.kanji;
+            frontKanjiEl.style.display = 'block';
+            frontKanaEl.textContent = current.jp;
+        } else {
+            frontKanjiEl.textContent = '';
+            frontKanjiEl.style.display = 'none';
+            frontKanaEl.textContent = current.jp;
+        }
+        
+        // 背面渲染
         const backContainer = document.getElementById('card-back-content');
         let backHTML = '';
 
-        const mainTitle = current.kanji ? current.kanji : current.jp;
-        backHTML += `<div class="kanji-title">${mainTitle}</div>`;
+        const fullTitle = (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp)
+            ? `${current.kanji} (${current.jp})`
+            : current.jp;
+
+        backHTML += `<div class="kanji-title">${fullTitle}</div>`;
 
         if (current.type) {
             backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
