@@ -52,7 +52,7 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            margin-bottom: 20px; 
+            margin-bottom: 16px; 
             width: 100%;
         }
         h1 { 
@@ -60,7 +60,7 @@
             font-size: 26px; 
             letter-spacing: 2px; 
             color: var(--primary); 
-            margin: 0 0 14px 0; 
+            margin: 0 0 12px 0; 
             font-weight: 700;
             text-shadow: 2px 2px 0px #0b1329, 0 0 10px rgba(56, 189, 248, 0.5);
         }
@@ -78,6 +78,7 @@
             box-sizing: border-box;
             backdrop-filter: blur(8px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-bottom: 12px;
         }
         .user-info { 
             display: flex; 
@@ -124,6 +125,63 @@
             border-color: var(--primary);
             color: var(--primary);
             background: rgba(56, 189, 248, 0.1);
+        }
+
+        /* 📢 像素風無縫滾動跑馬燈 */
+        .marquee-box {
+            width: 100%;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+            color: #fde68a;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 12px;
+        }
+        .marquee-tag {
+            background: #d97706;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: 1px;
+        }
+        .marquee-viewport {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            position: relative;
+        }
+        .marquee-content {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 22s linear infinite;
+        }
+        .marquee-viewport:hover .marquee-content {
+            animation-play-state: paused;
+        }
+        @keyframes marquee {
+            0%   { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .marquee-item {
+            margin-right: 28px;
+            display: inline-block;
+            cursor: pointer;
+            color: #fef08a;
+            transition: color 0.1s;
+        }
+        .marquee-item:hover {
+            color: var(--primary);
+            text-decoration: underline;
         }
 
         .control-panel {
@@ -395,6 +453,16 @@
                 </svg>
                 <span id="btn-auth-text">Google 登入同步</span>
             </button>
+        </div>
+
+        <!-- 📢 最新單字自動跑馬燈公告 -->
+        <div class="marquee-box" id="marquee-box">
+            <span class="marquee-tag">最新收錄</span>
+            <div class="marquee-viewport">
+                <div class="marquee-content" id="marquee-content">
+                    <span>⚡ 正在掃描試算表最新收錄內容...</span>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -720,6 +788,7 @@
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
+    let globalLatestWords = []; 
 
     function getProgress(wordJp) {
         const key = `jp_progress_${wordJp}`;
@@ -787,13 +856,11 @@
         window.speechSynthesis.speak(utterance);
     }
 
-    // 🌟 核心優化：唸例句只唸第一行（日文句子），並過濾注音括號
     function speakExampleJP(event, rawText) {
         if (event) event.stopPropagation();
         playClickSound();
         if (!rawText) return;
 
-        // 依斷行分割，只取第一行日文
         const firstLine = rawText.split('\n')[0] || rawText;
         const textToSpeak = cleanTextForSpeech(firstLine).trim();
         if (!textToSpeak) return;
@@ -861,20 +928,27 @@
         return true;
     }
 
+    // 📢 預載入所有分類並自動提取最新單字生成跑馬燈
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
+        const promises = [];
+        let collectedLatest = [];
+
         for (let i = 0; i < selectElement.options.length; i++) {
             const opt = selectElement.options[i];
             if (opt.value === 'all') continue;
             
             const catName = opt.text;
-            const url = SHEETS_CONFIG[opt.value];
+            const sheetKey = opt.value;
+            const url = SHEETS_CONFIG[sheetKey];
             if (!url) continue;
 
-            fetch(url).then(res => res.text()).then(text => {
+            const p = fetch(url).then(res => res.text()).then(text => {
                 const parsedData = parseCSVText(text);
                 if (parsedData.length >= 2) {
                     const headers = parsedData[0];
+                    const validRows = [];
+
                     parsedData.slice(1).forEach(cols => {
                         const jp = cols[0] || '';
                         if (jp && jp.length <= 15 && !/[。，、！？,,]/.test(jp)) {
@@ -882,13 +956,57 @@
                             globalWordDataMap[jp] = {
                                 kanji: cols[1] || '',
                                 rawCols: cols,
-                                rawHeaders: headers
+                                rawHeaders: headers,
+                                catKey: sheetKey,
+                                catName: catName
                             };
+                            validRows.push({
+                                jp: jp,
+                                kanji: cols[1] || '',
+                                catKey: sheetKey,
+                                catName: catName
+                            });
                         }
                     });
+
+                    // 抓取各分頁最底部的最新 2 個單字
+                    if (validRows.length > 0) {
+                        const latestFromSheet = validRows.slice(-2);
+                        collectedLatest.push(...latestFromSheet);
+                    }
                 }
             }).catch(() => {});
+
+            promises.push(p);
         }
+
+        await Promise.all(promises);
+
+        // 渲染跑馬燈
+        if (collectedLatest.length > 0) {
+            renderMarquee(collectedLatest);
+        }
+    }
+
+    function renderMarquee(items) {
+        const marqueeEl = document.getElementById('marquee-content');
+        if (!marqueeEl) return;
+
+        // 取出最新的單字做無縫水平循環滾動
+        const itemsHtml = items.map(item => {
+            const display = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
+            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}')">✨ [${item.catName}] ${display}</span>`;
+        }).join('');
+
+        // 雙份內容實現無縫 Loop
+        marqueeEl.innerHTML = `${itemsHtml} &nbsp;&nbsp;&nbsp;&nbsp; ${itemsHtml}`;
+    }
+
+    function jumpToCategory(sheetKey) {
+        playClickSound();
+        const select = document.getElementById('sheetSelect');
+        select.value = sheetKey;
+        changeSheet();
     }
 
     async function loadSheetData(urlKey) {
@@ -1163,7 +1281,6 @@
                 if (i === 3 && current.rawCols[i] === current.type) continue;
 
                 if (headerName.includes('例句')) {
-                    // 轉義字串供 onclick 使用
                     const escapedRawText = encodeURIComponent(current.rawCols[i]);
                     backHTML += `<div class="detail-section">
                         <span class="section-title">💬 ${headerName}：</span>
@@ -1252,7 +1369,6 @@
         selectedOptionData = null; 
         
         const rawExample = getQuizExampleText(currentWord);
-        // 克漏字題目只使用第一行日文
         const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
         const hasExample = exampleLine1 !== '';
         
