@@ -8,6 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
 
+    <!-- Firebase SDK (CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --bg-color: #1e2d4a;        
@@ -42,16 +47,55 @@
         }
 
         .container { width: 100%; max-width: 520px; box-sizing: border-box; }
-        header { text-align: center; margin-bottom: 24px; }
+        
+        /* 頂部列與 Google 登入卡片 */
+        header { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            position: relative;
+        }
         h1 { 
             font-family: 'DotGothic16', sans-serif;
             font-size: 24px; 
             letter-spacing: 2px; 
             color: var(--primary); 
-            margin: 0 0 16px 0; 
+            margin: 0 0 12px 0; 
             font-weight: 700;
             text-shadow: 2px 2px 0px #0b1329, 0 0 10px rgba(56, 189, 248, 0.5);
         }
+
+        .auth-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 30px;
+            width: 100%;
+            box-sizing: border-box;
+            backdrop-filter: blur(8px);
+        }
+        .user-info { display: flex; align-items: center; gap: 8px; color: #ffffff; font-size: 13px; font-weight: 600; }
+        .user-avatar { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--primary); }
+        .btn-auth {
+            background: #ffffff;
+            color: #0f172a;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        .btn-auth:hover { transform: scale(1.03); background: #f8fafc; }
 
         .control-panel {
             background: var(--card-bg); padding: 16px; border-radius: 16px;
@@ -306,7 +350,18 @@
 <body>
 
 <div class="container">
-    <header><h1>👾 日本語ノート 🎮</h1></header>
+    <header>
+        <h1>👾 日本語ノート 🎮</h1>
+        <div class="auth-bar">
+            <div class="user-info" id="user-info">
+                <span>☁️ 訪客模式 (未登入)</span>
+            </div>
+            <button class="btn-auth" id="btn-auth" onclick="toggleAuth()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="14" height="14">
+                <span id="btn-auth-text">Google 登入同步</span>
+            </button>
+        </div>
+    </header>
 
     <div class="control-panel">
         <select id="sheetSelect" onchange="changeSheet()">
@@ -403,35 +458,114 @@
 </div>
 
 <script>
-    // 🔊 Web Audio API 聲音引擎
+    // 🔥 Firebase 初始化設定 (填入你的專屬金鑰)
+    const firebaseConfig = {
+        apiKey: "AIzaSyClHAkJZ8EJuLHtksAsl8OoXYgdlKtjQZQ",
+        authDomain: "japanese-note-4cb5a.firebaseapp.com",
+        projectId: "japanese-note-4cb5a",
+        storageBucket: "japanese-note-4cb5a.firebasestorage.app",
+        messagingSenderId: "931372617510",
+        appId: "1:931372617510:web:36823175438ac2618b7be7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let currentUser = null;
+
+    // 監聽 Google 登入狀態
+    auth.onAuthStateChanged(async (user) => {
+        const userInfoEl = document.getElementById('user-info');
+        const authBtnText = document.getElementById('btn-auth-text');
+        
+        if (user) {
+            currentUser = user;
+            const photo = user.photoURL ? `<img src="${user.photoURL}" class="user-avatar">` : '👤';
+            userInfoEl.innerHTML = `${photo} <span>${user.displayName || '使用者'} (已同步)</span>`;
+            authBtnText.textContent = '登出';
+            
+            // 登入時自動將雲端與本地進度雙向合併
+            await syncCloudData();
+        } else {
+            currentUser = null;
+            userInfoEl.innerHTML = `<span>☁️ 訪客模式 (未登入)</span>`;
+            authBtnText.textContent = 'Google 登入同步';
+        }
+
+        if (currentMode === 'review') updateReviewUI();
+        if (currentMode === 'stats') renderStatsDashboard();
+    });
+
+    async function toggleAuth() {
+        playClickSound();
+        if (currentUser) {
+            await auth.signOut();
+        } else {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+            } catch (err) {
+                console.error(err);
+                alert('登入失敗，請確認是否已在 Firebase 授權 candlekang.github.io 網域！');
+            }
+        }
+    }
+
+    // 雲端進度讀取與合併
+    async function syncCloudData() {
+        if (!currentUser) return;
+        try {
+            const docRef = db.collection('user_progress').doc(currentUser.uid);
+            const docSnap = await docRef.get();
+            
+            let localData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k.startsWith('jp_progress_')) {
+                    localData[k] = JSON.parse(localStorage.getItem(k));
+                }
+            }
+
+            if (docSnap.exists) {
+                const cloudData = docSnap.data().progress || {};
+                
+                // 雙向合併（取最大次數）
+                for (const [key, cVal] of Object.entries(cloudData)) {
+                    const lVal = localData[key] || { read: 0, quiz: 0 };
+                    localData[key] = {
+                        read: Math.max(lVal.read || 0, cVal.read || 0),
+                        quiz: Math.max(lVal.quiz || 0, cVal.quiz || 0)
+                    };
+                    localStorage.setItem(key, JSON.stringify(localData[key]));
+                }
+            }
+
+            // 將合併後的進度回寫雲端
+            await docRef.set({ progress: localData, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        } catch (e) {
+            console.error('雲端同步失敗:', e);
+        }
+    }
+
+    // 🔊 Web Audio API 音效
     let audioCtx = null;
     function getAudioContext() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
         return audioCtx;
     }
 
-    // 🖱️ 擬真滑鼠「喀噠」微動開關聲（超微小柔和音量）
     function playClickSound() {
         try {
             const ctx = getAudioContext();
             const now = ctx.currentTime;
-
-            // 1. 高頻瞬態白雜訊模擬微動摩擦聲
             const bufferSize = ctx.sampleRate * 0.005; 
             const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
             const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
             const noise = ctx.createBufferSource();
             noise.buffer = buffer;
-
             const filter = ctx.createBiquadFilter();
             filter.type = 'highpass';
             filter.frequency.setValueAtTime(2500, now);
@@ -444,7 +578,6 @@
             filter.connect(noiseGain);
             noiseGain.connect(ctx.destination);
 
-            // 2. 超短瞬態正弦波模擬微動彈片共振
             const osc = ctx.createOscillator();
             const oscGain = ctx.createGain();
             osc.type = 'sine';
@@ -463,16 +596,14 @@
         } catch(e) {}
     }
 
-    // 💖 答對時的微型升調音效（清新雙音階）
     function playSuccessSound() {
         try {
             const ctx = getAudioContext();
             const now = ctx.currentTime;
-
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
             osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(523.25, now); // C5
+            osc1.frequency.setValueAtTime(523.25, now);
             gain1.gain.setValueAtTime(0.08, now);
             gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
             osc1.connect(gain1);
@@ -483,7 +614,7 @@
             const osc2 = ctx.createOscillator();
             const gain2 = ctx.createGain();
             osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(659.25, now + 0.09); // E5
+            osc2.frequency.setValueAtTime(659.25, now + 0.09);
             gain2.gain.setValueAtTime(0.1, now + 0.09);
             gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
             osc2.connect(gain2);
@@ -493,16 +624,14 @@
         } catch(e) {}
     }
 
-    // 👾 答錯時的可愛 8-bit 下降音效（嘟嘟～扣血聲）
     function playWrongSound() {
         try {
             const ctx = getAudioContext();
             const now = ctx.currentTime;
-
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
             osc1.type = 'triangle';
-            osc1.frequency.setValueAtTime(349.23, now); // F4
+            osc1.frequency.setValueAtTime(349.23, now);
             gain1.gain.setValueAtTime(0.08, now);
             gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
             osc1.connect(gain1);
@@ -513,7 +642,7 @@
             const osc2 = ctx.createOscillator();
             const gain2 = ctx.createGain();
             osc2.type = 'triangle';
-            osc2.frequency.setValueAtTime(277.18, now + 0.1); // Db4 (下降半音階，可愛軟萌的失誤感)
+            osc2.frequency.setValueAtTime(277.18, now + 0.1);
             gain2.gain.setValueAtTime(0.09, now + 0.1);
             gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
             osc2.connect(gain2);
@@ -569,10 +698,22 @@
     }
     
     function saveProgress(wordJp, type) {
+        const key = `jp_progress_${wordJp}`;
         const progress = getProgress(wordJp);
         if (type === 'read') progress.read++;
         if (type === 'quiz') progress.quiz++;
-        localStorage.setItem(`jp_progress_${wordJp}`, JSON.stringify(progress));
+        localStorage.setItem(key, JSON.stringify(progress));
+
+        // 如果已登入 Google，同步更新至 Firestore
+        if (currentUser) {
+            const updateObj = {};
+            updateObj[`progress.${key}`] = progress;
+            db.collection('user_progress').doc(currentUser.uid).update(updateObj).catch(() => {
+                const fullObj = {};
+                fullObj[key] = progress;
+                db.collection('user_progress').doc(currentUser.uid).set({ progress: fullObj }, { merge: true });
+            });
+        }
     }
 
     let jpVoice = null;
@@ -610,7 +751,6 @@
         if (!text || text.includes('載入中') || text.includes('測驗完成') || text.includes('＿')) return;
         
         text = cleanTextForSpeech(text);
-        
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ja-JP'; 
         utterance.rate = 1.0; 
@@ -626,8 +766,6 @@
         const questionType = currentCorrectAnswer.activeQuestionType;
         if (questionType === 1) {
             speakWordDirectly(event, currentCorrectAnswer.jp);
-        } else if (questionType === 0) {
-            speakJP(event, 'quiz-jp');
         } else {
             speakJP(event, 'quiz-jp');
         }
@@ -1194,7 +1332,7 @@
         });
 
         if (selectedOptionData.jp === currentCorrectAnswer.jp) {
-            playSuccessSound(); // 💖 播放升調答對音效
+            playSuccessSound();
             if (clickedBtn) clickedBtn.classList.add('correct');
             feedbackEl.textContent = '💖 答對了！+100 EXP';
             feedbackEl.classList.add('success');
@@ -1210,7 +1348,7 @@
             if (jpVoice) utterance.voice = jpVoice;
             window.speechSynthesis.speak(utterance);
         } else {
-            playWrongSound(); // 👾 播放可愛的 8-bit 下降音效
+            playWrongSound();
             if (clickedBtn) clickedBtn.classList.add('wrong');
             
             let correctAnswerText;
