@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日文筆記複習系統</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #1e2d4a;        
+            --card-bg: #ffffff;         
+            --primary: #38bdf8;        
+            --primary-dark: #0284c7;
+            
+            --pixel-pink: #ec4899;     
+            --pixel-pink-bg: rgba(236, 72, 153, 0.12);
+            
+            --pixel-yellow: #f59e0b;   
+            --pixel-yellow-bg: rgba(245, 158, 11, 0.15);
+            
+            --accent: #0d9488;         
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border-color: #94a3b8;
+            --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container { width: 100%; max-width: 520px; box-sizing: border-box; }
+        header { text-align: center; margin-bottom: 24px; }
+        h1 { 
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 24px; 
+            letter-spacing: 2px; 
+            color: var(--primary); 
+            margin: 0 0 16px 0; 
+            font-weight: 700;
+            text-shadow: 2px 2px 0px #0b1329, 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .control-panel {
+            background: var(--card-bg); padding: 16px; border-radius: 16px;
+            box-shadow: var(--shadow); margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;
+            box-sizing: border-box; border: 2px solid #334155;
+        }
+
+        select {
+            width: 100%; padding: 10px 14px; border: 2px solid #cbd5e1;
+            border-radius: 8px; font-size: 15px; background-color: #f8fafc;
+            color: var(--text-main); outline: none; box-sizing: border-box;
+            font-weight: 600;
+        }
+
+        .button-group { display: flex; gap: 8px; }
+        button {
+            flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px;
+            cursor: pointer; transition: all 0.2s ease; background: #e2e8f0;
+            color: var(--text-sub); font-weight: 700;
+            border: 1px solid #cbd5e1;
+        }
+        button.active { 
+            background: var(--primary-dark); 
+            color: #ffffff;
+            border-color: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+        }
+        
+        .btn-tts {
+            background: var(--pixel-pink-bg); color: var(--pixel-pink); border: 1.5px solid var(--pixel-pink); 
+            padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; display: inline-flex;
+            align-items: center; justify-content: center; margin-bottom: 12px; font-weight: bold;
+            flex: none; width: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .btn-tts:hover { background: rgba(236, 72, 153, 0.22); }
+
+        .btn-tts-small {
+            background: var(--pixel-pink-bg); color: var(--pixel-pink); border: 1.5px solid var(--pixel-pink); 
+            padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); vertical-align: middle; margin-left: 8px;
+        }
+        .btn-tts-small:hover { background: rgba(236, 72, 153, 0.22); }
+
+        .btn-tts-micro {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            margin-right: 6px;
+            display: inline;
+            vertical-align: baseline;
+            transition: transform 0.1s;
+        }
+        .btn-tts-micro:hover { transform: scale(1.25); }
+
+        .card-container { perspective: 1000px; width: 100%; height: 480px; margin-bottom: 20px; cursor: pointer; }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d;
+        }
+        .card-container.is-flipped .card-inner { transform: rotateY(180deg); }
+        
+        .card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 20px; box-shadow: var(--shadow); background: var(--card-bg);
+            display: flex; flex-direction: column; padding: 24px; box-sizing: border-box;
+            border: 2px solid #334155;
+        }
+        
+        .card-front { justify-content: center; align-items: center; }
+        .card-back { 
+            transform: rotateY(180deg); background: #f8fafc; border: 2px solid #334155;
+            justify-content: flex-start; align-items: flex-start; overflow-y: auto; text-align: left;
+        }
+        
+        .card-back::-webkit-scrollbar { width: 6px; }
+        .card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .kanji-title {
+            font-size: 32px; font-weight: 700; color: var(--text-main);
+            text-align: center; width: 100%; margin-bottom: 16px; 
+            padding-bottom: 16px; border-bottom: 2px dashed #cbd5e1;
+            white-space: pre-wrap;
+        }
+        .detail-section { margin-bottom: 16px; width: 100%; }
+        .section-title { font-weight: 800; color: var(--primary-dark); font-size: 16px; margin-right: 6px; }
+        .section-text { color: var(--text-main); font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
+        .section-type-badge {
+            display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 12px;
+            background: rgba(56, 189, 248, 0.15); color: var(--primary-dark); margin-bottom: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.3); font-weight: 600;
+        }
+
+        .badge { 
+            font-size: 12px; padding: 4px 10px; border-radius: 20px; 
+            background: var(--pixel-yellow-bg); color: #b45309; 
+            margin-bottom: 12px; border: 1px solid rgba(245, 158, 11, 0.4);
+            font-weight: 700;
+        }
+        .word-jp { font-size: 40px; font-weight: 700; margin-bottom: 16px; color: var(--text-main); line-height: 1.3; white-space: pre-wrap; }
+        .hint { font-size: 12px; color: var(--text-sub); position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; }
+        
+        .progress-text {
+            font-size: 13px; color: var(--text-main); margin-top: 16px; font-weight: 600;
+            background: #f1f5f9; padding: 6px 14px; border-radius: 20px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .nav-controls { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .counter { font-size: 14px; color: #ffffff; font-weight: 700; font-family: 'DotGothic16', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+        #quiz-section {
+            background: var(--card-bg); padding: 30px 20px; border-radius: 20px;
+            box-shadow: var(--shadow); width: 100%; box-sizing: border-box; text-align: center;
+            display: none; margin-bottom: 20px; border: 2px solid #334155;
+        }
+        
+        #quiz-jp { font-size: 26px; white-space: pre-wrap; }
+
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; text-align: left; }
+        .quiz-btn {
+            background: #f8fafc; border: 2px solid #cbd5e1; padding: 14px; border-radius: 12px;
+            font-size: 16px; cursor: pointer; transition: 0.2s; font-weight: 600; text-align: left;
+            white-space: pre-wrap; display: flex; flex-direction: column; gap: 4px; color: var(--text-main);
+        }
+        .quiz-btn:hover:not(:disabled) { border-color: var(--primary-dark); background: #f0f9ff; }
+        .quiz-btn.selected { background: rgba(56, 189, 248, 0.12) !important; border-color: var(--primary-dark) !important; }
+        .quiz-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d !important; }
+        .quiz-btn.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
+        .quiz-btn:disabled { cursor: not-allowed; }
+        
+        .option-subtext {
+            font-size: 13px; color: var(--pixel-pink); display: none; 
+            border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 4px; margin-top: 2px;
+        }
+        .quiz-btn.correct .option-subtext, .quiz-btn.wrong .option-subtext { color: inherit; opacity: 0.9; }
+
+        .quiz-feedback { margin-top: 20px; font-weight: bold; font-size: 18px; min-height: 27px; }
+        .quiz-feedback.success { color: #16a34a; }
+        .quiz-feedback.error { color: #dc2626; }
+        
+        .quiz-action-btn {
+            margin-top: 15px; background: var(--pixel-yellow); color: #ffffff; border: none;
+            padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 800; width: 100%;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+        }
+        .quiz-action-btn:hover { background: #d97706; }
+        #btn-next-quiz { background: var(--pixel-pink); color: #ffffff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35); }
+        #btn-next-quiz:hover { background: #db2777; }
+
+        /* 📊 學習進度面板與 5x5 網格 */
+        #stats-section {
+            background: var(--card-bg); padding: 24px; border-radius: 20px;
+            box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
+            display: none; margin-bottom: 20px; text-align: left;
+            border: 2px solid #334155;
+        }
+        .stats-summary { display: flex; gap: 12px; margin-bottom: 20px; }
+        .stat-card { 
+            flex: 1; background: #f8fafc; padding: 14px; border-radius: 12px; text-align: center; 
+            border: 1px solid #cbd5e1; 
+        }
+        .stat-number { 
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 28px; font-weight: 700; color: var(--primary-dark); margin-top: 4px; 
+        }
+        .stat-label { font-size: 13px; color: var(--text-sub); }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .category-grid-item {
+            background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px;
+            padding: 6px 2px; text-align: center; cursor: pointer; transition: 0.2s;
+            overflow: hidden; box-sizing: border-box; color: var(--text-main);
+        }
+        .category-grid-item:hover { 
+            background: var(--primary-dark); 
+            color: #ffffff; 
+            border-color: var(--primary-dark); 
+            font-weight: bold;
+        }
+        .category-grid-item:hover .grid-count { color: #ffffff; font-weight: bold; }
+        .grid-name { font-size: 10px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+        .grid-count { font-size: 9px; color: var(--pixel-pink); margin-top: 2px; font-family: 'DotGothic16', sans-serif; font-weight: 700; }
+
+        .progress-list { display: flex; flex-direction: column; gap: 10px; }
+        .category-group { border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: #f8fafc; }
+        .category-header {
+            background: #f1f5f9; padding: 12px 16px; font-weight: 700; color: var(--primary-dark);
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 15px;
+        }
+        .category-header:hover { background: #e2e8f0; }
+        
+        .category-content { 
+            display: none; 
+            max-height: 280px; 
+            overflow-y: auto; 
+            padding: 10px; 
+            flex-direction: column; 
+            gap: 8px; 
+            background: #ffffff; 
+        }
+        .category-content::-webkit-scrollbar { width: 6px; }
+        .category-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .category-group.open .category-content { display: flex; }
+        
+        .progress-item {
+            background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px 16px; border-radius: 8px;
+            font-size: 14px; position: relative;
+        }
+        .progress-item-word { 
+            font-weight: 700; 
+            color: var(--text-main); 
+            font-size: 15px; 
+            padding-right: 70px; 
+        }
+        .progress-item-sub { 
+            font-size: 13px; 
+            color: var(--pixel-pink); 
+            font-weight: 600;
+            margin-top: 4px; 
+            word-break: break-all;
+            padding-right: 70px;
+            padding-left: 22px;
+        }
+        .progress-item-counts { 
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            font-size: 11px; 
+            font-weight: 700; 
+            color: #b45309; 
+            background: var(--pixel-yellow-bg); 
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            white-space: nowrap;
+            font-family: 'DotGothic16', sans-serif;
+        }
+
+        .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header><h1>👾 日本語ノート 🎮</h1></header>
+
+    <div class="control-panel">
+        <select id="sheetSelect" onchange="changeSheet()">
+            <option value="sheet1">名詞</option>
+            <option value="sheet2">形式名詞</option>
+            <option value="sheet3">數詞</option>
+            <option value="sheet4">い形容詞</option>
+            <option value="sheet5">な形容詞</option>
+            <option value="sheet6">動詞</option>
+            <option value="sheet7">形容詞的變化</option>
+            <option value="sheet8">動詞的變化</option>
+            <option value="sheet9">一些知識&觀念</option>
+            <option value="sheet10">接續詞</option>
+            <option value="sheet11">接尾詞</option>
+            <option value="sheet12">接頭詞</option>
+            <option value="sheet13">連體詞</option>
+            <option value="sheet14">副詞&疑問詞</option>
+            <option value="sheet15">副助詞</option>
+            <option value="sheet16">助動詞</option>
+            <option value="sheet17">文法</option> 
+            <option value="sheet18">片語&慣用語</option>
+            <option value="sheet19">格助詞</option>
+            <option value="sheet20">終助詞</option>
+            <option value="sheet21">「因為」的用法比較</option>
+            <option value="sheet22">て形大魔王</option>
+            <option value="sheet23">日語的所有「詞」</option>
+            <option value="sheet24">します的擴充包</option>
+            <option value="sheet25">つけます的擴充包</option>
+            <option value="all">👾 綜合大亂鬥 (全範圍)</option>
+        </select>
+
+        <div class="button-group">
+            <button id="mode-review" class="active" onclick="setMode('review')">📖 翻卡複習</button>
+            <button id="mode-quiz" onclick="setMode('quiz')">🏆 選擇測驗</button>
+            <button id="mode-stats" onclick="setMode('stats')">📊 學習進度</button>
+        </div>
+    </div>
+
+    <!-- 1. 翻卡模式 -->
+    <div id="review-section">
+        <div class="card-container" id="flashcard" onclick="flipCard()">
+            <div class="card-inner">
+                <div class="card-face card-front">
+                    <span class="badge" id="card-badge-front">載入中...</span>
+                    <div class="word-jp" id="card-jp">載入中...</div>
+                    <button class="btn-tts" onclick="speakJP(event, 'card-jp')">🔊 發音</button>
+                    <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
+                    <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
+                </div>
+                <div class="card-face card-back" id="card-back-content"></div>
+            </div>
+        </div>
+        <div class="nav-controls" id="nav-controls">
+            <button onclick="prevCard()">◀ 上一張</button>
+            <span class="counter" id="card-counter">0 / 0</span>
+            <button onclick="nextCard()">下一張 ▶</button>
+        </div>
+    </div>
+
+    <!-- 2. 測驗模式 -->
+    <div id="quiz-section">
+        <div class="score-board" id="quiz-score">題數: 1 / 10</div>
+        <span class="badge" id="quiz-type">題型</span>
+        <div class="word-jp" id="quiz-jp" style="margin-bottom:10px;">載入中...</div>
+        <button class="btn-tts" onclick="speakQuizPrompt(event)">🔊 發音</button>
+        
+        <div class="quiz-options" id="quiz-options"></div>
+        <div id="quiz-feedback" class="quiz-feedback"></div>
+        
+        <button id="btn-submit-answer" class="quiz-action-btn" onclick="submitAnswer()" style="display:none;">提交答案 🔒</button>
+        <button id="btn-next-quiz" class="quiz-action-btn" onclick="nextQuiz()" style="display:none;">下一題 ➔</button>
+    </div>
+
+    <!-- 3. 📊 個人學習進度儀表板與 5x5 分類格子 -->
+    <div id="stats-section">
+        <h2 style="font-family: 'DotGothic16', sans-serif; font-size: 20px; color: var(--primary-dark); margin-top:0; margin-bottom:16px;">📈 我的學習戰果 🌟</h2>
+        <div class="stats-summary">
+            <div class="stat-card">
+                <div class="stat-label">已解鎖單字</div>
+                <div class="stat-number" id="stat-total-words">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">總累積答對</div>
+                <div class="stat-number" id="stat-total-quizzes">0</div>
+            </div>
+        </div>
+
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 25 分類快速導覽 (5 × 5)：</div>
+        <div class="category-grid" id="stats-category-grid"></div>
+
+        <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
+        <div class="progress-list" id="stats-progress-list"></div>
+    </div>
+</div>
+
+<script>
+    // 🔊 Web Audio API 聲音引擎
+    let audioCtx = null;
+    function getAudioContext() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
+
+    // 🖱️ 擬真滑鼠「喀噠」微動開關聲（超微小柔和音量）
+    function playClickSound() {
+        try {
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
+
+            // 1. 高頻瞬態白雜訊模擬微動摩擦聲
+            const bufferSize = ctx.sampleRate * 0.005; 
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(2500, now);
+
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.025, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.005);
+
+            noise.connect(filter);
+            filter.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+
+            // 2. 超短瞬態正弦波模擬微動彈片共振
+            const osc = ctx.createOscillator();
+            const oscGain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1400, now);
+            osc.frequency.exponentialRampToValueAtTime(300, now + 0.012);
+
+            oscGain.gain.setValueAtTime(0.035, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+
+            osc.connect(oscGain);
+            oscGain.connect(ctx.destination);
+
+            noise.start(now);
+            osc.start(now);
+            osc.stop(now + 0.012);
+        } catch(e) {}
+    }
+
+    // 💖 答對時的微型升調音效（清新雙音階）
+    function playSuccessSound() {
+        try {
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
+
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, now); // C5
+            gain1.gain.setValueAtTime(0.08, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.12);
+
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(659.25, now + 0.09); // E5
+            gain2.gain.setValueAtTime(0.1, now + 0.09);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.09);
+            osc2.stop(now + 0.28);
+        } catch(e) {}
+    }
+
+    // 👾 答錯時的可愛 8-bit 下降音效（嘟嘟～扣血聲）
+    function playWrongSound() {
+        try {
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
+
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'triangle';
+            osc1.frequency.setValueAtTime(349.23, now); // F4
+            gain1.gain.setValueAtTime(0.08, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.12);
+
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(277.18, now + 0.1); // Db4 (下降半音階，可愛軟萌的失誤感)
+            gain2.gain.setValueAtTime(0.09, now + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.1);
+            osc2.stop(now + 0.28);
+        } catch(e) {}
+    }
+
+    const SHEETS_CONFIG = {
+        sheet1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=938197036&single=true&output=csv',
+        sheet2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1844228081&single=true&output=csv',
+        sheet3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1130260118&single=true&output=csv',
+        sheet4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=20080234&single=true&output=csv',
+        sheet5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=591299877&single=true&output=csv',
+        sheet6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1833922770&single=true&output=csv',
+        sheet7: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1447704017&single=true&output=csv',
+        sheet8: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=124325165&single=true&output=csv',
+        sheet9: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1679842630&single=true&output=csv',
+        sheet10: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1897403022&single=true&output=csv',
+        sheet11: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1587333217&single=true&output=csv',
+        sheet12: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1490497949&single=true&output=csv',
+        sheet13: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1342438350&single=true&output=csv',
+        sheet14: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=373655117&single=true&output=csv',
+        sheet15: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1550390723&single=true&output=csv',
+        sheet16: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1982280953&single=true&output=csv',
+        sheet17: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=369240348&single=true&output=csv',
+        sheet18: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1114398002&single=true&output=csv',
+        sheet19: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1377172328&single=true&output=csv',
+        sheet20: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=826241804&single=true&output=csv',
+        sheet21: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=141438539&single=true&output=csv',
+        sheet22: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=584642201&single=true&output=csv',
+        sheet23: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1592371998&single=true&output=csv',
+        sheet24: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=942908072&single=true&output=csv',
+        sheet25: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=219719106&single=true&output=csv'
+    };
+
+    let currentList = [];
+    let currentIndex = 0;
+    let currentMode = 'review';
+    let quizList = [];
+    let quizIndex = 0;
+    let currentCorrectAnswer = null;
+    let selectedOptionData = null;
+
+    let globalWordCategoryMap = {};
+    let globalWordDataMap = {};
+
+    function getProgress(wordJp) {
+        const key = `jp_progress_${wordJp}`;
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : { read: 0, quiz: 0 };
+    }
+    
+    function saveProgress(wordJp, type) {
+        const progress = getProgress(wordJp);
+        if (type === 'read') progress.read++;
+        if (type === 'quiz') progress.quiz++;
+        localStorage.setItem(`jp_progress_${wordJp}`, JSON.stringify(progress));
+    }
+
+    let jpVoice = null;
+    function initVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoices = ['Google 日本語', 'Kyoko Premium', 'Otoya Premium', 'Kyoko', 'Otoya', 'Nanami'];
+        jpVoice = preferredVoices.reduce((found, name) => found || voices.find(v => v.name.includes(name) && v.lang.includes('ja')), null) 
+                  || voices.find(v => v.lang.includes('ja'));
+    }
+    window.speechSynthesis.onvoiceschanged = initVoice;
+    setTimeout(initVoice, 500); 
+
+    function cleanTextForSpeech(text) {
+        if (!text) return '';
+        return text.replace(/[（\(][^）\)]*[）\)]/g, '');
+    }
+
+    function speakWordDirectly(event, wordText) {
+        if (event) event.stopPropagation();
+        if (!wordText) return;
+        
+        playClickSound();
+        let text = cleanTextForSpeech(wordText);
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP'; 
+        utterance.rate = 1.0; 
+        if (jpVoice) utterance.voice = jpVoice;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function speakJP(event, elementId) {
+        if (event) event.stopPropagation();
+        playClickSound();
+        let text = document.getElementById(elementId).textContent;
+        if (!text || text.includes('載入中') || text.includes('測驗完成') || text.includes('＿')) return;
+        
+        text = cleanTextForSpeech(text);
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP'; 
+        utterance.rate = 1.0; 
+        if (jpVoice) utterance.voice = jpVoice;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function speakQuizPrompt(event) {
+        if (event) event.stopPropagation();
+        if (!currentCorrectAnswer) return;
+
+        playClickSound();
+        const questionType = currentCorrectAnswer.activeQuestionType;
+        if (questionType === 1) {
+            speakWordDirectly(event, currentCorrectAnswer.jp);
+        } else if (questionType === 0) {
+            speakJP(event, 'quiz-jp');
+        } else {
+            speakJP(event, 'quiz-jp');
+        }
+    }
+
+    function parseCSVText(text) {
+        let result = [];
+        let row = [];
+        let current = '';
+        let insideQuote = false;
+
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            let nextChar = text[i + 1];
+
+            if (char === '"') {
+                if (insideQuote && nextChar === '"') {
+                    current += '"';
+                    i++; 
+                } else {
+                    insideQuote = !insideQuote;
+                }
+            } else if (char === ',' && !insideQuote) {
+                row.push(current.trim());
+                current = '';
+            } else if ((char === '\n' || char === '\r') && !insideQuote) {
+                if (char === '\r' && nextChar === '\n') i++; 
+                row.push(current.trim());
+                result.push(row);
+                row = [];
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        if (current !== '' || row.length > 0) {
+            row.push(current.trim());
+            result.push(row);
+        }
+        return result;
+    }
+
+    function isValidWord(item) {
+        if (!item.jp || item.jp.trim() === '') return false;
+        if (item.jp.length > 15 || /[。，、！？,,]/.test(item.jp)) return false;
+        return true;
+    }
+
+    async function preloadAllCategories() {
+        const selectElement = document.getElementById('sheetSelect');
+        for (let i = 0; i < selectElement.options.length; i++) {
+            const opt = selectElement.options[i];
+            if (opt.value === 'all') continue;
+            
+            const catName = opt.text;
+            const url = SHEETS_CONFIG[opt.value];
+            if (!url) continue;
+
+            fetch(url).then(res => res.text()).then(text => {
+                const parsedData = parseCSVText(text);
+                if (parsedData.length >= 2) {
+                    const headers = parsedData[0];
+                    parsedData.slice(1).forEach(cols => {
+                        const jp = cols[0] || '';
+                        if (jp && jp.length <= 15 && !/[。，、！？,,]/.test(jp)) {
+                            globalWordCategoryMap[jp] = catName;
+                            globalWordDataMap[jp] = {
+                                kanji: cols[1] || '',
+                                rawCols: cols,
+                                rawHeaders: headers
+                            };
+                        }
+                    });
+                }
+            }).catch(() => {});
+        }
+    }
+
+    async function loadSheetData(urlKey) {
+        document.getElementById('card-jp').textContent = '資料載入中...';
+        
+        try {
+            if (urlKey === 'all') {
+                let allData = [];
+                const urls = Object.values(SHEETS_CONFIG);
+                const responses = await Promise.all(urls.map(url => fetch(url).catch(() => null)));
+                
+                for (let res of responses) {
+                    if (!res) continue;
+                    const text = await res.text();
+                    const parsedData = parseCSVText(text);
+                    if (parsedData.length < 2) continue;
+                    
+                    const headers = parsedData[0];
+                    const parsed = parsedData.slice(1).map(cols => {
+                        const item = { 
+                            jp: cols[0] || '', kanji: cols[1] || '', level: cols[2] || '', type: cols[3] || '',
+                            rawCols: cols, rawHeaders: headers 
+                        };
+                        if (isValidWord(item)) {
+                            globalWordDataMap[item.jp] = item;
+                            return item;
+                        }
+                        return null;
+                    }).filter(Boolean);
+                    allData = allData.concat(parsed);
+                }
+                currentList = allData;
+            } else {
+                const response = await fetch(SHEETS_CONFIG[urlKey]);
+                const text = await response.text();
+                const parsedData = parseCSVText(text);
+                
+                if (parsedData.length >= 2) {
+                    const headers = parsedData[0];
+                    currentList = parsedData.slice(1).map(cols => {
+                        const item = { 
+                            jp: cols[0] || '', kanji: cols[1] || '', level: cols[2] || '', type: cols[3] || '',
+                            rawCols: cols, rawHeaders: headers 
+                        };
+                        if (isValidWord(item)) {
+                            globalWordDataMap[item.jp] = item;
+                            return item;
+                        }
+                        return null;
+                    }).filter(Boolean);
+                } else {
+                    currentList = [];
+                }
+            }
+            
+            currentList.sort(() => Math.random() - 0.5);
+            initMode();
+            
+        } catch (e) {
+            document.getElementById('card-jp').textContent = '載入失敗 (請檢查網路)';
+            console.log(e);
+        }
+    }
+
+    function changeSheet() {
+        playClickSound();
+        const selected = document.getElementById('sheetSelect').value;
+        document.getElementById('flashcard').classList.remove('is-flipped');
+        loadSheetData(selected);
+    }
+
+    function setMode(mode) {
+        playClickSound();
+        currentMode = mode;
+        document.getElementById('mode-review').classList.toggle('active', mode === 'review');
+        document.getElementById('mode-quiz').classList.toggle('active', mode === 'quiz');
+        document.getElementById('mode-stats').classList.toggle('active', mode === 'stats');
+        
+        document.getElementById('review-section').style.display = (mode === 'review') ? 'block' : 'none';
+        document.getElementById('quiz-section').style.display = (mode === 'quiz') ? 'block' : 'none';
+        document.getElementById('stats-section').style.display = (mode === 'stats') ? 'block' : 'none';
+
+        if (mode === 'review') {
+            document.getElementById('review-section').style.display = 'block';
+            currentIndex = 0;
+            updateReviewUI();
+        } else if (mode === 'quiz') {
+            document.getElementById('quiz-section').style.display = 'block';
+            startQuiz();
+        } else if (mode === 'stats') {
+            renderStatsDashboard();
+        }
+    }
+
+    function initMode() {
+        if (currentMode === 'review') {
+            currentIndex = 0;
+            updateReviewUI();
+        } else if (currentMode === 'quiz') {
+            startQuiz();
+        } else if (currentMode === 'stats') {
+            renderStatsDashboard();
+        }
+    }
+
+    function getWordZhText(wordObj) {
+        if (!wordObj || !wordObj.rawHeaders) return '';
+        const idx = wordObj.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
+        if (idx !== -1 && wordObj.rawCols[idx]) return wordObj.rawCols[idx];
+        return wordObj.rawCols[4] || wordObj.rawCols[2] || '';
+    }
+
+    function renderStatsDashboard() {
+        const gridContainer = document.getElementById('stats-category-grid');
+        const listContainer = document.getElementById('stats-progress-list');
+        gridContainer.innerHTML = '';
+        listContainer.innerHTML = '';
+        
+        let totalUnlocked = 0;
+        let totalQuizSuccess = 0;
+        
+        const selectElement = document.getElementById('sheetSelect');
+        let categoryMap = {};
+        for (let i = 0; i < selectElement.options.length; i++) {
+            const opt = selectElement.options[i];
+            if (opt.value !== 'all') {
+                categoryMap[opt.text] = [];
+            }
+        }
+        categoryMap['其他/未分類'] = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('jp_progress_')) {
+                const wordJp = key.replace('jp_progress_', '');
+                const prog = JSON.parse(localStorage.getItem(key));
+                
+                if (prog.read > 0 || prog.quiz > 0) {
+                    totalUnlocked++;
+                    totalQuizSuccess += prog.quiz;
+
+                    let catName = globalWordCategoryMap[wordJp] || '其他/未分類';
+                    if (!categoryMap[catName]) {
+                        categoryMap[catName] = [];
+                    }
+                    const wordObj = globalWordDataMap[wordJp] || null;
+                    categoryMap[catName].push({ wordJp, prog, wordObj });
+                }
+            }
+        }
+
+        document.getElementById('stat-total-words').textContent = totalUnlocked;
+        document.getElementById('stat-total-quizzes').textContent = totalQuizSuccess;
+
+        let gridHtml = '';
+        for (const [catKey, optObj] of Object.entries(SHEETS_CONFIG)) {
+            const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
+            const catName = optElement ? optElement.text : catKey;
+            
+            let count = categoryMap[catName] ? categoryMap[catName].length : 0;
+
+            gridHtml += `
+                <div class="category-grid-item" onclick="expandCategoryByName('${catName}')" title="${catName}">
+                    <div class="grid-name">${catName}</div>
+                    <div class="grid-count">${count} 字</div>
+                </div>
+            `;
+        }
+        gridContainer.innerHTML = gridHtml;
+
+        let groupsHtml = '';
+        for (const [catName, wordsArray] of Object.entries(categoryMap)) {
+            if (wordsArray.length === 0) continue;
+
+            let itemsHtml = '';
+            wordsArray.forEach(item => {
+                const zhText = getWordZhText(item.wordObj);
+                const kanjiText = item.wordObj && item.wordObj.kanji ? item.wordObj.kanji : item.wordJp;
+                const safeWordJp = item.wordJp.replace(/'/g, "\\'");
+
+                itemsHtml += `
+                    <div class="progress-item">
+                        <div class="progress-item-word">
+                            <button class="btn-tts-micro" onclick="speakWordDirectly(event, '${safeWordJp}')" title="播放發音">🔊</button>
+                            <span>${kanjiText} (${item.wordJp})</span>
+                        </div>
+                        <div class="progress-item-sub">${zhText}</div>
+                        <div class="progress-item-counts">👀 ${item.prog.read} | 🏆 ${item.prog.quiz}</div>
+                    </div>
+                `;
+            });
+
+            groupsHtml += `
+                <div class="category-group" id="group-${catName}">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>🗂️ ${catName} (${wordsArray.length} 個單字)</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="category-content">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        listContainer.innerHTML = groupsHtml || `<div style="text-align:center; color:#64748b; padding: 20px;">目前還沒有學習紀錄，快去翻卡複習或進行測驗吧！</div>`;
+    }
+
+    function expandCategoryByName(catName) {
+        playClickSound();
+        const allGroups = document.querySelectorAll('.category-group');
+        allGroups.forEach(g => {
+            g.classList.remove('open');
+            const arrow = g.querySelector('.category-header span:last-child');
+            if (arrow) arrow.textContent = '▼';
+        });
+
+        const groupEl = document.getElementById(`group-${catName}`);
+        if (groupEl) {
+            groupEl.classList.add('open');
+            const arrow = groupEl.querySelector('.category-header span:last-child');
+            if (arrow) arrow.textContent = '▲';
+            groupEl.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert(`「${catName}」目前還沒有任何學習記錄喔！`);
+        }
+    }
+
+    function toggleCategory(headerElement) {
+        playClickSound();
+        const currentGroup = headerElement.parentElement;
+        const isOpen = currentGroup.classList.contains('open');
+
+        const allGroups = document.querySelectorAll('.category-group');
+        allGroups.forEach(g => {
+            g.classList.remove('open');
+            const arrow = g.querySelector('.category-header span:last-child');
+            if (arrow) arrow.textContent = '▼';
+        });
+
+        if (!isOpen) {
+            currentGroup.classList.add('open');
+            const arrow = headerElement.querySelector('span:last-child');
+            if (arrow) arrow.textContent = '▲';
+        }
+    }
+
+    function updateReviewUI() {
+        if (currentList.length === 0) return;
+        const current = currentList[currentIndex];
+        current.hasReadThisTime = false;
+        
+        const progress = getProgress(current.jp);
+        document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+        
+        document.getElementById('card-jp').textContent = current.jp;
+        document.getElementById('card-badge-front').textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字'; 
+        
+        const backContainer = document.getElementById('card-back-content');
+        let backHTML = '';
+
+        const mainTitle = current.kanji ? current.kanji : current.jp;
+        backHTML += `<div class="kanji-title">${mainTitle}</div>`;
+
+        if (current.type) {
+            backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
+        }
+
+        for (let i = 2; i < current.rawHeaders.length; i++) {
+            if (current.rawCols[i] && current.rawCols[i].trim() !== '') {
+                const headerName = current.rawHeaders[i] ? current.rawHeaders[i].trim() : `補充 ${i-1}`;
+                if (i === 3 && current.rawCols[i] === current.type) continue;
+
+                if (headerName.includes('例句')) {
+                    backHTML += `<div class="detail-section">
+                        <span class="section-title">💬 ${headerName}：</span>
+                        <span class="section-text" id="card-example-text-${i}">${current.rawCols[i]}</span>
+                        <button class="btn-tts-small" onclick="speakJP(event, 'card-example-text-${i}')">🔊 唸例句</button>
+                    </div>`;
+                } else {
+                    backHTML += `<div class="detail-section">
+                        <span class="section-title">💡 ${headerName}：</span>
+                        <span class="section-text">${current.rawCols[i]}</span>
+                    </div>`;
+                }
+            }
+        }
+
+        backContainer.innerHTML = backHTML;
+        backContainer.innerHTML += `<div class="hint" style="position:relative; margin-top:20px;">✨ 點擊空白處翻回正面 ✨</div>`;
+
+        document.getElementById('card-counter').textContent = `${currentIndex + 1} / ${currentList.length}`;
+        document.getElementById('flashcard').classList.remove('is-flipped');
+    }
+
+    function flipCard() { 
+        playClickSound();
+        const flashcard = document.getElementById('flashcard');
+        const isFlipped = flashcard.classList.contains('is-flipped');
+        
+        if (!isFlipped) {
+            const current = currentList[currentIndex];
+            if (!current.hasReadThisTime) {
+                saveProgress(current.jp, 'read');
+                current.hasReadThisTime = true;
+                const progress = getProgress(current.jp);
+                document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+            }
+        }
+        flashcard.classList.toggle('is-flipped'); 
+    }
+    
+    function nextCard() { playClickSound(); if (currentIndex < currentList.length - 1) { currentIndex++; updateReviewUI(); } }
+    function prevCard() { playClickSound(); if (currentIndex > 0) { currentIndex--; updateReviewUI(); } }
+
+    function getJapaneseText(word) {
+        if (word.kanji && /[a-zA-Z]/.test(word.kanji)) return word.jp;
+        return word.kanji || word.jp;
+    }
+
+    function getQuizZhText(word) {
+        const idx = word.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
+        if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
+        return word.rawCols[4] || word.rawCols[2] || '無翻譯';
+    }
+
+    function getQuizExampleText(word) {
+        const idx = word.rawHeaders.findIndex(h => h.includes('例句'));
+        if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
+        return word.rawCols[6] || word.rawCols[5] || '';
+    }
+
+    function startQuiz() {
+        if (currentList.length < 4) {
+            alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
+            setMode('review');
+            return;
+        }
+        quizList = [...currentList].sort(() => Math.random() - 0.5);
+        quizIndex = 0;
+        renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+        if (quizIndex >= quizList.length) {
+            document.getElementById('quiz-jp').textContent = '測驗完成！🎉✨';
+            document.getElementById('quiz-type').textContent = 'LEVEL CLEAR!';
+            document.getElementById('quiz-options').innerHTML = '';
+            document.getElementById('quiz-feedback').textContent = '';
+            document.getElementById('btn-submit-answer').style.display = 'none';
+            document.getElementById('btn-next-quiz').style.display = 'none';
+            document.getElementById('quiz-score').textContent = `全部完成 (${quizList.length} 題)`;
+            return;
+        }
+
+        const currentWord = quizList[quizIndex];
+        currentCorrectAnswer = currentWord;
+        currentCorrectAnswer.hasQuizzedThisTime = false;
+        selectedOptionData = null; 
+        
+        const exampleText = getQuizExampleText(currentWord);
+        const hasExample = exampleText.trim() !== '';
+        
+        let questionType = Math.floor(Math.random() * (hasExample ? 3 : 2));
+        
+        const typeSelect = document.getElementById('sheetSelect');
+        const defaultType = typeSelect.value === 'all' ? '綜合' : typeSelect.selectedOptions[0].text;
+        
+        let questionText = '';
+        let quizBadge = '';
+        
+        if (questionType === 0) {
+            quizBadge = '📖 讀音測意';
+            questionText = currentWord.jp; 
+        } else if (questionType === 1) {
+            quizBadge = '🔄 語意反查';
+            questionText = getQuizZhText(currentWord); 
+        } else {
+            quizBadge = '✍️ 克漏字';
+            let cloze = exampleText;
+            if (currentWord.kanji && currentWord.kanji.trim() !== '') {
+                cloze = cloze.split(currentWord.kanji).join('＿＿＿');
+            }
+            if (currentWord.jp && currentWord.jp.trim() !== '') {
+                cloze = cloze.split(currentWord.jp).join('＿＿＿');
+            }
+            questionText = cloze;
+        }
+
+        currentWord.activeQuestionType = questionType;
+
+        document.getElementById('quiz-type').textContent = `${quizBadge} (${defaultType})`;
+        document.getElementById('quiz-jp').textContent = questionText;
+        document.getElementById('quiz-score').textContent = `STAGE ${quizIndex + 1} / ${quizList.length}`;
+        
+        document.getElementById('quiz-feedback').textContent = '';
+        document.getElementById('quiz-feedback').className = 'quiz-feedback';
+        document.getElementById('btn-submit-answer').style.display = 'none'; 
+        document.getElementById('btn-next-quiz').style.display = 'none';
+
+        let wrongCandidates = currentList.filter(word => {
+            if (word.jp === currentWord.jp) return false;
+            
+            let textToShow;
+            if (questionType === 0) {
+                textToShow = getQuizZhText(word);
+            } else if (questionType === 2) {
+                textToShow = word.jp; 
+            } else {
+                textToShow = word.kanji && word.kanji !== word.jp ? `${word.jp} (${word.kanji})` : word.jp;
+            }
+            return textToShow && textToShow.trim() !== '';
+        });
+        
+        wrongCandidates.sort(() => Math.random() - 0.5);
+        let options = [currentWord].concat(wrongCandidates.slice(0, 3)); 
+        options.sort(() => Math.random() - 0.5); 
+
+        const optionsContainer = document.getElementById('quiz-options');
+        optionsContainer.innerHTML = '';
+        
+        options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-btn';
+            
+            let optMainText = '';
+            let optSubText = getQuizZhText(opt);
+            
+            if (questionType === 0) {
+                optMainText = getQuizZhText(opt); 
+                optSubText = `${opt.jp} (${getJapaneseText(opt)})`; 
+            } else if (questionType === 2) {
+                optMainText = opt.jp; 
+            } else {
+                const kanjiPart = opt.kanji && opt.kanji !== opt.jp ? ` (${opt.kanji})` : '';
+                optMainText = `${opt.jp}${kanjiPart}`;
+            }
+            
+            btn.innerHTML = `<span>[${index + 1}] ${optMainText}</span><span class="option-subtext">💡 意思：${optSubText}</span>`;
+            
+            btn.onclick = () => selectOption(btn, opt);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(clickedBtn, selectedWord) {
+        playClickSound();
+        const allBtns = document.querySelectorAll('.quiz-btn');
+        allBtns.forEach(btn => btn.classList.remove('selected'));
+        
+        clickedBtn.classList.add('selected');
+        selectedOptionData = selectedWord;
+        
+        document.getElementById('btn-submit-answer').style.display = 'block';
+    }
+
+    function submitAnswer() {
+        if (!selectedOptionData) return;
+        
+        const allBtns = document.querySelectorAll('.quiz-btn');
+        const questionType = currentCorrectAnswer.activeQuestionType;
+
+        allBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.classList.remove('selected');
+            const subtext = btn.querySelector('.option-subtext');
+            if (subtext) subtext.style.display = 'block';
+        });
+
+        document.getElementById('btn-submit-answer').style.display = 'none';
+        const feedbackEl = document.getElementById('quiz-feedback');
+        const nextBtn = document.getElementById('btn-next-quiz');
+
+        let clickedBtn = null;
+        allBtns.forEach(btn => {
+            let checkText = '';
+            if (questionType === 0) {
+                checkText = getQuizZhText(selectedOptionData);
+            } else if (questionType === 2) {
+                checkText = selectedOptionData.jp;
+            } else {
+                checkText = selectedOptionData.jp;
+            }
+
+            if (btn.textContent.includes(checkText)) {
+                clickedBtn = btn;
+            }
+        });
+
+        if (selectedOptionData.jp === currentCorrectAnswer.jp) {
+            playSuccessSound(); // 💖 播放升調答對音效
+            if (clickedBtn) clickedBtn.classList.add('correct');
+            feedbackEl.textContent = '💖 答對了！+100 EXP';
+            feedbackEl.classList.add('success');
+            
+            if (!currentCorrectAnswer.hasQuizzedThisTime) {
+                saveProgress(currentCorrectAnswer.jp, 'quiz');
+                currentCorrectAnswer.hasQuizzedThisTime = true;
+            }
+            
+            let textToSpeak = cleanTextForSpeech(currentCorrectAnswer.jp);
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'ja-JP'; utterance.rate = 1.0; 
+            if (jpVoice) utterance.voice = jpVoice;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            playWrongSound(); // 👾 播放可愛的 8-bit 下降音效
+            if (clickedBtn) clickedBtn.classList.add('wrong');
+            
+            let correctAnswerText;
+            if (questionType === 0) {
+                correctAnswerText = getQuizZhText(currentCorrectAnswer);
+            } else if (questionType === 2) {
+                correctAnswerText = currentCorrectAnswer.jp;
+            } else {
+                correctAnswerText = `${currentCorrectAnswer.jp} (${getJapaneseText(currentCorrectAnswer)})`;
+            }
+            
+            feedbackEl.textContent = `💀 答錯囉！正解：${correctAnswerText}`;
+            feedbackEl.classList.add('error');
+            
+            allBtns.forEach(btn => {
+                if (btn.textContent.includes(currentCorrectAnswer.jp)) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+        nextBtn.style.display = 'block'; 
+    }
+
+    function nextQuiz() {
+        playClickSound();
+        quizIndex++;
+        renderQuizQuestion();
+    }
+
+    preloadAllCategories();
+    changeSheet();
+</script>
+
+</body>
+</html>
