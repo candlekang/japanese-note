@@ -163,7 +163,7 @@
         .marquee-content {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 150s linear infinite; /* 極致慢速平緩滾動 */
+            animation: marquee 150s linear infinite;
         }
         .marquee-viewport:hover .marquee-content {
             animation-play-state: paused;
@@ -455,7 +455,7 @@
             </button>
         </div>
 
-        <!-- 📢 最新單字跑馬燈 (含完整 YYYY/MM/DD 年份與 150 秒超漫步速度) -->
+        <!-- 📢 最新單字跑馬燈 (支援點擊直接精確跳轉到該單字) -->
         <div class="marquee-box" id="marquee-box">
             <span class="marquee-tag" id="marquee-date-tag">最新收錄</span>
             <div class="marquee-viewport">
@@ -788,7 +788,6 @@
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
-    let globalLatestWords = []; 
 
     function getProgress(wordJp) {
         const key = `jp_progress_${wordJp}`;
@@ -928,13 +927,11 @@
         return true;
     }
 
-    // 📢 預載入所有分類並自動提取最新單字生成跑馬燈（含完整 YYYY/MM/DD 年份）
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const promises = [];
         let collectedLatest = [];
 
-        // 自動取得完整年月日 YYYY/MM/DD
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -981,7 +978,6 @@
                         }
                     });
 
-                    // 抓取各分頁最底部的最新 2 個單字
                     if (validRows.length > 0) {
                         const latestFromSheet = validRows.slice(-2);
                         collectedLatest.push(...latestFromSheet);
@@ -1005,21 +1001,24 @@
 
         const itemsHtml = items.map(item => {
             const display = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
-            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}')">✨ [${dateString} 收錄・${item.catName}] ${display}</span>`;
+            const safeJp = item.jp.replace(/'/g, "\\'");
+            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}', '${safeJp}')">✨ [${dateString} 收錄・${item.catName}] ${display}</span>`;
         }).join('');
 
-        // 雙份內容實現無縫 Loop
         marqueeEl.innerHTML = `${itemsHtml} &nbsp;&nbsp;&nbsp;&nbsp; ${itemsHtml}`;
     }
 
-    function jumpToCategory(sheetKey) {
+    // 🌟 核心修正：接收指定單字並精準定位
+    function jumpToCategory(sheetKey, targetWordJp = null) {
         playClickSound();
+        setMode('review');
         const select = document.getElementById('sheetSelect');
         select.value = sheetKey;
-        changeSheet();
+        document.getElementById('flashcard').classList.remove('is-flipped');
+        loadSheetData(sheetKey, targetWordJp);
     }
 
-    async function loadSheetData(urlKey) {
+    async function loadSheetData(urlKey, targetWordJp = null) {
         document.getElementById('card-jp').textContent = '資料載入中...';
         
         try {
@@ -1072,8 +1071,18 @@
                 }
             }
             
+            // 隨機洗牌
             currentList.sort(() => Math.random() - 0.5);
-            initMode();
+
+            // 如果有指定特定單字，精準定位其索引
+            if (targetWordJp) {
+                const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
+                currentIndex = (foundIndex !== -1) ? foundIndex : 0;
+            } else {
+                currentIndex = 0;
+            }
+            
+            initMode(targetWordJp ? true : false);
             
         } catch (e) {
             document.getElementById('card-jp').textContent = '載入失敗 (請檢查網路)';
@@ -1101,7 +1110,6 @@
 
         if (mode === 'review') {
             document.getElementById('review-section').style.display = 'block';
-            currentIndex = 0;
             updateReviewUI();
         } else if (mode === 'quiz') {
             document.getElementById('quiz-section').style.display = 'block';
@@ -1111,9 +1119,9 @@
         }
     }
 
-    function initMode() {
+    function initMode(preserveIndex = false) {
         if (currentMode === 'review') {
-            currentIndex = 0;
+            if (!preserveIndex) currentIndex = 0;
             updateReviewUI();
         } else if (currentMode === 'quiz') {
             startQuiz();
