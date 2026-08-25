@@ -127,7 +127,7 @@
             background: rgba(56, 189, 248, 0.1);
         }
 
-        /* 📢 慢速平緩無縫跑馬燈 */
+        /* 📢 超悠閒慢速無縫跑馬燈 */
         .marquee-box {
             width: 100%;
             background: rgba(245, 158, 11, 0.12);
@@ -163,7 +163,7 @@
         .marquee-content {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 60s linear infinite; /* 放慢至 60 秒平緩滾動 */
+            animation: marquee 150s linear infinite; /* 極致慢速平緩滾動 */
         }
         .marquee-viewport:hover .marquee-content {
             animation-play-state: paused;
@@ -173,7 +173,7 @@
             100% { transform: translateX(-50%); }
         }
         .marquee-item {
-            margin-right: 36px;
+            margin-right: 40px;
             display: inline-block;
             cursor: pointer;
             color: #fef08a;
@@ -455,7 +455,7 @@
             </button>
         </div>
 
-        <!-- 📢 最新單字跑馬燈 (含日期標籤與悠閒慢速) -->
+        <!-- 📢 最新單字跑馬燈 (含完整 YYYY/MM/DD 年份與 150 秒超漫步速度) -->
         <div class="marquee-box" id="marquee-box">
             <span class="marquee-tag" id="marquee-date-tag">最新收錄</span>
             <div class="marquee-viewport">
@@ -928,17 +928,18 @@
         return true;
     }
 
-    // 📢 預載入所有分類並自動提取最新單字生成跑馬燈（含日期標籤）
+    // 📢 預載入所有分類並自動提取最新單字生成跑馬燈（含完整 YYYY/MM/DD 年份）
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const promises = [];
         let collectedLatest = [];
 
-        // 自動取得當前日期 MM/DD
+        // 自動取得完整年月日 YYYY/MM/DD
         const now = new Date();
-        const month = now.getMonth() + 1;
-        const date = now.getDate();
-        const dateString = `${month}/${date}`;
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const date = String(now.getDate()).padStart(2, '0');
+        const dateString = `${year}/${month}/${date}`;
 
         const dateTagEl = document.getElementById('marquee-date-tag');
         if (dateTagEl) {
