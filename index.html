@@ -65,7 +65,6 @@
             text-shadow: 2px 2px 0px #0b1329, 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
-        /* 👾 像素風微型 HUD 狀態列 */
         .auth-bar {
             display: flex;
             align-items: center;
@@ -127,7 +126,6 @@
             background: rgba(56, 189, 248, 0.1);
         }
 
-        /* 📢 慢速跑馬燈 */
         .marquee-box {
             width: 100%;
             background: rgba(245, 158, 11, 0.12);
@@ -190,7 +188,6 @@
             box-sizing: border-box; border: 2px solid #334155;
         }
 
-        /* 🔍 智慧搜尋列樣式 */
         .search-container {
             position: relative;
             width: 100%;
@@ -318,10 +315,18 @@
         }
         .btn-tts-micro:hover { transform: scale(1.25); }
 
-        .card-container { perspective: 1000px; width: 100%; height: 480px; margin-bottom: 20px; cursor: pointer; }
+        /* 📇 字卡外框與內置箭頭、數字 */
+        .card-container { 
+            perspective: 1000px; 
+            width: 100%; 
+            height: 500px; 
+            margin-bottom: 20px; 
+            position: relative;
+        }
         .card-inner {
             position: relative; width: 100%; height: 100%; text-align: center;
             transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d;
+            cursor: pointer;
         }
         .card-container.is-flipped .card-inner { transform: rotateY(180deg); }
         
@@ -336,10 +341,58 @@
         .card-back { 
             transform: rotateY(180deg); background: #f8fafc; border: 2px solid #334155;
             justify-content: flex-start; align-items: flex-start; overflow-y: auto; text-align: left;
+            padding-top: 46px; /* 留空間給頂部頁數 */
         }
         
         .card-back::-webkit-scrollbar { width: 6px; }
         .card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* 內建頂部頁數指示器 */
+        .card-counter-inside {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 3px 12px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 內建左右翻頁箭頭按鈕 */
+        .card-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.55);
+            border: 1.5px solid rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            user-select: none;
+        }
+        .card-nav-arrow:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .card-nav-arrow.left { left: 10px; }
+        .card-nav-arrow.right { right: 10px; }
 
         .front-kanji-title {
             font-size: 38px;
@@ -385,9 +438,6 @@
             background: #f1f5f9; padding: 6px 14px; border-radius: 20px;
             border: 1px solid #cbd5e1;
         }
-
-        .nav-controls { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .counter { font-size: 14px; color: #ffffff; font-weight: 700; font-family: 'DotGothic16', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 
         #quiz-section {
             background: var(--card-bg); padding: 30px 20px; border-radius: 20px;
@@ -549,7 +599,6 @@
             </button>
         </div>
 
-        <!-- 📢 最新單字跑馬燈 -->
         <div class="marquee-box" id="marquee-box">
             <span class="marquee-tag" id="marquee-date-tag">最新收錄</span>
             <div class="marquee-viewport">
@@ -561,7 +610,6 @@
     </header>
 
     <div class="control-panel">
-        <!-- 🔍 智慧語意搜尋框 -->
         <div class="search-container">
             <span class="search-icon">🔍</span>
             <input type="text" id="searchInput" class="search-input" placeholder="智慧搜尋（例：只/僅僅、因為、交通、假名...）" oninput="handleSearch(this.value)">
@@ -604,11 +652,17 @@
         </div>
     </div>
 
-    <!-- 1. 翻卡模式 -->
+    <!-- 1. 翻卡模式 (左右箭頭與數字皆內建於字卡中) -->
     <div id="review-section">
-        <div class="card-container" id="flashcard" onclick="flipCard()">
-            <div class="card-inner">
+        <div class="card-container" id="flashcard">
+            <!-- 內建左右導覽箭頭 -->
+            <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
+            <div class="card-nav-arrow right" onclick="nextCard(event)" title="下一張">▶</div>
+
+            <div class="card-inner" onclick="flipCard()">
+                <!-- 正面 -->
                 <div class="card-face card-front">
+                    <div class="card-counter-inside" id="card-counter-front">0 / 0</div>
                     <span class="badge" id="card-badge-front">載入中...</span>
                     <div class="front-kanji-title" id="card-kanji-front"></div>
                     <div class="front-kana-sub" id="card-kana-front">載入中...</div>
@@ -616,13 +670,11 @@
                     <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
                     <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
                 </div>
-                <div class="card-face card-back" id="card-back-content"></div>
+                <!-- 背面 -->
+                <div class="card-face card-back" id="card-back-content">
+                    <div class="card-counter-inside" id="card-counter-back">0 / 0</div>
+                </div>
             </div>
-        </div>
-        <div class="nav-controls" id="nav-controls">
-            <button onclick="prevCard()">◀ 上一張</button>
-            <span class="counter" id="card-counter">0 / 0</span>
-            <button onclick="nextCard()">下一張 ▶</button>
         </div>
     </div>
 
@@ -640,7 +692,7 @@
         <button id="btn-next-quiz" class="quiz-action-btn" onclick="nextQuiz()" style="display:none;">下一題 ➔</button>
     </div>
 
-    <!-- 3. 📊 個人學習進度儀表板與 5x5 分類格子 -->
+    <!-- 3. 📊 個人學習進度儀表板 -->
     <div id="stats-section">
         <h2 style="font-family: 'DotGothic16', sans-serif; font-size: 20px; color: var(--primary-dark); margin-top:0; margin-bottom:16px;">📈 我的學習戰果 🌟</h2>
         <div class="stats-summary">
@@ -663,7 +715,6 @@
 </div>
 
 <script>
-    // 🔥 Firebase 初始化設定
     const firebaseConfig = {
         apiKey: "AIzaSyClHAkJZ8EJuLHtksAsl8OoXYgdlKtjQZQ",
         authDomain: "japanese-note-4cb5a.firebaseapp.com",
@@ -678,7 +729,6 @@
     const db = firebase.firestore();
     let currentUser = null;
 
-    // 監聽 Google 登入狀態
     auth.onAuthStateChanged(async (user) => {
         const userInfoEl = document.getElementById('user-info');
         const authBtnText = document.getElementById('btn-auth-text');
@@ -747,7 +797,6 @@
         }
     }
 
-    // 🔊 Web Audio API 音效
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -880,7 +929,6 @@
         sheet25: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=219719106&single=true&output=csv'
     };
 
-    // 🧠 內建日語語意同義聯想辭典（擴充性極高）
     const SEMANTIC_SYNONYMS = [
         { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
         { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげで', 'によって', 'つき'] },
@@ -1113,7 +1161,6 @@
         }
     }
 
-    // 🔍 智慧語意與多詞關聯搜尋處理
     function handleSearch(inputText) {
         const dropdown = document.getElementById('searchResultsDropdown');
         const rawInput = inputText.trim();
@@ -1124,10 +1171,8 @@
             return;
         }
 
-        // 1. 拆解空白關鍵字
         const tokens = rawInput.toLowerCase().split(/\s+/).filter(Boolean);
 
-        // 2. 擴展語意同義關鍵字
         let expandedTargets = [];
         tokens.forEach(token => {
             SEMANTIC_SYNONYMS.forEach(syn => {
@@ -1136,9 +1181,8 @@
                 }
             });
         });
-        expandedTargets = [...new Set(expandedTargets)]; // 去重複
+        expandedTargets = [...new Set(expandedTargets)];
 
-        // 3. 評分與匹配運算
         let scoredMatches = [];
 
         allSearchableWords.forEach(item => {
@@ -1149,17 +1193,12 @@
             const fullContent = (item.rawCols || []).join(' ').toLowerCase();
 
             tokens.forEach(tok => {
-                // 完全命中標題
                 if (jp === tok || kanji === tok) score += 100;
-                // 部分命中標題
                 else if (jp.includes(tok) || kanji.includes(tok)) score += 50;
-                // 命中中文意思
                 if (zh.includes(tok)) score += 40;
-                // 命中全欄位（包含例句與備註）
                 else if (fullContent.includes(tok)) score += 15;
             });
 
-            // 語意同義關聯加分
             expandedTargets.forEach(tgt => {
                 if (jp.includes(tgt) || kanji.includes(tgt) || fullContent.includes(tgt)) {
                     score += 30;
@@ -1171,7 +1210,6 @@
             }
         });
 
-        // 依照相關度評分降序排序
         scoredMatches.sort((a, b) => b.score - a.score);
 
         if (scoredMatches.length === 0) {
@@ -1180,7 +1218,6 @@
             return;
         }
 
-        // 最多展示前 15 筆最相關結果
         const resultsHtml = scoredMatches.slice(0, 15).map(({ item }) => {
             const zhText = getWordZhText(item);
             const mainDisplay = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
@@ -1500,6 +1537,13 @@
         document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
         document.getElementById('card-badge-front').textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字'; 
         
+        // 更新卡片內置頂部數字
+        const counterText = `${currentIndex + 1} / ${currentList.length}`;
+        const frontCounter = document.getElementById('card-counter-front');
+        const backCounter = document.getElementById('card-counter-back');
+        if (frontCounter) frontCounter.textContent = counterText;
+        if (backCounter) backCounter.textContent = counterText;
+
         const frontKanjiEl = document.getElementById('card-kanji-front');
         const frontKanaEl = document.getElementById('card-kana-front');
 
@@ -1514,7 +1558,7 @@
         }
         
         const backContainer = document.getElementById('card-back-content');
-        let backHTML = '';
+        let backHTML = `<div class="card-counter-inside" id="card-counter-back">${counterText}</div>`;
 
         const fullTitle = (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp)
             ? `${current.kanji} (${current.jp})`
@@ -1547,10 +1591,9 @@
             }
         }
 
+        backHTML += `<div class="hint" style="position:relative; margin-top:20px;">✨ 點擊空白處翻回正面 ✨</div>`;
         backContainer.innerHTML = backHTML;
-        backContainer.innerHTML += `<div class="hint" style="position:relative; margin-top:20px;">✨ 點擊空白處翻回正面 ✨</div>`;
 
-        document.getElementById('card-counter').textContent = `${currentIndex + 1} / ${currentList.length}`;
         document.getElementById('flashcard').classList.remove('is-flipped');
     }
 
@@ -1571,8 +1614,23 @@
         flashcard.classList.toggle('is-flipped'); 
     }
     
-    function nextCard() { playClickSound(); if (currentIndex < currentList.length - 1) { currentIndex++; updateReviewUI(); } }
-    function prevCard() { playClickSound(); if (currentIndex > 0) { currentIndex--; updateReviewUI(); } }
+    function nextCard(event) { 
+        if (event) event.stopPropagation();
+        playClickSound(); 
+        if (currentIndex < currentList.length - 1) { 
+            currentIndex++; 
+            updateReviewUI(); 
+        } 
+    }
+
+    function prevCard(event) { 
+        if (event) event.stopPropagation();
+        playClickSound(); 
+        if (currentIndex > 0) { 
+            currentIndex--; 
+            updateReviewUI(); 
+        } 
+    }
 
     function getJapaneseText(word) {
         if (word.kanji && /[a-zA-Z]/.test(word.kanji)) return word.jp;
