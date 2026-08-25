@@ -312,7 +312,7 @@
         }
         .btn-tts-micro:hover { transform: scale(1.25); }
 
-        /* 📇 字卡樣式優化（左右文字留白，箭頭縮小） */
+        /* 📇 字卡外框與自適應留白 */
         .card-container { 
             perspective: 1000px; 
             width: 100%; 
@@ -331,7 +331,7 @@
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
             border-radius: 20px; box-shadow: var(--shadow); background: var(--card-bg);
             display: flex; flex-direction: column; 
-            padding: 24px 38px; /* 💡 左右留白加大，避免內容與兩側箭頭重疊 */
+            padding: 20px 16px; 
             box-sizing: border-box;
             border: 2px solid #334155;
         }
@@ -340,11 +340,18 @@
         .card-back { 
             transform: rotateY(180deg); background: #f8fafc; border: 2px solid #334155;
             justify-content: flex-start; align-items: flex-start; overflow-y: auto; text-align: left;
-            padding-top: 46px; 
+            padding-top: 48px; 
         }
         
         .card-back::-webkit-scrollbar { width: 6px; }
         .card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* 內容物強制向內縮限，絕對不會碰到兩側箭頭 */
+        .card-body-wrapper {
+            width: 100%;
+            padding: 0 36px;
+            box-sizing: border-box;
+        }
 
         .card-counter-inside {
             position: absolute;
@@ -363,23 +370,23 @@
             pointer-events: none;
         }
 
-        /* 💡 微型化導覽箭頭 */
+        /* 💡 輕巧微型箭頭 */
         .card-nav-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
+            width: 24px !important;
+            height: 24px !important;
             border-radius: 50%;
-            background: rgba(15, 23, 42, 0.45);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             color: #ffffff;
-            font-size: 11px;
+            font-size: 10px !important;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 20;
+            z-index: 25;
             transition: all 0.2s ease;
             backdrop-filter: blur(4px);
             user-select: none;
@@ -389,8 +396,8 @@
             border-color: var(--primary);
             transform: translateY(-50%) scale(1.15);
         }
-        .card-nav-arrow.left { left: 8px; }
-        .card-nav-arrow.right { right: 8px; }
+        .card-nav-arrow.left { left: 6px !important; }
+        .card-nav-arrow.right { right: 6px !important; }
 
         .front-kanji-title {
             font-size: 36px;
@@ -649,9 +656,10 @@
         </div>
     </div>
 
-    <!-- 1. 翻卡模式 (左右箭頭與數字皆內建於字卡中) -->
+    <!-- 1. 翻卡模式 -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
+            <!-- 內建左右導覽箭頭 -->
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
             <div class="card-nav-arrow right" onclick="nextCard(event)" title="下一張">▶</div>
 
@@ -659,16 +667,19 @@
                 <!-- 正面 -->
                 <div class="card-face card-front">
                     <div class="card-counter-inside" id="card-counter-front">0 / 0</div>
-                    <span class="badge" id="card-badge-front">載入中...</span>
-                    <div class="front-kanji-title" id="card-kanji-front"></div>
-                    <div class="front-kana-sub" id="card-kana-front">載入中...</div>
-                    <button class="btn-tts" onclick="speakJP(event, 'card-kana-front')">🔊 發音</button>
-                    <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
+                    <div class="card-body-wrapper">
+                        <span class="badge" id="card-badge-front">載入中...</span>
+                        <div class="front-kanji-title" id="card-kanji-front"></div>
+                        <div class="front-kana-sub" id="card-kana-front">載入中...</div>
+                        <button class="btn-tts" onclick="speakJP(event, 'card-kana-front')">🔊 發音</button>
+                        <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
+                    </div>
                     <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
                 </div>
                 <!-- 背面 -->
-                <div class="card-face card-back" id="card-back-content">
+                <div class="card-face card-back">
                     <div class="card-counter-inside" id="card-counter-back">0 / 0</div>
+                    <div class="card-body-wrapper" id="card-back-content"></div>
                 </div>
             </div>
         </div>
@@ -1553,7 +1564,7 @@
         }
         
         const backContainer = document.getElementById('card-back-content');
-        let backHTML = `<div class="card-counter-inside" id="card-counter-back">${counterText}</div>`;
+        let backHTML = '';
 
         const fullTitle = (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp)
             ? `${current.kanji} (${current.jp})`
