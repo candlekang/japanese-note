@@ -787,6 +787,24 @@
         window.speechSynthesis.speak(utterance);
     }
 
+    // 🌟 核心優化：唸例句只唸第一行（日文句子），並過濾注音括號
+    function speakExampleJP(event, rawText) {
+        if (event) event.stopPropagation();
+        playClickSound();
+        if (!rawText) return;
+
+        // 依斷行分割，只取第一行日文
+        const firstLine = rawText.split('\n')[0] || rawText;
+        const textToSpeak = cleanTextForSpeech(firstLine).trim();
+        if (!textToSpeak) return;
+
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = 'ja-JP'; 
+        utterance.rate = 1.0; 
+        if (jpVoice) utterance.voice = jpVoice;
+        window.speechSynthesis.speak(utterance);
+    }
+
     function speakQuizPrompt(event) {
         if (event) event.stopPropagation();
         if (!currentCorrectAnswer) return;
@@ -1145,10 +1163,12 @@
                 if (i === 3 && current.rawCols[i] === current.type) continue;
 
                 if (headerName.includes('例句')) {
+                    // 轉義字串供 onclick 使用
+                    const escapedRawText = encodeURIComponent(current.rawCols[i]);
                     backHTML += `<div class="detail-section">
                         <span class="section-title">💬 ${headerName}：</span>
                         <span class="section-text" id="card-example-text-${i}">${current.rawCols[i]}</span>
-                        <button class="btn-tts-small" onclick="speakJP(event, 'card-example-text-${i}')">🔊 唸例句</button>
+                        <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedRawText}'))">🔊 唸例句</button>
                     </div>`;
                 } else {
                     backHTML += `<div class="detail-section">
@@ -1231,8 +1251,10 @@
         currentCorrectAnswer.hasQuizzedThisTime = false;
         selectedOptionData = null; 
         
-        const exampleText = getQuizExampleText(currentWord);
-        const hasExample = exampleText.trim() !== '';
+        const rawExample = getQuizExampleText(currentWord);
+        // 克漏字題目只使用第一行日文
+        const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
+        const hasExample = exampleLine1 !== '';
         
         let questionType = Math.floor(Math.random() * (hasExample ? 3 : 2));
         
@@ -1250,7 +1272,7 @@
             questionText = getQuizZhText(currentWord); 
         } else {
             quizBadge = '✍️ 克漏字';
-            let cloze = exampleText;
+            let cloze = exampleLine1;
             if (currentWord.kanji && currentWord.kanji.trim() !== '') {
                 cloze = cloze.split(currentWord.kanji).join('＿＿＿');
             }
