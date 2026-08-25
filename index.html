@@ -127,7 +127,7 @@
             background: rgba(56, 189, 248, 0.1);
         }
 
-        /* 📢 像素風無縫滾動跑馬燈 */
+        /* 📢 慢速平緩無縫跑馬燈 */
         .marquee-box {
             width: 100%;
             background: rgba(245, 158, 11, 0.12);
@@ -163,7 +163,7 @@
         .marquee-content {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 22s linear infinite;
+            animation: marquee 60s linear infinite; /* 放慢至 60 秒平緩滾動 */
         }
         .marquee-viewport:hover .marquee-content {
             animation-play-state: paused;
@@ -173,7 +173,7 @@
             100% { transform: translateX(-50%); }
         }
         .marquee-item {
-            margin-right: 28px;
+            margin-right: 36px;
             display: inline-block;
             cursor: pointer;
             color: #fef08a;
@@ -455,9 +455,9 @@
             </button>
         </div>
 
-        <!-- 📢 最新單字自動跑馬燈公告 -->
+        <!-- 📢 最新單字跑馬燈 (含日期標籤與悠閒慢速) -->
         <div class="marquee-box" id="marquee-box">
-            <span class="marquee-tag">最新收錄</span>
+            <span class="marquee-tag" id="marquee-date-tag">最新收錄</span>
             <div class="marquee-viewport">
                 <div class="marquee-content" id="marquee-content">
                     <span>⚡ 正在掃描試算表最新收錄內容...</span>
@@ -928,11 +928,22 @@
         return true;
     }
 
-    // 📢 預載入所有分類並自動提取最新單字生成跑馬燈
+    // 📢 預載入所有分類並自動提取最新單字生成跑馬燈（含日期標籤）
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const promises = [];
         let collectedLatest = [];
+
+        // 自動取得當前日期 MM/DD
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const date = now.getDate();
+        const dateString = `${month}/${date}`;
+
+        const dateTagEl = document.getElementById('marquee-date-tag');
+        if (dateTagEl) {
+            dateTagEl.textContent = `📢 ${dateString} 更新`;
+        }
 
         for (let i = 0; i < selectElement.options.length; i++) {
             const opt = selectElement.options[i];
@@ -982,20 +993,18 @@
 
         await Promise.all(promises);
 
-        // 渲染跑馬燈
         if (collectedLatest.length > 0) {
-            renderMarquee(collectedLatest);
+            renderMarquee(collectedLatest, dateString);
         }
     }
 
-    function renderMarquee(items) {
+    function renderMarquee(items, dateString) {
         const marqueeEl = document.getElementById('marquee-content');
         if (!marqueeEl) return;
 
-        // 取出最新的單字做無縫水平循環滾動
         const itemsHtml = items.map(item => {
             const display = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
-            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}')">✨ [${item.catName}] ${display}</span>`;
+            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}')">✨ [${dateString} 收錄・${item.catName}] ${display}</span>`;
         }).join('');
 
         // 雙份內容實現無縫 Loop
