@@ -145,7 +145,6 @@
             background: rgba(56, 189, 248, 0.1);
         }
 
-        /* 👑 頭銜與經驗條 (滑過加亮效果) */
         .rpg-level-bar {
             display: flex;
             align-items: center;
@@ -729,7 +728,7 @@
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
 
-        /* 👑 像素 RPG 等級圖鑑彈窗 (Level Guide Modal) */
+        /* 👑 像素 RPG 等級指南彈窗 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -805,7 +804,6 @@
         .modal-body::-webkit-scrollbar { width: 6px; }
         .modal-body::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
-        /* 當前狀態卡片 */
         .my-rank-status-card {
             background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(236, 72, 153, 0.15));
             border: 1px solid rgba(56, 189, 248, 0.4);
@@ -830,7 +828,6 @@
             line-height: 1.4;
         }
 
-        /* 階級項目列表 */
         .rank-tier-list {
             display: flex;
             flex-direction: column;
@@ -879,6 +876,17 @@
             border-radius: 4px;
             font-weight: bold;
         }
+
+        .dynamic-boss-box {
+            background: rgba(236, 72, 153, 0.1);
+            border: 1px dashed rgba(236, 72, 153, 0.4);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #fbcfe8;
+            line-height: 1.5;
+            font-family: 'DotGothic16', sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -908,7 +916,7 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列（點擊開啟等級指南彈窗） -->
+            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1080,8 +1088,15 @@
                 <div class="my-rank-next-hint" id="modal-my-rank-hint">⚡ 距離下一等還需 0 EXP</div>
             </div>
 
+            <!-- 👾 大魔王動態天花板機制宣告 -->
+            <div class="dynamic-boss-box" id="modal-boss-dynamic-info">
+                👾 <b>【大魔王動態天花板機制】</b><br>
+                目前筆記總收錄：<b id="modal-total-words-count">0</b> 字（滿等封頂：<b id="modal-max-exp-count">0</b> EXP）。<br>
+                💡 <b>終極大魔王就是作者本人！</b> 只要作者在試算表中擴充新單字，等級天花板就會自動提升，想要維持大魔王稱號就要持續跟上作者的腳步喔！🔥
+            </div>
+
             <div style="font-family: 'DotGothic16', sans-serif; font-size: 13px; color: #94a3b8; margin-top: 4px;">
-                📜 等級比例尺一覽（依筆記全字數換算）：
+                📜 階級比例尺一覽：
             </div>
 
             <!-- 階級項目清單 -->
@@ -1223,7 +1238,9 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1475,7 +1492,8 @@
             currentExp: exp,
             maxExp: maxExpCap,
             nextRank: nextRank,
-            expToNext: expToNext
+            expToNext: expToNext,
+            totalWords: totalWords
         };
     }
 
@@ -1492,13 +1510,15 @@
         if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
     }
 
-    // 👑 階級指南彈窗操作
+    // 👑 階級指南彈窗操作 (動態計算大魔王數據)
     function openRankGuideModal() {
         playClickSound();
         const totalWords = allSearchableWords.length || 1000;
         const info = getLevelAndTitle(getTotalEXP(), totalWords);
 
         document.getElementById('modal-my-rank-title').textContent = `${info.title} (${info.ratioPercent}%)`;
+        document.getElementById('modal-total-words-count').textContent = totalWords;
+        document.getElementById('modal-max-exp-count').textContent = info.maxExp;
 
         const hintEl = document.getElementById('modal-my-rank-hint');
         if (info.nextRank) {
