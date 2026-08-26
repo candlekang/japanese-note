@@ -148,9 +148,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 6px;
+            gap: 8px;
             background: rgba(0, 0, 0, 0.35);
-            padding: 5px 8px;
+            padding: 5px 10px;
             border-radius: 8px;
             border: 1px solid #334155;
             font-family: 'DotGothic16', sans-serif;
@@ -175,7 +175,7 @@
             flex: 1;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             min-width: 0;
         }
         .rpg-exp-bar-bg {
@@ -185,7 +185,7 @@
             border-radius: 4px;
             overflow: hidden;
             border: 1px solid #475569;
-            min-width: 30px;
+            min-width: 40px;
         }
         .rpg-exp-bar-fill {
             height: 100%;
@@ -198,22 +198,6 @@
             font-size: 10px;
             white-space: nowrap;
             flex-shrink: 0;
-        }
-        .rpg-sync-hint {
-            font-size: 10px;
-            color: #f59e0b;
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px dashed rgba(245, 158, 11, 0.5);
-            padding: 2px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-            transition: all 0.2s;
-        }
-        .rpg-sync-hint:hover {
-            background: #f59e0b;
-            color: #000000;
         }
         .rpg-info-icon {
             font-size: 11px;
@@ -1115,7 +1099,7 @@
             <div class="auth-row-top">
                 <div class="user-info" id="user-info">
                     <span class="user-status-dot"></span>
-                    <span>訪客離線模式</span>
+                    <span id="user-status-text">訪客離線模式</span>
                 </div>
                 <div class="auth-buttons">
                     <button class="btn-refresh" onclick="forceAppReload()" title="重新整理最新資料">
@@ -1133,7 +1117,7 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列 -->
+            <!-- 👑 像素等級與頭銜狀態列（清爽無贅飾） -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1142,8 +1126,6 @@
                     </div>
                     <span class="rpg-exp-text" id="hud-rpg-exp-text">0 EXP</span>
                 </div>
-                <!-- 💡 點擊直接觸發登入同步 -->
-                <span class="rpg-sync-hint" id="hud-sync-hint" onclick="triggerAuthFromHint(event)" style="display:none;" title="點此立即登入 Google 保存戰果">⚠️ 登入同步等級資料</span>
                 <span class="rpg-info-icon">📖指南</span>
             </div>
         </div>
@@ -1230,7 +1212,7 @@
         <button id="btn-unlock-more-cards" class="btn-unlock-more" onclick="unlockFullCards()">🔓 進入無限修煉模式（展開此分類所有單字）</button>
     </div>
 
-    <!-- 2. 測驗模式 (含生猛開考/未學引導看板) -->
+    <!-- 2. 測驗模式 -->
     <div id="quiz-section">
         <div id="quiz-guide-box" class="quiz-guide-box" style="display:none;">
             <div class="quiz-guide-title">⚔️ 勇者注意！今日修煉尚未開始 🐣</div>
@@ -1426,7 +1408,7 @@
             await syncCloudData();
         } else {
             currentUser = null;
-            userInfoEl.innerHTML = `<span class="user-status-dot"></span> <span>訪客離線模式</span>`;
+            userInfoEl.innerHTML = `<span class="user-status-dot"></span> <span>訪客模式（點右側登入同步 ➔）</span>`;
             authBtnText.textContent = 'Google 登入同步';
         }
 
@@ -1448,12 +1430,6 @@
                 alert('登入失敗，請確認是否已在 Firebase 授權 candlekang.github.io 網域！');
             }
         }
-    }
-
-    // 💡 點擊等級條中的提示，直接呼叫 Google 登入
-    function triggerAuthFromHint(event) {
-        if (event) event.stopPropagation();
-        toggleAuth();
     }
 
     function forceAppReload() {
@@ -1707,7 +1683,7 @@
     const SEMANTIC_SYNONYMS = [
         { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
         { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげ德', 'によって', 'つき'] },
-        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', 'が', 'けれども', 'ものの', 'としても'] },
+        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', '外', 'けれども', 'ものの', 'としても'] },
         { triggers: ['打算', '計畫', '準備', '想要'], targets: ['つもり', '予定', 'ようとする', 'たい', 'ほしい'] },
         { triggers: ['好像', '似乎', '聽說', '看起來'], targets: ['そう', 'よう', 'らしい', 'みたい'] },
         { triggers: ['必須', '一定要', '非得'], targets: ['なければならない', 'ないと', 'ざるを得ない', 'べき'] },
@@ -1797,15 +1773,10 @@
         const titleEl = document.getElementById('hud-rpg-title');
         const fillEl = document.getElementById('hud-rpg-exp-fill');
         const textEl = document.getElementById('hud-rpg-exp-text');
-        const syncHintEl = document.getElementById('hud-sync-hint');
 
         if (titleEl) titleEl.textContent = info.title;
         if (fillEl) fillEl.style.width = `${info.ratioPercent}%`;
         if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
-
-        if (syncHintEl) {
-            syncHintEl.style.display = currentUser ? 'none' : 'inline-block';
-        }
     }
 
     function openRankGuideModal() {
@@ -2574,7 +2545,7 @@
         const allGroups = document.querySelectorAll('.category-group');
         allGroups.forEach(g => {
             g.classList.remove('open');
-            const arrow = g.querySelector('.category-header span:last-child');
+            const arrow = headerElement.querySelector('span:last-child');
             if (arrow) arrow.textContent = '▼';
         });
 
