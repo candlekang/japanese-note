@@ -65,7 +65,6 @@
             text-shadow: 2px 2px 0px #0b1329, 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
-        /* 👾 像素風微型 HUD 狀態列 */
         .auth-bar {
             display: flex;
             flex-direction: column;
@@ -145,7 +144,6 @@
             background: rgba(56, 189, 248, 0.1);
         }
 
-        /* 👑 頭銜與經驗條 (未登入時可點擊提示) */
         .rpg-level-bar {
             display: flex;
             align-items: center;
@@ -558,7 +556,6 @@
         #btn-next-quiz { background: var(--pixel-pink); color: #ffffff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35); }
         #btn-next-quiz:hover { background: #db2777; }
 
-        /* 📊 學習進度面板與 RPG 任務告示板樣式 */
         #stats-section {
             background: var(--card-bg); padding: 20px; border-radius: 20px;
             box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
@@ -756,7 +753,7 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列（點擊可觸發同步提示/登入） -->
+            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="handleLevelBarClick()">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1016,19 +1013,22 @@
         }
     }
 
+    // 🔊 升級版音訊處理器：確保手機喚醒與零延遲
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) audioCtx = new AudioContextClass();
         }
-        if (audioCtx.state === 'suspended') {
+        if (audioCtx && audioCtx.state === 'suspended') {
             audioCtx.resume();
         }
         return audioCtx;
     }
 
     function unlockAudioOnMobile() {
-        getAudioContext();
+        const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') ctx.resume();
         try {
             const dummyAudio = new Audio();
             dummyAudio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
@@ -1037,13 +1037,17 @@
         document.removeEventListener('touchstart', unlockAudioOnMobile);
         document.removeEventListener('click', unlockAudioOnMobile);
     }
-    document.addEventListener('touchstart', unlockAudioOnMobile, { once: true });
-    document.addEventListener('click', unlockAudioOnMobile, { once: true });
+    document.addEventListener('touchstart', unlockAudioOnMobile, { passive: true });
+    document.addEventListener('click', unlockAudioOnMobile, { passive: true });
 
+    // 📄 擬真紙張翻頁音效（高相容、防吞音設計）
     function playPageFlipSound() {
         try {
             const ctx = getAudioContext();
-            if (ctx.state === 'suspended') ctx.resume();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1085,6 +1089,7 @@
     function playClickSound() {
         try {
             const ctx = getAudioContext();
+            if (!ctx) return;
             if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
@@ -1128,6 +1133,7 @@
     function playSuccessSound() {
         try {
             const ctx = getAudioContext();
+            if (!ctx) return;
             if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
@@ -1158,6 +1164,7 @@
     function playWrongSound() {
         try {
             const ctx = getAudioContext();
+            if (!ctx) return;
             if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
@@ -1215,7 +1222,7 @@
 
     const SEMANTIC_SYNONYMS = [
         { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
-        { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげ德', 'によって', 'つき'] },
+        { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげで', 'によって', 'つき'] },
         { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', 'が', 'けれども', 'ものの', 'としても'] },
         { triggers: ['打算', '計畫', '準備', '想要'], targets: ['つもり', '予定', 'ようとする', 'たい', 'ほしい'] },
         { triggers: ['好像', '似乎', '聽說', '看起來'], targets: ['そう', 'よう', 'らしい', 'みたい'] },
@@ -1235,7 +1242,7 @@
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
-    let allSearchableWords = [];
+    allSearchableWords = [];
 
     function getTotalEXP() {
         const exp = localStorage.getItem('jp_rpg_exp');
