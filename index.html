@@ -65,6 +65,7 @@
             text-shadow: 2px 2px 0px #0b1329, 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
+        /* 👾 像素風微型 HUD 狀態列 */
         .auth-bar {
             display: flex;
             flex-direction: column;
@@ -144,18 +145,24 @@
             background: rgba(56, 189, 248, 0.1);
         }
 
+        /* 👑 頭銜與經驗條 (滑過加亮效果) */
         .rpg-level-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 8px;
             background: rgba(0, 0, 0, 0.35);
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 8px;
             border: 1px solid #334155;
             font-family: 'DotGothic16', sans-serif;
             font-size: 11px;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .rpg-level-bar:hover {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.12);
         }
         .rpg-title-badge {
             color: #fde047;
@@ -188,14 +195,10 @@
             font-size: 10px;
             white-space: nowrap;
         }
-        .rpg-sync-hint {
-            font-size: 10px;
-            color: #f59e0b;
-            animation: blink 2s infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+        .rpg-info-icon {
+            font-size: 11px;
+            color: #38bdf8;
+            margin-left: 2px;
         }
 
         .marquee-box {
@@ -556,6 +559,7 @@
         #btn-next-quiz { background: var(--pixel-pink); color: #ffffff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35); }
         #btn-next-quiz:hover { background: #db2777; }
 
+        /* 📊 學習進度面板與 RPG 任務告示板樣式 */
         #stats-section {
             background: var(--card-bg); padding: 20px; border-radius: 20px;
             box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
@@ -724,6 +728,157 @@
         }
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
+
+        /* 👑 像素 RPG 等級圖鑑彈窗 (Level Guide Modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal-box {
+            background: #0f172a;
+            border: 2px solid #38bdf8;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 440px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.3);
+            color: #f8fafc;
+            box-sizing: border-box;
+            overflow: hidden;
+            animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            padding: 14px 18px;
+            background: rgba(30, 41, 59, 0.8);
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 17px;
+            color: #fde047;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .btn-modal-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+        .btn-modal-close:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        /* 當前狀態卡片 */
+        .my-rank-status-card {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(236, 72, 153, 0.15));
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-family: 'DotGothic16', sans-serif;
+        }
+        .my-rank-status-title {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .my-rank-status-val {
+            font-size: 18px;
+            color: #38bdf8;
+            font-weight: bold;
+        }
+        .my-rank-next-hint {
+            font-size: 12px;
+            color: #fde047;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        /* 階級項目列表 */
+        .rank-tier-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .rank-tier-item {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        .rank-tier-item.current {
+            border: 2px solid #fde047;
+            background: rgba(245, 158, 11, 0.15);
+            box-shadow: 0 0 12px rgba(253, 224, 71, 0.25);
+        }
+        .rank-tier-item.unlocked {
+            border-color: rgba(34, 197, 94, 0.4);
+            opacity: 0.85;
+        }
+        .rank-tier-item.locked {
+            opacity: 0.55;
+        }
+        .tier-name {
+            font-family: 'DotGothic16', sans-serif;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tier-req {
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .tier-badge-current {
+            background: #d97706;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -753,8 +908,8 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列 -->
-            <div class="rpg-level-bar" onclick="handleLevelBarClick()">
+            <!-- 👑 像素等級與頭銜狀態列（點擊開啟等級指南彈窗） -->
+            <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
                     <div class="rpg-exp-bar-bg">
@@ -762,7 +917,7 @@
                     </div>
                     <span class="rpg-exp-text" id="hud-rpg-exp-text">0 EXP</span>
                 </div>
-                <span class="rpg-sync-hint" id="hud-sync-hint" style="display:none;">⚠️ 點此登入同步</span>
+                <span class="rpg-info-icon">📖指南</span>
             </div>
         </div>
 
@@ -910,6 +1065,39 @@
     </div>
 </div>
 
+<!-- 👑 像素 RPG 等級指南彈窗 (Level Guide Modal) -->
+<div class="modal-overlay" id="rankGuideModal" onclick="closeRankGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">⚔️ 修煉階級與等級指南 👑</h3>
+            <button class="btn-modal-close" onclick="closeRankGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <!-- 當前位階與升等提示 -->
+            <div class="my-rank-status-card">
+                <div class="my-rank-status-title">你目前的修煉境界：</div>
+                <div class="my-rank-status-val" id="modal-my-rank-title">Lv.1 日文小白ㄔ 🐣</div>
+                <div class="my-rank-next-hint" id="modal-my-rank-hint">⚡ 距離下一等還需 0 EXP</div>
+            </div>
+
+            <div style="font-family: 'DotGothic16', sans-serif; font-size: 13px; color: #94a3b8; margin-top: 4px;">
+                📜 等級比例尺一覽（依筆記全字數換算）：
+            </div>
+
+            <!-- 階級項目清單 -->
+            <div class="rank-tier-list" id="modal-rank-tier-list"></div>
+
+            <div style="font-size: 11px; color: #64748b; line-height: 1.5; margin-top: 6px; border-top: 1px dashed #334155; padding-top: 8px;">
+                💡 <b>EXP 獲取規則</b>：<br>
+                • 首次翻閱新單字：+10 EXP<br>
+                • 測驗答對一題：+25 EXP<br>
+                • 完成每日雙修煉任務：+100 EXP<br>
+                • 記得登入 Google 帳號，跨手機與電腦同步你的戰果！
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyClHAkJZ8EJuLHtksAsl8OoXYgdlKtjQZQ",
@@ -962,14 +1150,6 @@
         }
     }
 
-    function handleLevelBarClick() {
-        playClickSound();
-        if (!currentUser) {
-            const confirmLogin = confirm('💡 你目前處於「訪客模式」，進度僅保存在此裝置！\n是否要立即登入 Google 帳號以啟用跨裝置自動同步？');
-            if (confirmLogin) toggleAuth();
-        }
-    }
-
     function forceAppReload() {
         playClickSound();
         window.location.reload(true);
@@ -1013,7 +1193,6 @@
         }
     }
 
-    // 🔊 升級版音訊處理器：確保手機喚醒與零延遲
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) {
@@ -1040,14 +1219,11 @@
     document.addEventListener('touchstart', unlockAudioOnMobile, { passive: true });
     document.addEventListener('click', unlockAudioOnMobile, { passive: true });
 
-    // 📄 擬真紙張翻頁音效（高相容、防吞音設計）
     function playPageFlipSound() {
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') {
-                ctx.resume();
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1126,7 +1302,7 @@
 
             noise.start(now);
             osc.start(now);
-            osc.stop(now + 0.012);
+            osc.stop(now + 0.12);
         } catch(e) {}
     }
 
@@ -1222,7 +1398,7 @@
 
     const SEMANTIC_SYNONYMS = [
         { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
-        { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげで', 'によって', 'つき'] },
+        { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげ德', 'によって', 'つき'] },
         { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', 'が', 'けれども', 'ものの', 'としても'] },
         { triggers: ['打算', '計畫', '準備', '想要'], targets: ['つもり', '予定', 'ようとする', 'たい', 'ほしい'] },
         { triggers: ['好像', '似乎', '聽說', '看起來'], targets: ['そう', 'よう', 'らしい', 'みたい'] },
@@ -1230,6 +1406,18 @@
         { triggers: ['可以', '能夠', '能力', '會'], targets: ['できる', 'れる', 'られる', 'こと'] },
         { triggers: ['一邊', '同時'], targets: ['ながら', 'つつ'] },
         { triggers: ['越...越...', '隨著'], targets: ['ば...ほど', 'につれて', 'とともに'] }
+    ];
+
+    const RANK_TIERS_CONFIG = [
+        { threshold: 0.00, title: "Lv.1 日文小白ㄔ 🐣", desc: "剛踏入日語修煉之門" },
+        { threshold: 0.05, title: "Lv.2 日文小菜鳥 🐤", desc: "熟悉基本問候與簡單名詞" },
+        { threshold: 0.15, title: "Lv.3 日文初心者 🌿", desc: "掌握基礎五十音與日常詞彙" },
+        { threshold: 0.30, title: "Lv.4 單字小行家 ⚔️", desc: "已具備大量 N5 核心單字庫" },
+        { threshold: 0.50, title: "Lv.5 文法修行僧 🛡️", desc: "突破動詞變化與句型難關" },
+        { threshold: 0.70, title: "Lv.6 假名魔法使 🧙‍♀️", desc: "掌握進階文法與細膩語感" },
+        { threshold: 0.85, title: "Lv.7 日語狂戰士 🐉", desc: "全方位制霸日語詞彙庫" },
+        { threshold: 0.95, title: "Lv.8 準・魔王領主 👑", desc: "即將登頂的頂級強者" },
+        { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達終極境界！" }
     ];
 
     let currentList = [];
@@ -1263,31 +1451,31 @@
         const maxExpCap = Math.max(totalWords * 35, 1000);
         const progressRatio = Math.min(exp / maxExpCap, 1.0);
 
-        const ranks = [
-            { threshold: 0.00, title: "Lv.1 日文小白ㄔ 🐣" },
-            { threshold: 0.05, title: "Lv.2 日文小菜鳥 🐤" },
-            { threshold: 0.15, title: "Lv.3 日文初心者 🌿" },
-            { threshold: 0.30, title: "Lv.4 單字小行家 ⚔️" },
-            { threshold: 0.50, title: "Lv.5 文法修行僧 🛡️" },
-            { threshold: 0.70, title: "Lv.6 假名魔法使 🧙‍♀️" },
-            { threshold: 0.85, title: "Lv.7 日語狂戰士 🐉" },
-            { threshold: 0.95, title: "Lv.8 準・魔王領主 👑" },
-            { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥" }
-        ];
+        let currentRank = RANK_TIERS_CONFIG[0];
+        let nextRank = null;
 
-        let currentRank = ranks[0];
-        for (let i = ranks.length - 1; i >= 0; i--) {
-            if (progressRatio >= ranks[i].threshold) {
-                currentRank = ranks[i];
+        for (let i = RANK_TIERS_CONFIG.length - 1; i >= 0; i--) {
+            if (progressRatio >= RANK_TIERS_CONFIG[i].threshold) {
+                currentRank = RANK_TIERS_CONFIG[i];
+                nextRank = RANK_TIERS_CONFIG[i + 1] || null;
                 break;
             }
+        }
+
+        let nextExpReq = 0;
+        let expToNext = 0;
+        if (nextRank) {
+            nextExpReq = Math.ceil(nextRank.threshold * maxExpCap);
+            expToNext = Math.max(nextExpReq - exp, 0);
         }
 
         return {
             title: currentRank.title,
             ratioPercent: Math.floor(progressRatio * 100),
             currentExp: exp,
-            maxExp: maxExpCap
+            maxExp: maxExpCap,
+            nextRank: nextRank,
+            expToNext: expToNext
         };
     }
 
@@ -1298,15 +1486,56 @@
         const titleEl = document.getElementById('hud-rpg-title');
         const fillEl = document.getElementById('hud-rpg-exp-fill');
         const textEl = document.getElementById('hud-rpg-exp-text');
-        const syncHintEl = document.getElementById('hud-sync-hint');
 
         if (titleEl) titleEl.textContent = info.title;
         if (fillEl) fillEl.style.width = `${info.ratioPercent}%`;
         if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
-        
-        if (syncHintEl) {
-            syncHintEl.style.display = currentUser ? 'none' : 'inline-block';
+    }
+
+    // 👑 階級指南彈窗操作
+    function openRankGuideModal() {
+        playClickSound();
+        const totalWords = allSearchableWords.length || 1000;
+        const info = getLevelAndTitle(getTotalEXP(), totalWords);
+
+        document.getElementById('modal-my-rank-title').textContent = `${info.title} (${info.ratioPercent}%)`;
+
+        const hintEl = document.getElementById('modal-my-rank-hint');
+        if (info.nextRank) {
+            hintEl.textContent = `⚡ 距離下一位階【${info.nextRank.title}】還差 ${info.expToNext} EXP！`;
+        } else {
+            hintEl.textContent = `👾 恭喜登頂！你已達成【日文大魔王】的最高境界！🔥`;
         }
+
+        const tierListEl = document.getElementById('modal-rank-tier-list');
+        tierListEl.innerHTML = '';
+
+        RANK_TIERS_CONFIG.forEach(tier => {
+            const reqExp = Math.ceil(tier.threshold * info.maxExp);
+            const isCurrent = (tier.title === info.title);
+            const isUnlocked = (info.currentExp >= reqExp);
+
+            let statusClass = isCurrent ? 'current' : (isUnlocked ? 'unlocked' : 'locked');
+            let badgeHtml = isCurrent ? `<span class="tier-badge-current">▶ 目前位置</span>` : (isUnlocked ? `<span style="color:#22c55e; font-size:11px; font-weight:bold;">✅ 已解鎖</span>` : `<span style="color:#64748b; font-size:11px;">🔒 ${reqExp} EXP</span>`);
+
+            tierListEl.innerHTML += `
+                <div class="rank-tier-item ${statusClass}">
+                    <div>
+                        <div class="tier-name">${tier.title}</div>
+                        <div class="tier-req">${tier.desc}</div>
+                    </div>
+                    <div>${badgeHtml}</div>
+                </div>
+            `;
+        });
+
+        document.getElementById('rankGuideModal').style.display = 'flex';
+    }
+
+    function closeRankGuideModal(e) {
+        if (e && e.target !== document.getElementById('rankGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('rankGuideModal').style.display = 'none';
     }
 
     function getTodayKey() {
