@@ -577,7 +577,6 @@
         #btn-next-quiz { background: var(--pixel-pink); color: #ffffff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35); }
         #btn-next-quiz:hover { background: #db2777; }
 
-        /* ⚔️ 測驗引導看板 (Quiz Prompt Guide Box) */
         .quiz-guide-box {
             background: #0f172a;
             border: 2px dashed #f59e0b;
@@ -811,7 +810,6 @@
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
 
-        /* 👑 像素 RPG 通用彈窗樣式 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -979,7 +977,6 @@
             font-weight: bold;
         }
 
-        /* ⚙️ 自訂每日目標視窗 */
         .quest-setting-group {
             background: #1e293b;
             border: 1px solid #334155;
@@ -1108,6 +1105,7 @@
                 </div>
             </div>
 
+            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1204,7 +1202,6 @@
 
     <!-- 2. 測驗模式 (含生猛開考/未學引導看板) -->
     <div id="quiz-section">
-        <!-- 💡 尚未翻卡時的引導看板 -->
         <div id="quiz-guide-box" class="quiz-guide-box" style="display:none;">
             <div class="quiz-guide-title">⚔️ 勇者注意！今日修煉尚未開始 🐣</div>
             <div class="quiz-guide-desc">
@@ -1217,7 +1214,6 @@
             </div>
         </div>
 
-        <!-- 正常測驗容器 -->
         <div id="quiz-main-container" style="display:none;">
             <div class="score-board" id="quiz-score">題數: 1 / 10</div>
             <span class="badge" id="quiz-type">題型</span>
@@ -1572,9 +1568,6 @@
             oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
 
             osc.connect(oscGain);
-            oscGain.connect(ctx.destination);
-
-            noise.start(now);
             osc.start(now);
             osc.stop(now + 0.12);
         } catch(e) {}
@@ -1819,7 +1812,6 @@
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // 🧠 今日已學單字清單紀錄 (翻過即算已學)
     function getTodayLearnedWords() {
         const today = getTodayKey();
         const data = localStorage.getItem(`jp_learned_${today}`);
@@ -1946,7 +1938,7 @@
 
         if (type === 'read') {
             progress.read++;
-            recordTodayLearnedWord(wordJp); // 記錄到今日已學
+            recordTodayLearnedWord(wordJp);
         }
         if (type === 'quiz') progress.quiz++;
         localStorage.setItem(key, JSON.stringify(progress));
@@ -2698,7 +2690,7 @@
     function getQuizZhText(word) {
         const idx = word.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
         if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
-        return word.rawCols[4] || word.rawCols[2] || '無翻譯';
+        return word.rawCols[4] || word.rawCols[2] || '';
     }
 
     function getQuizExampleText(word) {
@@ -2707,8 +2699,14 @@
         return word.rawCols[6] || word.rawCols[5] || '';
     }
 
-    // ⚔️ 測驗啟動流程判斷（優先今日已學 ➔ 無已學則引導）
+    // 💖 可愛修飾版載入中判斷與測驗啟動流程
     function checkQuizStartFlow() {
+        if (fullSourceList.length === 0) {
+            alert('⏳ 單字庫正在全力加速傳送中！請稍微等我一下下嘛～( ＞＜ )✨');
+            setMode('review');
+            return;
+        }
+
         if (fullSourceList.length < 4) {
             alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
             setMode('review');
@@ -2720,11 +2718,9 @@
         const mainBox = document.getElementById('quiz-main-container');
 
         if (learnedKeys.length === 0) {
-            // 今日尚未翻卡學習，顯示引導畫面
             guideBox.style.display = 'flex';
             mainBox.style.display = 'none';
         } else {
-            // 今日已有學習紀錄，直接進入已學題組
             guideBox.style.display = 'none';
             mainBox.style.display = 'block';
             startQuiz(false);
@@ -2735,32 +2731,32 @@
         playClickSound();
         document.getElementById('quiz-guide-box').style.display = 'none';
         document.getElementById('quiz-main-container').style.display = 'block';
-        startQuiz(false, true); // 強制生猛開考（全隨機）
+        startQuiz(false, true);
     }
 
-    // 💡 測驗出題核心（今日已學優先 + 隨機補足）
     function startQuiz(infiniteMode = false, forceWild = false) {
+        if (fullSourceList.length < 4) {
+            alert('⏳ 單字庫正在全力加速傳送中！請稍微等我一下下嘛～( ＞＜ )✨');
+            setMode('review');
+            return;
+        }
+
         const settings = getQuestSettings();
         const targetCount = infiniteMode ? fullSourceList.length : settings.quizTarget;
 
         let selectedQuestions = [];
 
         if (forceWild || infiniteMode) {
-            // 生猛或無限模式：全隨機出題
             selectedQuestions = [...fullSourceList].sort(() => Math.random() - 0.5);
         } else {
-            // 🧠 今日已學優先出題策略
             const learnedKeys = getTodayLearnedWords();
             const learnedObjs = fullSourceList.filter(item => learnedKeys.includes(item.jp));
             
-            // 洗牌已學單字
             const shuffledLearned = [...learnedObjs].sort(() => Math.random() - 0.5);
 
             if (shuffledLearned.length >= targetCount) {
-                // 已學單字足夠，全部從已學單字出題
                 selectedQuestions = shuffledLearned.slice(0, targetCount);
             } else {
-                // 已學單字不足，先全出，剩餘從單字庫隨機補齊
                 selectedQuestions = [...shuffledLearned];
                 const remainCount = targetCount - selectedQuestions.length;
                 const poolWithoutLearned = fullSourceList.filter(item => !learnedKeys.includes(item.jp));
