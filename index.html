@@ -746,7 +746,7 @@
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
 
-        /* 👑 像素 RPG 等級指南彈窗 */
+        /* 👑 像素 RPG 通用彈窗樣式 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -912,6 +912,107 @@
             margin: 6px 0 2px 0;
             color: #ffffff;
             font-weight: bold;
+        }
+
+        /* ⚙️ 自訂每日目標視窗 (Quest Settings Modal) */
+        .quest-setting-group {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .quest-setting-label {
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .quest-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-stepper {
+            background: #334155;
+            color: #ffffff;
+            border: 1px solid #475569;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex: none;
+        }
+        .btn-stepper:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary);
+        }
+        .quest-number-input {
+            flex: 1;
+            background: #0f172a;
+            border: 2px solid #475569;
+            color: #fde047;
+            text-align: center;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 6px;
+            border-radius: 8px;
+            outline: none;
+        }
+        .quest-number-input:focus {
+            border-color: var(--primary);
+        }
+        .quest-chips {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .quest-chip {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid #475569;
+            color: #94a3b8;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'DotGothic16', sans-serif;
+            flex: 1;
+            text-align: center;
+        }
+        .quest-chip:hover {
+            color: #ffffff;
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.15);
+        }
+        .btn-save-quest {
+            background: linear-gradient(90deg, #0284c7, #38bdf8);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+            margin-top: 6px;
+            transition: all 0.2s;
+        }
+        .btn-save-quest:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -1110,14 +1211,12 @@
             <button class="btn-modal-close" onclick="closeRankGuideModal()">✕</button>
         </div>
         <div class="modal-body">
-            <!-- 當前位階與升等提示 -->
             <div class="my-rank-status-card">
                 <div class="my-rank-status-title">你目前的修煉境界：</div>
                 <div class="my-rank-status-val" id="modal-my-rank-title">Lv.1 日文小白ㄔ 🐣</div>
                 <div class="my-rank-next-hint" id="modal-my-rank-hint">⚡ 距離下一等還需 0 EXP</div>
             </div>
 
-            <!-- 👾 大魔王戰力同步率機制宣告 -->
             <div class="dynamic-boss-box">
                 <div>👾 <b>【大魔王境界與戰力同步率】</b></div>
                 <div class="boss-progress-row">
@@ -1137,7 +1236,6 @@
                 📜 階級達成度一覽：
             </div>
 
-            <!-- 階級項目清單 -->
             <div class="rank-tier-list" id="modal-rank-tier-list"></div>
 
             <div style="font-size: 11px; color: #64748b; line-height: 1.5; margin-top: 6px; border-top: 1px dashed #334155; padding-top: 8px;">
@@ -1147,6 +1245,51 @@
                 • 完成每日雙修煉任務：+100 EXP<br>
                 • 記得登入 Google 帳號，跨手機與電腦同步你的戰果！
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ⚙️ 每日修煉目標設定彈窗 (Quest Settings Modal) -->
+<div class="modal-overlay" id="questSettingsModal" onclick="closeQuestSettingsModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">⚙️ 自訂每日修煉目標 🎯</h3>
+            <button class="btn-modal-close" onclick="closeQuestSettingsModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <!-- 1. 翻卡目標 -->
+            <div class="quest-setting-group">
+                <div class="quest-setting-label">📖 每日翻卡張數目標：</div>
+                <div class="quest-input-row">
+                    <button class="btn-stepper" onclick="stepQuestInput('input-read-target', -5)">-</button>
+                    <input type="number" id="input-read-target" class="quest-number-input" min="1" max="500" value="5">
+                    <button class="btn-stepper" onclick="stepQuestInput('input-read-target', 5)">+</button>
+                </div>
+                <div class="quest-chips">
+                    <span class="quest-chip" onclick="setQuestInputValue('input-read-target', 5)">5 張</span>
+                    <span class="quest-chip" onclick="setQuestInputValue('input-read-target', 10)">10 張</span>
+                    <span class="quest-chip" onclick="setQuestInputValue('input-read-target', 20)">20 張</span>
+                    <span class="quest-chip" onclick="setQuestInputValue('input-read-target', 50)">50 張</span>
+                </div>
+            </div>
+
+            <!-- 2. 測驗目標 -->
+            <div class="quest-setting-group">
+                <div class="quest-setting-label">🏆 每日測驗練習題數：</div>
+                <div class="quest-input-row">
+                    <button class="btn-stepper" onclick="stepQuestInput('input-quiz-target', -5)">-</button>
+                    <input type="number" id="input-quiz-target" class="quest-number-input" min="1" max="200" value="5">
+                    <button class="btn-stepper" onclick="stepQuestInput('input-quiz-target', 5)">+</button>
+                </div>
+                <div class="quest-chips">
+                    <span class="quest-chip" onclick="setQuestInputValue('input-quiz-target', 5)">5 題</span>
+                    <span class="quest-chip" onclick="setQuestInputValue('input-quiz-target', 10)">10 題</span>
+                    <span class="quest-chip" onclick="setQuestInputValue('input-quiz-target', 15)">15 題</span>
+                    <span class="quest-chip" onclick="setQuestInputValue('input-quiz-target', 30)">30 題</span>
+                </div>
+            </div>
+
+            <button class="btn-save-quest" onclick="saveQuestSettingsFromModal()">💾 保存目標並套用</button>
         </div>
     </div>
 </div>
@@ -1276,7 +1419,9 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1355,7 +1500,7 @@
 
             noise.start(now);
             osc.start(now);
-            osc.stop(now + 0.012);
+            osc.stop(now + 0.12);
         } catch(e) {}
     }
 
@@ -1473,8 +1618,8 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
-    let fullSourceList = []; // 當前分類完整單字庫
-    let currentList = [];    // 當前翻卡使用之單字清單
+    let fullSourceList = [];
+    let currentList = [];
     let currentIndex = 0;
     let currentMode = 'review';
     let quizList = [];
@@ -1609,7 +1754,6 @@
         return data ? JSON.parse(data) : { readCount: 0, quizCount: 0, rewardClaimed: false };
     }
 
-    // 💡 每日測驗挑戰只要「完成作答」就增加次數，不強制要求答對
     function saveTodayQuestProgress(type) {
         const today = getTodayKey();
         const prog = getTodayQuestProgress();
@@ -1634,19 +1778,46 @@
         renderQuestBoard();
     }
 
+    // 🎯 8-bit 合一自訂目標彈窗操作
     function openQuestSettings() {
         playClickSound();
         const current = getQuestSettings();
-        const newRead = prompt('請輸入每日翻卡修煉目標張數：', current.readTarget);
-        if (newRead === null) return;
-        const newQuiz = prompt('請輸入每日測驗練習目標題數（完成即可）：', current.quizTarget);
-        if (newQuiz === null) return;
+        document.getElementById('input-read-target').value = current.readTarget;
+        document.getElementById('input-quiz-target').value = current.quizTarget;
+        document.getElementById('questSettingsModal').style.display = 'flex';
+    }
+
+    function closeQuestSettingsModal(e) {
+        if (e && e.target !== document.getElementById('questSettingsModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('questSettingsModal').style.display = 'none';
+    }
+
+    function stepQuestInput(inputId, delta) {
+        playClickSound();
+        const input = document.getElementById(inputId);
+        let val = (parseInt(input.value, 10) || 5) + delta;
+        if (val < 1) val = 1;
+        input.value = val;
+    }
+
+    function setQuestInputValue(inputId, value) {
+        playClickSound();
+        document.getElementById(inputId).value = value;
+    }
+
+    function saveQuestSettingsFromModal() {
+        playClickSound();
+        const readVal = parseInt(document.getElementById('input-read-target').value, 10) || 5;
+        const quizVal = parseInt(document.getElementById('input-quiz-target').value, 10) || 5;
 
         const targetObj = {
-            readTarget: Math.max(parseInt(newRead, 10) || 5, 1),
-            quizTarget: Math.max(parseInt(newQuiz, 10) || 5, 1)
+            readTarget: Math.max(readVal, 1),
+            quizTarget: Math.max(quizVal, 1)
         };
         localStorage.setItem('jp_quest_settings', JSON.stringify(targetObj));
+        
+        document.getElementById('questSettingsModal').style.display = 'none';
         renderQuestBoard();
         loadSheetData(document.getElementById('sheetSelect').value);
     }
@@ -1891,7 +2062,6 @@
         if (allSearchableWords.length > 0) {
             pickDailyFiveWords(dateString);
             updateHUDLevel();
-            // 預設為全域大亂鬥
             if (fullSourceList.length === 0) {
                 loadSheetData('all');
             }
@@ -2041,7 +2211,6 @@
         loadSheetData(sheetKey, targetWordJp);
     }
 
-    // 💡 翻卡載入邏輯：預設依自訂目標限制數量，並提供解鎖全部的按鈕
     async function loadSheetData(urlKey, targetWordJp = null) {
         document.getElementById('card-sub-front').textContent = '資料載入中...';
         document.getElementById('card-main-front').textContent = '';
@@ -2098,7 +2267,6 @@
             
             fullSourceList.sort(() => Math.random() - 0.5);
 
-            // 依據每日目標設定抽取數量
             const settings = getQuestSettings();
             const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
 
@@ -2445,7 +2613,6 @@
         return word.rawCols[6] || word.rawCols[5] || '';
     }
 
-    // 💡 測驗出題邏輯：預設限制出題數量，完成後提供續練選項
     function startQuiz(infiniteMode = false) {
         if (fullSourceList.length < 4) {
             alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
@@ -2618,7 +2785,6 @@
             }
         });
 
-        // 每次作答都累計每日測驗次數
         saveTodayQuestProgress('quiz');
 
         if (selectedOptionData.jp === currentCorrectAnswer.jp) {
