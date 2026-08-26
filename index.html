@@ -1088,6 +1088,22 @@
             opacity: 0.92;
             transform: translateY(-1px);
         }
+
+        /* 👾 突發驚喜任務彈窗 (Surprise Boss Modal) */
+        .boss-modal-box {
+            border: 2px solid #ec4899;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(236, 72, 153, 0.45);
+        }
+        .boss-badge {
+            background: #db2777;
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-family: 'DotGothic16', sans-serif;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -1117,7 +1133,7 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列（清爽無贅飾） -->
+            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1330,6 +1346,7 @@
                 💡 <b>EXP 獲取規則</b>：<br>
                 • 首次翻閱新單字：+10 EXP<br>
                 • 測驗答對一題：+25 EXP<br>
+                • 擊破 3 天驚喜任務：+200 EXP 🔥<br>
                 • 完成每日雙修煉任務：+100 EXP<br>
                 • 記得登入 Google 帳號，跨手機與電腦同步你的戰果！
             </div>
@@ -1376,6 +1393,35 @@
             </div>
 
             <button class="btn-save-quest" onclick="saveQuestSettingsFromModal()">💾 保存目標並套用</button>
+        </div>
+    </div>
+</div>
+
+<!-- 👾 每 3 天突發驚喜任務彈窗 (Surprise Boss Modal) -->
+<div class="modal-overlay" id="surpriseBossModal">
+    <div class="modal-box boss-modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header" style="background: rgba(219, 39, 119, 0.25);">
+            <h3 class="modal-title" style="color:#f472b6;">⚠️ 突發副本事件！大魔王突襲 👾</h3>
+        </div>
+        <div class="modal-body" id="boss-modal-content">
+            <span class="boss-badge" id="boss-quest-badge">🎯 弱點狙擊 ⚔️ 文法陷阱</span>
+            <div style="font-size:14px; font-weight:bold; color:#fde047; line-height:1.5;">
+                大魔王感應到你的修煉進度，特派【狂暴試煉怪】前來狙擊你的弱點與文法盲區！
+            </div>
+            
+            <div style="background:#1e293b; border:1px solid #475569; padding:12px; border-radius:10px; margin-top:4px;">
+                <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;">題目試煉：</div>
+                <div id="boss-question-text" style="font-size:18px; font-weight:bold; color:#ffffff; white-space:pre-wrap;">載入試煉中...</div>
+            </div>
+
+            <div class="quiz-options" id="boss-quiz-options" style="margin-top:6px;"></div>
+            <div id="boss-quiz-feedback" class="quiz-feedback" style="min-height:22px; font-size:15px;"></div>
+
+            <div style="display:flex; gap:8px; margin-top:6px;">
+                <button id="btn-boss-submit" class="quiz-action-btn" onclick="submitBossAnswer()" style="display:none; background:#ec4899; box-shadow:0 4px 12px rgba(236,72,153,0.35);">💥 迎頭痛擊（提交答案）</button>
+                <button id="btn-boss-close" class="btn-quest-setting" onclick="closeSurpriseModal()" style="display:none; width:100%; padding:10px; font-size:14px;">🚪 凱旋返回</button>
+            </div>
+            <button id="btn-boss-flee" class="btn-quest-setting" onclick="fleeSurpriseModal()" style="background:none; border:none; color:#64748b; font-size:11px; margin-top:4px; text-decoration:underline;">🏃 戰術撤退（今日先不挑戰）</button>
         </div>
     </div>
 </div>
@@ -1446,7 +1492,7 @@
             let localData = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const k = localStorage.key(i);
-                if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_') || k.startsWith('jp_learned_')) {
+                if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_') || k.startsWith('jp_learned_') || k.startsWith('jp_surprise_')) {
                     localData[k] = JSON.parse(localStorage.getItem(k));
                 }
             }
@@ -1505,9 +1551,7 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') {
-                ctx.resume();
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1683,7 +1727,7 @@
     const SEMANTIC_SYNONYMS = [
         { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
         { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげ德', 'によって', 'つき'] },
-        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', '外', 'けれども', 'ものの', 'としても'] },
+        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', 'が', 'けれども', 'ものの', 'としても'] },
         { triggers: ['打算', '計畫', '準備', '想要'], targets: ['つもり', '予定', 'ようとする', 'たい', 'ほしい'] },
         { triggers: ['好像', '似乎', '聽說', '看起來'], targets: ['そう', 'よう', 'らしい', 'みたい'] },
         { triggers: ['必須', '一定要', '非得'], targets: ['なければならない', 'ないと', 'ざるを得ない', 'べき'] },
@@ -1713,6 +1757,10 @@
     let quizIndex = 0;
     let currentCorrectAnswer = null;
     let selectedOptionData = null;
+
+    // 👾 驚喜副本變數
+    let currentBossWord = null;
+    let selectedBossOption = null;
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
@@ -2173,6 +2221,166 @@
         updateHUDLevel();
 
         loadSheetData(document.getElementById('sheetSelect').value);
+
+        // 👾 載入完成後檢查每 3 天驚喜任務觸發條件
+        checkSurpriseBossTrigger();
+    }
+
+    // 👾 每 3 天驚喜任務觸發核心邏輯
+    function checkSurpriseBossTrigger() {
+        const lastTrigger = localStorage.getItem('jp_surprise_last_date');
+        const today = getTodayKey();
+        
+        if (!lastTrigger) {
+            // 初次設定基準日
+            localStorage.setItem('jp_surprise_last_date', today);
+            return;
+        }
+
+        const d1 = new Date(lastTrigger);
+        const d2 = new Date(today);
+        const diffDays = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+
+        if (diffDays >= 3) {
+            setTimeout(() => {
+                triggerSurpriseBossQuest();
+            }, 1200);
+        }
+    }
+
+    function triggerSurpriseBossQuest() {
+        if (allSearchableWords.length < 4) return;
+
+        // 1. 弱點池查找：答對次數少且有翻閱過的單字
+        let weakCandidates = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k.startsWith('jp_progress_')) {
+                const w = k.replace('jp_progress_', '');
+                const p = JSON.parse(localStorage.getItem(k));
+                if (p.read > 0 && p.quiz === 0 && globalWordDataMap[w]) {
+                    weakCandidates.push(globalWordDataMap[w]);
+                }
+            }
+        }
+
+        // 2. 文法陷阱池查找（助詞、て形、文法、因為的比較等）
+        const grammarTrapKeys = ['sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
+        let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey));
+
+        let isWeakness = false;
+        if (weakCandidates.length > 0 && Math.random() > 0.4) {
+            currentBossWord = weakCandidates[Math.floor(Math.random() * weakCandidates.length)];
+            isWeakness = true;
+        } else if (grammarCandidates.length > 0) {
+            currentBossWord = grammarCandidates[Math.floor(Math.random() * grammarCandidates.length)];
+            isWeakness = false;
+        } else {
+            currentBossWord = allSearchableWords[Math.floor(Math.random() * allSearchableWords.length)];
+        }
+
+        document.getElementById('boss-quest-badge').textContent = isWeakness ? '🎯 弱點突擊（遺忘盲區狙擊）' : '⚔️ 文法魔王陷阱（句型助詞特訓）';
+
+        // 生成題目 (優先克漏字或意思)
+        const rawExample = getQuizExampleText(currentBossWord);
+        const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
+        let questionText = '';
+        let targetAnswerText = '';
+
+        if (exampleLine1 !== '') {
+            let cloze = exampleLine1;
+            if (currentBossWord.kanji && currentBossWord.kanji.trim() !== '') {
+                cloze = cloze.split(currentBossWord.kanji).join('＿＿＿');
+            }
+            if (currentBossWord.jp && currentBossWord.jp.trim() !== '') {
+                cloze = cloze.split(currentBossWord.jp).join('＿＿＿');
+            }
+            questionText = `【${currentBossWord.catName}】\n${cloze}`;
+            targetAnswerText = currentBossWord.jp;
+        } else {
+            questionText = `【${currentBossWord.catName}】\n${currentBossWord.jp}`;
+            targetAnswerText = getQuizZhText(currentBossWord);
+        }
+
+        document.getElementById('boss-question-text').textContent = questionText;
+
+        // 生成選項
+        let wrongCandidates = allSearchableWords.filter(w => w.jp !== currentBossWord.jp).sort(() => Math.random() - 0.5).slice(0, 3);
+        let options = [currentBossWord].concat(wrongCandidates).sort(() => Math.random() - 0.5);
+
+        const optionsContainer = document.getElementById('boss-quiz-options');
+        optionsContainer.innerHTML = '';
+        selectedBossOption = null;
+
+        options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-btn';
+            const optText = (exampleLine1 !== '') ? opt.jp : getQuizZhText(opt);
+            btn.innerHTML = `<span>[${idx + 1}] ${optText}</span>`;
+            btn.onclick = () => selectBossOption(btn, opt);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('boss-quiz-feedback').textContent = '';
+        document.getElementById('boss-quiz-feedback').className = 'quiz-feedback';
+        document.getElementById('btn-boss-submit').style.display = 'none';
+        document.getElementById('btn-boss-close').style.display = 'none';
+        document.getElementById('btn-boss-flee').style.display = 'block';
+
+        playWrongSound(); // 警報提示音
+        document.getElementById('surpriseBossModal').style.display = 'flex';
+    }
+
+    function selectBossOption(btn, opt) {
+        playClickSound();
+        const allBtns = document.querySelectorAll('#boss-quiz-options .quiz-btn');
+        allBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedBossOption = opt;
+        document.getElementById('btn-boss-submit').style.display = 'block';
+    }
+
+    function submitBossAnswer() {
+        if (!selectedBossOption) return;
+        const allBtns = document.querySelectorAll('#boss-quiz-options .quiz-btn');
+        allBtns.forEach(b => {
+            b.disabled = true;
+            b.classList.remove('selected');
+        });
+
+        document.getElementById('btn-boss-submit').style.display = 'none';
+        document.getElementById('btn-boss-flee').style.display = 'none';
+        const feedbackEl = document.getElementById('boss-quiz-feedback');
+
+        if (selectedBossOption.jp === currentBossWord.jp) {
+            playSuccessSound();
+            addEXP(200); // 獎勵 200 EXP
+            feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
+            feedbackEl.className = 'quiz-feedback success';
+            localStorage.setItem('jp_surprise_last_date', getTodayKey());
+        } else {
+            playWrongSound();
+            feedbackEl.textContent = `💀 挑戰失敗！正解是：${currentBossWord.jp} (${getQuizZhText(currentBossWord)})`;
+            feedbackEl.className = 'quiz-feedback error';
+        }
+
+        allBtns.forEach(b => {
+            if (b.textContent.includes(currentBossWord.jp) || b.textContent.includes(getQuizZhText(currentBossWord))) {
+                b.classList.add('correct');
+            }
+        });
+
+        document.getElementById('btn-boss-close').style.display = 'block';
+    }
+
+    function closeSurpriseModal() {
+        playClickSound();
+        document.getElementById('surpriseBossModal').style.display = 'none';
+    }
+
+    function fleeSurpriseModal() {
+        playClickSound();
+        document.getElementById('surpriseBossModal').style.display = 'none';
     }
 
     function pickDailyFiveWords(dateString) {
@@ -2545,7 +2753,7 @@
         const allGroups = document.querySelectorAll('.category-group');
         allGroups.forEach(g => {
             g.classList.remove('open');
-            const arrow = headerElement.querySelector('span:last-child');
+            const arrow = g.querySelector('.category-header span:last-child');
             if (arrow) arrow.textContent = '▼';
         });
 
