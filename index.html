@@ -1089,7 +1089,6 @@
             transform: translateY(-1px);
         }
 
-        /* 👾 突發驚喜任務彈窗 (Surprise Boss Modal) */
         .boss-modal-box {
             border: 2px solid #ec4899;
             box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(236, 72, 153, 0.45);
@@ -1299,7 +1298,8 @@
             </div>
         </div>
 
-        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 25 分類快速導覽 (5 × 5)：</div>
+        <!-- 💡 精簡版分類導覽標題 -->
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 25 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
         <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
@@ -1727,7 +1727,7 @@
     const SEMANTIC_SYNONYMS = [
         { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
         { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげ德', 'によって', 'つき'] },
-        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', 'が', 'けれども', 'ものの', 'としても'] },
+        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', '外', 'けれども', 'ものの', 'としても'] },
         { triggers: ['打算', '計畫', '準備', '想要'], targets: ['つもり', '予定', 'ようとする', 'たい', 'ほしい'] },
         { triggers: ['好像', '似乎', '聽說', '看起來'], targets: ['そう', 'よう', 'らしい', 'みたい'] },
         { triggers: ['必須', '一定要', '非得'], targets: ['なければならない', 'ないと', 'ざるを得ない', 'べき'] },
@@ -1758,7 +1758,6 @@
     let currentCorrectAnswer = null;
     let selectedOptionData = null;
 
-    // 👾 驚喜副本變數
     let currentBossWord = null;
     let selectedBossOption = null;
 
@@ -2221,18 +2220,14 @@
         updateHUDLevel();
 
         loadSheetData(document.getElementById('sheetSelect').value);
-
-        // 👾 載入完成後檢查每 3 天驚喜任務觸發條件
         checkSurpriseBossTrigger();
     }
 
-    // 👾 每 3 天驚喜任務觸發核心邏輯
     function checkSurpriseBossTrigger() {
         const lastTrigger = localStorage.getItem('jp_surprise_last_date');
         const today = getTodayKey();
         
         if (!lastTrigger) {
-            // 初次設定基準日
             localStorage.setItem('jp_surprise_last_date', today);
             return;
         }
@@ -2251,7 +2246,6 @@
     function triggerSurpriseBossQuest() {
         if (allSearchableWords.length < 4) return;
 
-        // 1. 弱點池查找：答對次數少且有翻閱過的單字
         let weakCandidates = [];
         for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
@@ -2264,7 +2258,6 @@
             }
         }
 
-        // 2. 文法陷阱池查找（助詞、て形、文法、因為的比較等）
         const grammarTrapKeys = ['sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
         let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey));
 
@@ -2279,9 +2272,8 @@
             currentBossWord = allSearchableWords[Math.floor(Math.random() * allSearchableWords.length)];
         }
 
-        document.getElementById('boss-quest-badge').textContent = isWeakness ? '🎯 弱點突擊（遺忘盲區狙擊）' : '⚔️ 文法魔王陷阱（句型助詞特訓）';
+        document.getElementById('boss-quest-badge').textContent = isWeakness ? '🎯 弱點狙擊（遺忘盲區狙擊）' : '⚔️ 文法魔王陷阱（句型助詞特訓）';
 
-        // 生成題目 (優先克漏字或意思)
         const rawExample = getQuizExampleText(currentBossWord);
         const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
         let questionText = '';
@@ -2304,7 +2296,6 @@
 
         document.getElementById('boss-question-text').textContent = questionText;
 
-        // 生成選項
         let wrongCandidates = allSearchableWords.filter(w => w.jp !== currentBossWord.jp).sort(() => Math.random() - 0.5).slice(0, 3);
         let options = [currentBossWord].concat(wrongCandidates).sort(() => Math.random() - 0.5);
 
@@ -2327,7 +2318,7 @@
         document.getElementById('btn-boss-close').style.display = 'none';
         document.getElementById('btn-boss-flee').style.display = 'block';
 
-        playWrongSound(); // 警報提示音
+        playWrongSound();
         document.getElementById('surpriseBossModal').style.display = 'flex';
     }
 
@@ -2354,7 +2345,7 @@
 
         if (selectedBossOption.jp === currentBossWord.jp) {
             playSuccessSound();
-            addEXP(200); // 獎勵 200 EXP
+            addEXP(200);
             feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
             feedbackEl.className = 'quiz-feedback success';
             localStorage.setItem('jp_surprise_last_date', getTodayKey());
@@ -2662,26 +2653,23 @@
         document.getElementById('stat-total-words').textContent = totalUnlocked;
         document.getElementById('stat-total-quizzes').textContent = totalQuizSuccess;
 
+        // 💡 25 格準確計算：已學數 / 總字數
         let gridHtml = '';
-        for (const [catKey, optObj] of Object.entries(SHEETS_CONFIG)) {
+        for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
             const catName = optElement ? optElement.text : catKey;
             
-            let count = categoryMap[catName] ? categoryMap[catName].length : 0;
+            const totalWordsInCat = (sheetDataCache[catKey] || []).length;
+            const learnedWordsInCat = categoryMap[catName] ? categoryMap[catName].length : 0;
+            const isCompleted = totalWordsInCat > 0 && learnedWordsInCat >= totalWordsInCat;
 
             gridHtml += `
                 <div class="category-grid-item" onclick="expandCategoryByName('${catName}')" title="${catName}">
                     <div class="grid-name">${catName}</div>
-                    <div class="grid-count">${count} 字</div>
+                    <div class="grid-count">${learnedWordsInCat} / ${totalWordsInCat} 字${isCompleted ? ' ✨' : ''}</div>
                 </div>
             `;
         }
-        gridHtml += `
-            <div class="category-grid-item" onclick="expandCategoryByName('其他/未分類')" title="全範圍匯總">
-                <div class="grid-name">全範圍收錄</div>
-                <div class="grid-count">${allSearchableWords.length} 字</div>
-            </div>
-        `;
         gridContainer.innerHTML = gridHtml;
 
         let groupsHtml = '';
