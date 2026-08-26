@@ -518,6 +518,26 @@
             border: 1px solid #cbd5e1;
         }
 
+        .btn-unlock-more {
+            margin-top: 10px;
+            background: var(--pixel-pink-bg);
+            color: var(--pixel-pink);
+            border: 1.5px dashed var(--pixel-pink);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 13px;
+            display: none;
+            transition: all 0.2s;
+        }
+        .btn-unlock-more:hover {
+            background: var(--pixel-pink);
+            color: #ffffff;
+        }
+
         #quiz-section {
             background: var(--card-bg); padding: 30px 20px; border-radius: 20px;
             box-shadow: var(--shadow); width: 100%; box-sizing: border-box; text-align: center;
@@ -875,7 +895,6 @@
             font-weight: bold;
         }
 
-        /* 👾 戰力同步率專屬看板 */
         .dynamic-boss-box {
             background: rgba(236, 72, 153, 0.12);
             border: 1px dashed rgba(236, 72, 153, 0.45);
@@ -954,6 +973,7 @@
         </div>
 
         <select id="sheetSelect" onchange="changeSheet()">
+            <option value="all" selected>👾 綜合大亂鬥 (全範圍)</option>
             <option value="sheet1">名詞</option>
             <option value="sheet2">形式名詞</option>
             <option value="sheet3">數詞</option>
@@ -979,7 +999,6 @@
             <option value="sheet23">日語的所有「詞」</option>
             <option value="sheet24">します的擴充包</option>
             <option value="sheet25">つけます的擴充包</option>
-            <option value="all">👾 綜合大亂鬥 (全範圍)</option>
         </select>
 
         <div class="button-group">
@@ -1015,6 +1034,7 @@
                 </div>
             </div>
         </div>
+        <button id="btn-unlock-more-cards" class="btn-unlock-more" onclick="unlockFullCards()">🔓 進入無限修煉模式（展開此分類所有單字）</button>
     </div>
 
     <!-- 2. 測驗模式 -->
@@ -1029,6 +1049,8 @@
         
         <button id="btn-submit-answer" class="quiz-action-btn" onclick="submitAnswer()" style="display:none;">提交答案 🔒</button>
         <button id="btn-next-quiz" class="quiz-action-btn" onclick="nextQuiz()" style="display:none;">下一題 ➔</button>
+        <button id="btn-restart-quiz-round" class="quiz-action-btn" onclick="startQuiz(false)" style="display:none; background:#0284c7;">🔁 重新抽一組挑戰</button>
+        <button id="btn-infinite-quiz" class="btn-unlock-more" onclick="startQuiz(true)">🔥 進入全範圍無限測驗模式</button>
     </div>
 
     <!-- 3. 📊 個人學習進度儀表板 -->
@@ -1051,7 +1073,7 @@
 
             <div class="quest-item" style="margin-top: 10px;">
                 <div class="quest-info">
-                    <span>🏆 每日測驗挑戰</span>
+                    <span>🏆 每日測驗練習（完成即可）</span>
                     <span id="quest-quiz-text">0 / 10</span>
                 </div>
                 <div class="quest-bar-bg">
@@ -1254,9 +1276,7 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') {
-                ctx.resume();
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1453,7 +1473,8 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
-    let currentList = [];
+    let fullSourceList = []; // 當前分類完整單字庫
+    let currentList = [];    // 當前翻卡使用之單字清單
     let currentIndex = 0;
     let currentMode = 'review';
     let quizList = [];
@@ -1526,7 +1547,6 @@
         if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
     }
 
-    // 👑 階級指南彈窗操作 (以戰力同步率呈現)
     function openRankGuideModal() {
         playClickSound();
         const totalWords = allSearchableWords.length || 1000;
@@ -1580,7 +1600,7 @@
 
     function getQuestSettings() {
         const data = localStorage.getItem('jp_quest_settings');
-        return data ? JSON.parse(data) : { readTarget: 20, quizTarget: 10 };
+        return data ? JSON.parse(data) : { readTarget: 5, quizTarget: 5 };
     }
 
     function getTodayQuestProgress() {
@@ -1589,6 +1609,7 @@
         return data ? JSON.parse(data) : { readCount: 0, quizCount: 0, rewardClaimed: false };
     }
 
+    // 💡 每日測驗挑戰只要「完成作答」就增加次數，不強制要求答對
     function saveTodayQuestProgress(type) {
         const today = getTodayKey();
         const prog = getTodayQuestProgress();
@@ -1618,15 +1639,16 @@
         const current = getQuestSettings();
         const newRead = prompt('請輸入每日翻卡修煉目標張數：', current.readTarget);
         if (newRead === null) return;
-        const newQuiz = prompt('請輸入每日測驗答對目標題數：', current.quizTarget);
+        const newQuiz = prompt('請輸入每日測驗練習目標題數（完成即可）：', current.quizTarget);
         if (newQuiz === null) return;
 
         const targetObj = {
-            readTarget: Math.max(parseInt(newRead, 10) || 20, 1),
-            quizTarget: Math.max(parseInt(newQuiz, 10) || 10, 1)
+            readTarget: Math.max(parseInt(newRead, 10) || 5, 1),
+            quizTarget: Math.max(parseInt(newQuiz, 10) || 5, 1)
         };
         localStorage.setItem('jp_quest_settings', JSON.stringify(targetObj));
         renderQuestBoard();
+        loadSheetData(document.getElementById('sheetSelect').value);
     }
 
     function renderQuestBoard() {
@@ -1869,6 +1891,10 @@
         if (allSearchableWords.length > 0) {
             pickDailyFiveWords(dateString);
             updateHUDLevel();
+            // 預設為全域大亂鬥
+            if (fullSourceList.length === 0) {
+                loadSheetData('all');
+            }
         }
     }
 
@@ -2015,6 +2041,7 @@
         loadSheetData(sheetKey, targetWordJp);
     }
 
+    // 💡 翻卡載入邏輯：預設依自訂目標限制數量，並提供解鎖全部的按鈕
     async function loadSheetData(urlKey, targetWordJp = null) {
         document.getElementById('card-sub-front').textContent = '資料載入中...';
         document.getElementById('card-main-front').textContent = '';
@@ -2045,7 +2072,7 @@
                     }).filter(Boolean);
                     allData = allData.concat(parsed);
                 }
-                currentList = allData;
+                fullSourceList = allData;
             } else {
                 const response = await fetch(SHEETS_CONFIG[urlKey]);
                 const text = await response.text();
@@ -2053,7 +2080,7 @@
                 
                 if (parsedData.length >= 2) {
                     const headers = parsedData[0];
-                    currentList = parsedData.slice(1).map(cols => {
+                    fullSourceList = parsedData.slice(1).map(cols => {
                         const item = { 
                             jp: cols[0] || '', kanji: cols[1] || '', level: cols[2] || '', type: cols[3] || '',
                             rawCols: cols, rawHeaders: headers 
@@ -2065,11 +2092,23 @@
                         return null;
                     }).filter(Boolean);
                 } else {
-                    currentList = [];
+                    fullSourceList = [];
                 }
             }
             
-            currentList.sort(() => Math.random() - 0.5);
+            fullSourceList.sort(() => Math.random() - 0.5);
+
+            // 依據每日目標設定抽取數量
+            const settings = getQuestSettings();
+            const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
+
+            if (fullSourceList.length > targetLimit) {
+                currentList = fullSourceList.slice(0, targetLimit);
+                document.getElementById('btn-unlock-more-cards').style.display = 'block';
+            } else {
+                currentList = [...fullSourceList];
+                document.getElementById('btn-unlock-more-cards').style.display = 'none';
+            }
 
             if (targetWordJp) {
                 const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
@@ -2084,6 +2123,13 @@
             document.getElementById('card-sub-front').textContent = '載入失敗 (請檢查網路)';
             console.log(e);
         }
+    }
+
+    function unlockFullCards() {
+        playClickSound();
+        currentList = [...fullSourceList];
+        document.getElementById('btn-unlock-more-cards').style.display = 'none';
+        updateReviewUI();
     }
 
     function changeSheet() {
@@ -2399,26 +2445,41 @@
         return word.rawCols[6] || word.rawCols[5] || '';
     }
 
-    function startQuiz() {
-        if (currentList.length < 4) {
+    // 💡 測驗出題邏輯：預設限制出題數量，完成後提供續練選項
+    function startQuiz(infiniteMode = false) {
+        if (fullSourceList.length < 4) {
             alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
             setMode('review');
             return;
         }
-        quizList = [...currentList].sort(() => Math.random() - 0.5);
+
+        const settings = getQuestSettings();
+        const shuffled = [...fullSourceList].sort(() => Math.random() - 0.5);
+
+        if (infiniteMode) {
+            quizList = shuffled;
+        } else {
+            quizList = shuffled.slice(0, settings.quizTarget);
+        }
+
         quizIndex = 0;
+        document.getElementById('btn-restart-quiz-round').style.display = 'none';
+        document.getElementById('btn-infinite-quiz').style.display = 'none';
         renderQuizQuestion();
     }
 
     function renderQuizQuestion() {
         if (quizIndex >= quizList.length) {
-            document.getElementById('quiz-jp').textContent = '測驗完成！🎉✨';
-            document.getElementById('quiz-type').textContent = 'LEVEL CLEAR!';
+            document.getElementById('quiz-jp').textContent = '今日回合完成！🎉✨';
+            document.getElementById('quiz-type').textContent = 'STAGE CLEAR!';
             document.getElementById('quiz-options').innerHTML = '';
-            document.getElementById('quiz-feedback').textContent = '';
+            document.getElementById('quiz-feedback').textContent = '已完成此輪練習！';
+            document.getElementById('quiz-feedback').className = 'quiz-feedback success';
             document.getElementById('btn-submit-answer').style.display = 'none';
             document.getElementById('btn-next-quiz').style.display = 'none';
             document.getElementById('quiz-score').textContent = `全部完成 (${quizList.length} 題)`;
+            document.getElementById('btn-restart-quiz-round').style.display = 'block';
+            document.getElementById('btn-infinite-quiz').style.display = 'block';
             return;
         }
 
@@ -2434,7 +2495,7 @@
         let questionType = Math.floor(Math.random() * (hasExample ? 3 : 2));
         
         const typeSelect = document.getElementById('sheetSelect');
-        const defaultType = typeSelect.value === 'all' ? '綜合' : typeSelect.selectedOptions[0].text;
+        const defaultType = typeSelect.value === 'all' ? '綜合大亂鬥' : typeSelect.selectedOptions[0].text;
         
         let questionText = '';
         let quizBadge = '';
@@ -2468,7 +2529,7 @@
         document.getElementById('btn-submit-answer').style.display = 'none'; 
         document.getElementById('btn-next-quiz').style.display = 'none';
 
-        let wrongCandidates = currentList.filter(word => {
+        let wrongCandidates = fullSourceList.filter(word => {
             if (word.jp === currentWord.jp) return false;
             
             let textToShow;
@@ -2557,6 +2618,9 @@
             }
         });
 
+        // 每次作答都累計每日測驗次數
+        saveTodayQuestProgress('quiz');
+
         if (selectedOptionData.jp === currentCorrectAnswer.jp) {
             playSuccessSound();
             if (clickedBtn) clickedBtn.classList.add('correct');
@@ -2601,7 +2665,6 @@
     }
 
     preloadAllCategories();
-    changeSheet();
 </script>
 
 </body>
