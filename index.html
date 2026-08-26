@@ -171,7 +171,7 @@
         .marquee-content {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 280s linear infinite; /* 280s 極致慢步 */
+            animation: marquee 280s linear infinite;
         }
         .marquee-viewport:hover .marquee-content {
             animation-play-state: paused;
@@ -325,7 +325,6 @@
         }
         .btn-tts-micro:hover { transform: scale(1.25); }
 
-        /* 📇 字卡外框與 3D 結構 */
         .card-container { 
             perspective: 1000px; 
             width: 100%; 
@@ -365,7 +364,6 @@
             box-sizing: border-box;
         }
 
-        /* 💡 固定式頁數標籤（不受 3D 翻轉影響，永不顛倒） */
         .card-counter-fixed {
             position: absolute;
             top: 14px;
@@ -606,7 +604,7 @@
                 <span>訪客離線模式</span>
             </div>
             <div class="auth-buttons">
-                <!-- 🔄 手機專屬重新整理按鈕 -->
+                <!-- 🔄 重新整理按鈕 -->
                 <button class="btn-refresh" onclick="forceAppReload()" title="重新整理最新資料">
                     🔄 重新整理
                 </button>
@@ -1043,19 +1041,37 @@
         return text.replace(/[（\(][^）\)]*[）\)]/g, '');
     }
 
+    // 🌟 全平台統一使用 Google 官方自然日語發音串流
+    let globalAudioPlayer = new Audio();
+
     function speakWordDirectly(event, wordText) {
         if (event) event.stopPropagation();
         if (!wordText) return;
         
         playClickSound();
-        window.speechSynthesis.cancel(); 
 
-        let text = cleanTextForSpeech(wordText);
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP'; 
-        utterance.rate = 1.0; 
-        if (jpVoice) utterance.voice = jpVoice;
-        window.speechSynthesis.speak(utterance);
+        let text = cleanTextForSpeech(wordText).trim();
+        if (!text) return;
+
+        // 停止之前的播放
+        try {
+            globalAudioPlayer.pause();
+            globalAudioPlayer.currentTime = 0;
+            window.speechSynthesis.cancel();
+        } catch(e) {}
+
+        // Google Translate 高音質日語 TTS 接口
+        const googleTTSUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`;
+
+        globalAudioPlayer.src = googleTTSUrl;
+        globalAudioPlayer.play().catch(() => {
+            // 萬一網路或跨域受阻，自動退回本機 TTS 作為雙重保障
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP'; 
+            utterance.rate = 1.0; 
+            if (jpVoice) utterance.voice = jpVoice;
+            window.speechSynthesis.speak(utterance);
+        });
     }
 
     function speakFrontCard(event) {
@@ -1067,36 +1083,16 @@
 
     function speakJP(event, elementId) {
         if (event) event.stopPropagation();
-        playClickSound();
-        window.speechSynthesis.cancel();
-
         let text = document.getElementById(elementId).textContent;
         if (!text || text.includes('載入中') || text.includes('測驗完成') || text.includes('＿')) return;
-        
-        text = cleanTextForSpeech(text);
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP'; 
-        utterance.rate = 1.0; 
-        if (jpVoice) utterance.voice = jpVoice;
-        window.speechSynthesis.speak(utterance);
+        speakWordDirectly(event, text);
     }
 
     function speakExampleJP(event, rawText) {
         if (event) event.stopPropagation();
-        playClickSound();
-        window.speechSynthesis.cancel();
-
         if (!rawText) return;
-
         const firstLine = rawText.split('\n')[0] || rawText;
-        const textToSpeak = cleanTextForSpeech(firstLine).trim();
-        if (!textToSpeak) return;
-
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        utterance.lang = 'ja-JP'; 
-        utterance.rate = 1.0; 
-        if (jpVoice) utterance.voice = jpVoice;
-        window.speechSynthesis.speak(utterance);
+        speakWordDirectly(event, firstLine);
     }
 
     function speakQuizPrompt(event) {
@@ -1609,7 +1605,6 @@
         }
     }
 
-    // 📇 字卡渲染：精準辨識「外來語」與「漢字」的主副標題順序
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -1619,7 +1614,6 @@
         document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
         document.getElementById('card-badge-front').textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字'; 
         
-        // 更新頂部固定頁數（永不顛倒）
         const counterText = `${currentIndex + 1} / ${currentList.length}`;
         const fixedCounter = document.getElementById('card-counter-fixed');
         if (fixedCounter) fixedCounter.textContent = counterText;
@@ -1629,17 +1623,14 @@
 
         let fullBackTitle = current.jp;
 
-        // 判斷是否為外來語（包含英文字母）或漢字
         if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
             const isEnglishForeign = /[a-zA-Z]/.test(current.kanji);
             
             if (isEnglishForeign) {
-                // 外來語：片假名在上面（大），英文原詞在下面（小）
                 mainTitleEl.textContent = current.jp;
                 subTitleEl.textContent = current.kanji;
                 fullBackTitle = `${current.jp} (${current.kanji})`;
             } else {
-                // 漢字：漢字在上面（大），平假名讀音在下面（小）
                 mainTitleEl.textContent = current.kanji;
                 subTitleEl.textContent = current.jp;
                 fullBackTitle = `${current.kanji} (${current.jp})`;
@@ -1647,14 +1638,12 @@
             mainTitleEl.style.display = 'block';
             subTitleEl.style.display = 'block';
         } else {
-            // 純假名
             mainTitleEl.textContent = current.jp;
             subTitleEl.textContent = '';
             subTitleEl.style.display = 'none';
             fullBackTitle = current.jp;
         }
         
-        // 背面內容渲染
         const backContainer = document.getElementById('card-back-content');
         let backHTML = '';
 
@@ -1912,11 +1901,7 @@
                 currentCorrectAnswer.hasQuizzedThisTime = true;
             }
             
-            let textToSpeak = cleanTextForSpeech(currentCorrectAnswer.jp);
-            const utterance = new SpeechSynthesisUtterance(textToSpeak);
-            utterance.lang = 'ja-JP'; utterance.rate = 1.0; 
-            if (jpVoice) utterance.voice = jpVoice;
-            window.speechSynthesis.speak(utterance);
+            speakWordDirectly(null, currentCorrectAnswer.jp);
         } else {
             playWrongSound();
             if (clickedBtn) clickedBtn.classList.add('wrong');
