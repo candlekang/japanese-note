@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 💡 解除 Google 雲端語音的防盜連阻擋，確保 iOS/Android 順暢播放 -->
+    <meta name="referrer" content="no-referrer">
     <title>日文筆記複習系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -604,6 +606,7 @@
                 <span>訪客離線模式</span>
             </div>
             <div class="auth-buttons">
+                <!-- 🔄 重新整理按鈕 -->
                 <button class="btn-refresh" onclick="forceAppReload()" title="重新整理最新資料">
                     🔄 重新整理
                 </button>
@@ -675,8 +678,10 @@
     <!-- 1. 翻卡模式 -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
+            <!-- 💡 固定頁數標籤：在卡片翻轉層外，永不顛倒 -->
             <div class="card-counter-fixed" id="card-counter-fixed">0 / 0</div>
 
+            <!-- 內建微型左右導覽箭頭 -->
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
             <div class="card-nav-arrow right" onclick="nextCard(event)" title="下一張">▶</div>
 
@@ -824,7 +829,7 @@
         }
     }
 
-    // 🔊 手機版音訊與語音解鎖喚醒
+    // 🔊 音訊核心與手機解鎖機制
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) {
@@ -838,11 +843,11 @@
 
     function unlockAudioOnMobile() {
         getAudioContext();
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.getVoices();
-            const dummyUtterance = new SpeechSynthesisUtterance('');
-            window.speechSynthesis.speak(dummyUtterance);
-        }
+        try {
+            const dummyAudio = new Audio();
+            dummyAudio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
+            dummyAudio.play().catch(() => {});
+        } catch(e) {}
         document.removeEventListener('touchstart', unlockAudioOnMobile);
         document.removeEventListener('click', unlockAudioOnMobile);
     }
@@ -1028,62 +1033,46 @@
         }
     }
 
-    // 🔊 優化日語語音引擎：優先匹配最高音質的女聲
-    let jpVoice = null;
-    function getBestJapaneseVoice() {
-        if (!('speechSynthesis' in window)) return null;
-        const voices = window.speechSynthesis.getVoices();
-        if (!voices || voices.length === 0) return null;
-
-        const priorityKeywords = [
-            'Google 日本語', 'Google ja-JP', 
-            'Kyoko (Enhanced)', 'Kyoko (Premium)', 'Nanami', 'Otoya (Enhanced)',
-            'Kyoko', 'Otoya', 'Siri'
-        ];
-
-        for (let keyword of priorityKeywords) {
-            const found = voices.find(v => v.name.includes(keyword) || (v.lang.replace('_', '-').startsWith('ja') && v.name.includes(keyword)));
-            if (found) return found;
-        }
-
-        return voices.find(v => v.lang.replace('_', '-').startsWith('ja')) || null;
-    }
-
-    function initVoice() {
-        jpVoice = getBestJapaneseVoice();
-    }
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = initVoice;
-        setTimeout(initVoice, 300);
-        setTimeout(initVoice, 1000);
-    }
-
     function cleanTextForSpeech(text) {
         if (!text) return '';
         return text.replace(/[（\(][^）\)]*[）\)]/g, '');
     }
 
-    // 🔊 原生 Web Speech API 發音（相容手機與電腦，零封鎖）
+    // 🌟 全平台統一使用 Google 官方自然日語串流播放
+    let globalTTSAudio = new Audio();
+
     function speakWordDirectly(event, wordText) {
         if (event) event.stopPropagation();
-        if (!wordText || !('speechSynthesis' in window)) return;
+        if (!wordText) return;
         
         playClickSound();
 
         let text = cleanTextForSpeech(wordText).trim();
         if (!text) return;
 
-        window.speechSynthesis.cancel(); // 清空舊佇列
+        try {
+            globalTTSAudio.pause();
+            globalTTSAudio.currentTime = 0;
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        } catch(e) {}
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP';
-        utterance.rate = 0.95; // 稍微放慢一點點，語音更自然甜美
-        utterance.pitch = 1.0;
+        // Google 官方高品質 TTS 音訊串流
+        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`;
 
-        if (!jpVoice) jpVoice = getBestJapaneseVoice();
-        if (jpVoice) utterance.voice = jpVoice;
-
-        window.speechSynthesis.speak(utterance);
+        globalTTSAudio.src = ttsUrl;
+        const playPromise = globalTTSAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                // 若網路斷線，自動降級為本機語音引擎保底
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ja-JP';
+                    utterance.rate = 0.95;
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
     }
 
     function speakFrontCard(event) {
