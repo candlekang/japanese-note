@@ -172,7 +172,7 @@
         .marquee-content {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 280s linear infinite;
+            animation: marquee 200s linear infinite;
         }
         .marquee-viewport:hover .marquee-content {
             animation-play-state: paused;
@@ -620,11 +620,12 @@
             </div>
         </div>
 
+        <!-- 📢 每日必學跑馬燈 (固定每天精選 5 個字) -->
         <div class="marquee-box" id="marquee-box">
-            <span class="marquee-tag" id="marquee-date-tag">最新收錄</span>
+            <span class="marquee-tag" id="marquee-date-tag">今日必學</span>
             <div class="marquee-viewport">
                 <div class="marquee-content" id="marquee-content">
-                    <span>⚡ 正在掃描試算表最新收錄內容...</span>
+                    <span>⚡ 正在挑選今日必學單字...</span>
                 </div>
             </div>
         </div>
@@ -825,7 +826,6 @@
         }
     }
 
-    // 🔊 音訊核心與手機解鎖機制
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) {
@@ -850,7 +850,6 @@
     document.addEventListener('touchstart', unlockAudioOnMobile, { once: true });
     document.addEventListener('click', unlockAudioOnMobile, { once: true });
 
-    // 📄 翻頁專屬擬真音效（結合帶通濾波 + 輕微摩擦滑動）
     function playPageFlipSound() {
         try {
             const ctx = getAudioContext();
@@ -865,7 +864,7 @@
             let lastOut = 0.0;
             for (let i = 0; i < bufferSize; i++) {
                 const white = Math.random() * 2 - 1;
-                data[i] = (lastOut + (0.02 * white)) / 1.02; // Pink Noise 柔和質感
+                data[i] = (lastOut + (0.02 * white)) / 1.02;
                 lastOut = data[i];
                 data[i] *= 3.5;
             }
@@ -1188,10 +1187,23 @@
         return true;
     }
 
+    // 🎲 日期隨機種子產生器（每天固定一組隨機亂數）
+    function getDailyRandomSeed() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth() + 1;
+        const d = now.getDate();
+        return y * 10000 + m * 100 + d;
+    }
+
+    function pseudoRandom(seed) {
+        const x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const promises = [];
-        let collectedLatest = [];
         allSearchableWords = [];
 
         const now = new Date();
@@ -1202,7 +1214,7 @@
 
         const dateTagEl = document.getElementById('marquee-date-tag');
         if (dateTagEl) {
-            dateTagEl.textContent = `📢 ${dateString} 更新`;
+            dateTagEl.textContent = `📢 今日必學・${dateString}`;
         }
 
         for (let i = 0; i < selectElement.options.length; i++) {
@@ -1218,7 +1230,6 @@
                 const parsedData = parseCSVText(text);
                 if (parsedData.length >= 2) {
                     const headers = parsedData[0];
-                    const validRows = [];
 
                     parsedData.slice(1).forEach(cols => {
                         const jp = cols[0] || '';
@@ -1236,15 +1247,9 @@
 
                             globalWordCategoryMap[jp] = catName;
                             globalWordDataMap[jp] = wordObj;
-                            validRows.push(wordObj);
                             allSearchableWords.push(wordObj);
                         }
                     });
-
-                    if (validRows.length > 0) {
-                        const latestFromSheet = validRows.slice(-2);
-                        collectedLatest.push(...latestFromSheet);
-                    }
                 }
             }).catch(() => {});
 
@@ -1253,9 +1258,24 @@
 
         await Promise.all(promises);
 
-        if (collectedLatest.length > 0) {
-            renderMarquee(collectedLatest, dateString);
+        if (allSearchableWords.length > 0) {
+            pickDailyFiveWords(dateString);
         }
+    }
+
+    // 🌟 核心：每日精選 5 個單字
+    function pickDailyFiveWords(dateString) {
+        let seed = getDailyRandomSeed();
+        const pool = [...allSearchableWords];
+        const selectedDailyWords = [];
+
+        for (let i = 0; i < 5 && pool.length > 0; i++) {
+            const randIndex = Math.floor(pseudoRandom(seed + i * 17) * pool.length);
+            selectedDailyWords.push(pool[randIndex]);
+            pool.splice(randIndex, 1);
+        }
+
+        renderMarquee(selectedDailyWords, dateString);
     }
 
     function handleSearch(inputText) {
@@ -1361,7 +1381,7 @@
         const marqueeEl = document.getElementById('marquee-content');
         if (!marqueeEl) return;
 
-        const itemsHtml = items.map(item => {
+        const itemsHtml = items.map((item, idx) => {
             let display = item.jp;
             if (item.kanji && item.kanji !== item.jp) {
                 if (/[a-zA-Z]/.test(item.kanji)) {
@@ -1370,8 +1390,9 @@
                     display = `${item.kanji} (${item.jp})`;
                 }
             }
+            const zhText = getWordZhText(item);
             const safeJp = item.jp.replace(/'/g, "\\'");
-            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}', '${safeJp}')">✨ [${dateString} 收錄・${item.catName}] ${display}</span>`;
+            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}', '${safeJp}')">✨ [${idx + 1}/5・${item.catName}] ${display}：${zhText}</span>`;
         }).join('');
 
         marqueeEl.innerHTML = `${itemsHtml} &nbsp;&nbsp;&nbsp;&nbsp; ${itemsHtml}`;
@@ -1458,7 +1479,7 @@
     }
 
     function changeSheet() {
-        playPageFlipSound();
+        playClickSound();
         const selected = document.getElementById('sheetSelect').value;
         document.getElementById('flashcard').classList.remove('is-flipped');
         loadSheetData(selected);
@@ -1717,7 +1738,6 @@
         document.getElementById('flashcard').classList.remove('is-flipped');
     }
 
-    // 💡 翻面時播放翻頁音效
     function flipCard() { 
         playPageFlipSound();
         const flashcard = document.getElementById('flashcard');
@@ -1735,7 +1755,6 @@
         flashcard.classList.toggle('is-flipped'); 
     }
     
-    // 💡 切換上一張/下一張時播放翻頁音效
     function nextCard(event) { 
         if (event) event.stopPropagation();
         playPageFlipSound(); 
