@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 💡 解除 Google 雲端語音的防盜連阻擋，確保 iOS/Android 順暢播放 -->
     <meta name="referrer" content="no-referrer">
     <title>日文筆記複習系統</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -606,7 +605,6 @@
                 <span>訪客離線模式</span>
             </div>
             <div class="auth-buttons">
-                <!-- 🔄 重新整理按鈕 -->
                 <button class="btn-refresh" onclick="forceAppReload()" title="重新整理最新資料">
                     🔄 重新整理
                 </button>
@@ -678,10 +676,8 @@
     <!-- 1. 翻卡模式 -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
-            <!-- 💡 固定頁數標籤：在卡片翻轉層外，永不顛倒 -->
             <div class="card-counter-fixed" id="card-counter-fixed">0 / 0</div>
 
-            <!-- 內建微型左右導覽箭頭 -->
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
             <div class="card-nav-arrow right" onclick="nextCard(event)" title="下一張">▶</div>
 
@@ -853,6 +849,49 @@
     }
     document.addEventListener('touchstart', unlockAudioOnMobile, { once: true });
     document.addEventListener('click', unlockAudioOnMobile, { once: true });
+
+    // 📄 翻頁專屬擬真音效（結合帶通濾波 + 輕微摩擦滑動）
+    function playPageFlipSound() {
+        try {
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+            const duration = 0.08;
+            const bufferSize = Math.floor(ctx.sampleRate * duration);
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            let lastOut = 0.0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                data[i] = (lastOut + (0.02 * white)) / 1.02; // Pink Noise 柔和質感
+                lastOut = data[i];
+                data[i] *= 3.5;
+            }
+
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1400, now);
+            filter.frequency.exponentialRampToValueAtTime(700, now + duration);
+            filter.Q.setValueAtTime(1.8, now);
+
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.01, now);
+            gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+
+            noise.start(now);
+            noise.stop(now + duration);
+        } catch (e) {}
+    }
 
     function playClickSound() {
         try {
@@ -1038,7 +1077,6 @@
         return text.replace(/[（\(][^）\)]*[）\)]/g, '');
     }
 
-    // 🌟 全平台統一使用 Google 官方自然日語串流播放
     let globalTTSAudio = new Audio();
 
     function speakWordDirectly(event, wordText) {
@@ -1056,7 +1094,6 @@
             if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         } catch(e) {}
 
-        // Google 官方高品質 TTS 音訊串流
         const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`;
 
         globalTTSAudio.src = ttsUrl;
@@ -1064,7 +1101,6 @@
         
         if (playPromise !== undefined) {
             playPromise.catch(() => {
-                // 若網路斷線，自動降級為本機語音引擎保底
                 if ('speechSynthesis' in window) {
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.lang = 'ja-JP';
@@ -1342,7 +1378,7 @@
     }
 
     function jumpToCategory(sheetKey, targetWordJp = null) {
-        playClickSound();
+        playPageFlipSound();
         setMode('review');
         const select = document.getElementById('sheetSelect');
         select.value = sheetKey;
@@ -1422,7 +1458,7 @@
     }
 
     function changeSheet() {
-        playClickSound();
+        playPageFlipSound();
         const selected = document.getElementById('sheetSelect').value;
         document.getElementById('flashcard').classList.remove('is-flipped');
         loadSheetData(selected);
@@ -1681,8 +1717,9 @@
         document.getElementById('flashcard').classList.remove('is-flipped');
     }
 
+    // 💡 翻面時播放翻頁音效
     function flipCard() { 
-        playClickSound();
+        playPageFlipSound();
         const flashcard = document.getElementById('flashcard');
         const isFlipped = flashcard.classList.contains('is-flipped');
         
@@ -1698,9 +1735,10 @@
         flashcard.classList.toggle('is-flipped'); 
     }
     
+    // 💡 切換上一張/下一張時播放翻頁音效
     function nextCard(event) { 
         if (event) event.stopPropagation();
-        playClickSound(); 
+        playPageFlipSound(); 
         if (currentIndex < currentList.length - 1) { 
             currentIndex++; 
             updateReviewUI(); 
@@ -1709,7 +1747,7 @@
 
     function prevCard(event) { 
         if (event) event.stopPropagation();
-        playClickSound(); 
+        playPageFlipSound(); 
         if (currentIndex > 0) { 
             currentIndex--; 
             updateReviewUI(); 
