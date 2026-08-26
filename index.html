@@ -577,6 +577,71 @@
         #btn-next-quiz { background: var(--pixel-pink); color: #ffffff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35); }
         #btn-next-quiz:hover { background: #db2777; }
 
+        /* ⚔️ 測驗引導看板 (Quiz Prompt Guide Box) */
+        .quiz-guide-box {
+            background: #0f172a;
+            border: 2px dashed #f59e0b;
+            border-radius: 16px;
+            padding: 24px 18px;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-sizing: border-box;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            animation: modalPop 0.25s ease;
+        }
+        .quiz-guide-title {
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 18px;
+            color: #fde047;
+            margin: 0;
+            line-height: 1.4;
+        }
+        .quiz-guide-desc {
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        .quiz-guide-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .btn-guide-study {
+            background: linear-gradient(90deg, #0284c7, #38bdf8);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+            transition: all 0.2s;
+        }
+        .btn-guide-study:hover {
+            transform: translateY(-1px);
+        }
+        .btn-guide-wild {
+            background: linear-gradient(90deg, #d97706, #f59e0b);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+            transition: all 0.2s;
+        }
+        .btn-guide-wild:hover {
+            transform: translateY(-1px);
+        }
+
         #stats-section {
             background: var(--card-bg); padding: 20px; border-radius: 20px;
             box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
@@ -914,7 +979,7 @@
             font-weight: bold;
         }
 
-        /* ⚙️ 自訂每日目標視窗 (Quest Settings Modal) */
+        /* ⚙️ 自訂每日目標視窗 */
         .quest-setting-group {
             background: #1e293b;
             border: 1px solid #334155;
@@ -1043,7 +1108,6 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1138,20 +1202,36 @@
         <button id="btn-unlock-more-cards" class="btn-unlock-more" onclick="unlockFullCards()">🔓 進入無限修煉模式（展開此分類所有單字）</button>
     </div>
 
-    <!-- 2. 測驗模式 -->
+    <!-- 2. 測驗模式 (含生猛開考/未學引導看板) -->
     <div id="quiz-section">
-        <div class="score-board" id="quiz-score">題數: 1 / 10</div>
-        <span class="badge" id="quiz-type">題型</span>
-        <div class="word-jp" id="quiz-jp" style="margin-bottom:10px;">載入中...</div>
-        <button class="btn-tts" onclick="speakQuizPrompt(event)">🔊 發音</button>
-        
-        <div class="quiz-options" id="quiz-options"></div>
-        <div id="quiz-feedback" class="quiz-feedback"></div>
-        
-        <button id="btn-submit-answer" class="quiz-action-btn" onclick="submitAnswer()" style="display:none;">提交答案 🔒</button>
-        <button id="btn-next-quiz" class="quiz-action-btn" onclick="nextQuiz()" style="display:none;">下一題 ➔</button>
-        <button id="btn-restart-quiz-round" class="quiz-action-btn" onclick="startQuiz(false)" style="display:none; background:#0284c7;">🔁 重新抽一組挑戰</button>
-        <button id="btn-infinite-quiz" class="btn-unlock-more" onclick="startQuiz(true)">🔥 進入全範圍無限測驗模式</button>
+        <!-- 💡 尚未翻卡時的引導看板 -->
+        <div id="quiz-guide-box" class="quiz-guide-box" style="display:none;">
+            <div class="quiz-guide-title">⚔️ 勇者注意！今日修煉尚未開始 🐣</div>
+            <div class="quiz-guide-desc">
+                偵測到你今天還沒翻閱單字卡喔！<br>
+                建議先去「📖 翻卡複習」建立記憶，再來測驗成效最好！
+            </div>
+            <div class="quiz-guide-buttons">
+                <button class="btn-guide-study" onclick="setMode('review')">🌸 先去翻卡修煉！打好基礎再來測</button>
+                <button class="btn-guide-wild" onclick="startWildQuiz()">🔥 我就是生猛！直接盲測開考！</button>
+            </div>
+        </div>
+
+        <!-- 正常測驗容器 -->
+        <div id="quiz-main-container" style="display:none;">
+            <div class="score-board" id="quiz-score">題數: 1 / 10</div>
+            <span class="badge" id="quiz-type">題型</span>
+            <div class="word-jp" id="quiz-jp" style="margin-bottom:10px;">載入中...</div>
+            <button class="btn-tts" onclick="speakQuizPrompt(event)">🔊 發音</button>
+            
+            <div class="quiz-options" id="quiz-options"></div>
+            <div id="quiz-feedback" class="quiz-feedback"></div>
+            
+            <button id="btn-submit-answer" class="quiz-action-btn" onclick="submitAnswer()" style="display:none;">提交答案 🔒</button>
+            <button id="btn-next-quiz" class="quiz-action-btn" onclick="nextQuiz()" style="display:none;">下一題 ➔</button>
+            <button id="btn-restart-quiz-round" class="quiz-action-btn" onclick="startQuiz(false)" style="display:none; background:#0284c7;">🔁 重新挑戰一輪</button>
+            <button id="btn-infinite-quiz" class="btn-unlock-more" onclick="startQuiz(true)">🔥 進入全範圍無限測驗模式</button>
+        </div>
     </div>
 
     <!-- 3. 📊 個人學習進度儀表板 -->
@@ -1203,7 +1283,7 @@
     </div>
 </div>
 
-<!-- 👑 像素 RPG 等級指南彈窗 (Level Guide Modal) -->
+<!-- 👑 像素 RPG 等級指南彈窗 -->
 <div class="modal-overlay" id="rankGuideModal" onclick="closeRankGuideModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -1249,7 +1329,7 @@
     </div>
 </div>
 
-<!-- ⚙️ 每日修煉目標設定彈窗 (Quest Settings Modal) -->
+<!-- ⚙️ 每日修煉目標設定彈窗 -->
 <div class="modal-overlay" id="questSettingsModal" onclick="closeQuestSettingsModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -1257,7 +1337,6 @@
             <button class="btn-modal-close" onclick="closeQuestSettingsModal()">✕</button>
         </div>
         <div class="modal-body">
-            <!-- 1. 翻卡目標 -->
             <div class="quest-setting-group">
                 <div class="quest-setting-label">📖 每日翻卡張數目標：</div>
                 <div class="quest-input-row">
@@ -1273,7 +1352,6 @@
                 </div>
             </div>
 
-            <!-- 2. 測驗目標 -->
             <div class="quest-setting-group">
                 <div class="quest-setting-label">🏆 每日測驗練習題數：</div>
                 <div class="quest-input-row">
@@ -1360,7 +1438,7 @@
             let localData = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const k = localStorage.key(i);
-                if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_')) {
+                if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_') || k.startsWith('jp_learned_')) {
                     localData[k] = JSON.parse(localStorage.getItem(k));
                 }
             }
@@ -1419,9 +1497,7 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') {
-                ctx.resume();
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1743,6 +1819,22 @@
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
+    // 🧠 今日已學單字清單紀錄 (翻過即算已學)
+    function getTodayLearnedWords() {
+        const today = getTodayKey();
+        const data = localStorage.getItem(`jp_learned_${today}`);
+        return data ? JSON.parse(data) : [];
+    }
+
+    function recordTodayLearnedWord(wordJp) {
+        const today = getTodayKey();
+        let list = getTodayLearnedWords();
+        if (!list.includes(wordJp)) {
+            list.push(wordJp);
+            localStorage.setItem(`jp_learned_${today}`, JSON.stringify(list));
+        }
+    }
+
     function getQuestSettings() {
         const data = localStorage.getItem('jp_quest_settings');
         return data ? JSON.parse(data) : { readTarget: 5, quizTarget: 5 };
@@ -1778,7 +1870,6 @@
         renderQuestBoard();
     }
 
-    // 🎯 8-bit 合一自訂目標彈窗操作
     function openQuestSettings() {
         playClickSound();
         const current = getQuestSettings();
@@ -1853,7 +1944,10 @@
         const progress = getProgress(wordJp);
         const isFirstRead = (type === 'read' && progress.read === 0);
 
-        if (type === 'read') progress.read++;
+        if (type === 'read') {
+            progress.read++;
+            recordTodayLearnedWord(wordJp); // 記錄到今日已學
+        }
         if (type === 'quiz') progress.quiz++;
         localStorage.setItem(key, JSON.stringify(progress));
 
@@ -2323,7 +2417,7 @@
             updateReviewUI();
         } else if (mode === 'quiz') {
             document.getElementById('quiz-section').style.display = 'block';
-            startQuiz();
+            checkQuizStartFlow();
         } else if (mode === 'stats') {
             renderStatsDashboard();
         }
@@ -2334,7 +2428,7 @@
             if (!preserveIndex) currentIndex = 0;
             updateReviewUI();
         } else if (currentMode === 'quiz') {
-            startQuiz();
+            checkQuizStartFlow();
         } else if (currentMode === 'stats') {
             renderStatsDashboard();
         }
@@ -2613,22 +2707,69 @@
         return word.rawCols[6] || word.rawCols[5] || '';
     }
 
-    function startQuiz(infiniteMode = false) {
+    // ⚔️ 測驗啟動流程判斷（優先今日已學 ➔ 無已學則引導）
+    function checkQuizStartFlow() {
         if (fullSourceList.length < 4) {
             alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
             setMode('review');
             return;
         }
 
-        const settings = getQuestSettings();
-        const shuffled = [...fullSourceList].sort(() => Math.random() - 0.5);
+        const learnedKeys = getTodayLearnedWords();
+        const guideBox = document.getElementById('quiz-guide-box');
+        const mainBox = document.getElementById('quiz-main-container');
 
-        if (infiniteMode) {
-            quizList = shuffled;
+        if (learnedKeys.length === 0) {
+            // 今日尚未翻卡學習，顯示引導畫面
+            guideBox.style.display = 'flex';
+            mainBox.style.display = 'none';
         } else {
-            quizList = shuffled.slice(0, settings.quizTarget);
+            // 今日已有學習紀錄，直接進入已學題組
+            guideBox.style.display = 'none';
+            mainBox.style.display = 'block';
+            startQuiz(false);
+        }
+    }
+
+    function startWildQuiz() {
+        playClickSound();
+        document.getElementById('quiz-guide-box').style.display = 'none';
+        document.getElementById('quiz-main-container').style.display = 'block';
+        startQuiz(false, true); // 強制生猛開考（全隨機）
+    }
+
+    // 💡 測驗出題核心（今日已學優先 + 隨機補足）
+    function startQuiz(infiniteMode = false, forceWild = false) {
+        const settings = getQuestSettings();
+        const targetCount = infiniteMode ? fullSourceList.length : settings.quizTarget;
+
+        let selectedQuestions = [];
+
+        if (forceWild || infiniteMode) {
+            // 生猛或無限模式：全隨機出題
+            selectedQuestions = [...fullSourceList].sort(() => Math.random() - 0.5);
+        } else {
+            // 🧠 今日已學優先出題策略
+            const learnedKeys = getTodayLearnedWords();
+            const learnedObjs = fullSourceList.filter(item => learnedKeys.includes(item.jp));
+            
+            // 洗牌已學單字
+            const shuffledLearned = [...learnedObjs].sort(() => Math.random() - 0.5);
+
+            if (shuffledLearned.length >= targetCount) {
+                // 已學單字足夠，全部從已學單字出題
+                selectedQuestions = shuffledLearned.slice(0, targetCount);
+            } else {
+                // 已學單字不足，先全出，剩餘從單字庫隨機補齊
+                selectedQuestions = [...shuffledLearned];
+                const remainCount = targetCount - selectedQuestions.length;
+                const poolWithoutLearned = fullSourceList.filter(item => !learnedKeys.includes(item.jp));
+                poolWithoutLearned.sort(() => Math.random() - 0.5);
+                selectedQuestions = selectedQuestions.concat(poolWithoutLearned.slice(0, remainCount));
+            }
         }
 
+        quizList = selectedQuestions.slice(0, targetCount);
         quizIndex = 0;
         document.getElementById('btn-restart-quiz-round').style.display = 'none';
         document.getElementById('btn-infinite-quiz').style.display = 'none';
