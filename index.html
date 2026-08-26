@@ -65,7 +65,6 @@
             text-shadow: 2px 2px 0px #0b1329, 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
-        /* 👾 像素風微型 HUD 狀態列 */
         .auth-bar {
             display: flex;
             flex-direction: column;
@@ -558,7 +557,6 @@
         #btn-next-quiz { background: var(--pixel-pink); color: #ffffff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35); }
         #btn-next-quiz:hover { background: #db2777; }
 
-        /* 📊 學習進度面板與 RPG 任務告示板樣式 */
         #stats-section {
             background: var(--card-bg); padding: 20px; border-radius: 20px;
             box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
@@ -877,15 +875,24 @@
             font-weight: bold;
         }
 
+        /* 👾 戰力同步率專屬看板 */
         .dynamic-boss-box {
-            background: rgba(236, 72, 153, 0.1);
-            border: 1px dashed rgba(236, 72, 153, 0.4);
+            background: rgba(236, 72, 153, 0.12);
+            border: 1px dashed rgba(236, 72, 153, 0.45);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 12px 14px;
             font-size: 12px;
             color: #fbcfe8;
-            line-height: 1.5;
+            line-height: 1.6;
             font-family: 'DotGothic16', sans-serif;
+        }
+        .boss-progress-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 6px 0 2px 0;
+            color: #ffffff;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -1088,15 +1095,24 @@
                 <div class="my-rank-next-hint" id="modal-my-rank-hint">⚡ 距離下一等還需 0 EXP</div>
             </div>
 
-            <!-- 👾 大魔王動態天花板機制宣告 -->
-            <div class="dynamic-boss-box" id="modal-boss-dynamic-info">
-                👾 <b>【大魔王動態天花板機制】</b><br>
-                目前筆記總收錄：<b id="modal-total-words-count">0</b> 字（滿等封頂：<b id="modal-max-exp-count">0</b> EXP）。<br>
-                💡 <b>終極大魔王就是作者本人！</b> 只要作者在試算表中擴充新單字，等級天花板就會自動提升，想要維持大魔王稱號就要持續跟上作者的腳步喔！🔥
+            <!-- 👾 大魔王戰力同步率機制宣告 -->
+            <div class="dynamic-boss-box">
+                <div>👾 <b>【大魔王境界與戰力同步率】</b></div>
+                <div class="boss-progress-row">
+                    <span>👑 大魔王目前戰力：</span>
+                    <span style="color:#fde047;">100% 滿載境界</span>
+                </div>
+                <div class="boss-progress-row">
+                    <span>⚡ 你的戰力同步率：</span>
+                    <span style="color:#38bdf8;" id="modal-sync-rate-text">0%</span>
+                </div>
+                <div style="font-size: 11px; color: #cbd5e1; margin-top: 6px; line-height: 1.4;">
+                    💡 <b>終極大魔王就是作者本人！</b> 只要作者在筆記中收錄新知識，天花板就會自動提升！想要維持大魔王稱號就要持續跟上作者的腳步喔！🔥
+                </div>
             </div>
 
             <div style="font-family: 'DotGothic16', sans-serif; font-size: 13px; color: #94a3b8; margin-top: 4px;">
-                📜 階級比例尺一覽：
+                📜 階級達成度一覽：
             </div>
 
             <!-- 階級項目清單 -->
@@ -1319,7 +1335,7 @@
 
             noise.start(now);
             osc.start(now);
-            osc.stop(now + 0.12);
+            osc.stop(now + 0.012);
         } catch(e) {}
     }
 
@@ -1426,15 +1442,15 @@
     ];
 
     const RANK_TIERS_CONFIG = [
-        { threshold: 0.00, title: "Lv.1 日文小白ㄔ 🐣", desc: "剛踏入日語修煉之門" },
-        { threshold: 0.05, title: "Lv.2 日文小菜鳥 🐤", desc: "熟悉基本問候與簡單名詞" },
-        { threshold: 0.15, title: "Lv.3 日文初心者 🌿", desc: "掌握基礎五十音與日常詞彙" },
-        { threshold: 0.30, title: "Lv.4 單字小行家 ⚔️", desc: "已具備大量 N5 核心單字庫" },
-        { threshold: 0.50, title: "Lv.5 文法修行僧 🛡️", desc: "突破動詞變化與句型難關" },
-        { threshold: 0.70, title: "Lv.6 假名魔法使 🧙‍♀️", desc: "掌握進階文法與細膩語感" },
-        { threshold: 0.85, title: "Lv.7 日語狂戰士 🐉", desc: "全方位制霸日語詞彙庫" },
-        { threshold: 0.95, title: "Lv.8 準・魔王領主 👑", desc: "即將登頂的頂級強者" },
-        { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達終極境界！" }
+        { threshold: 0.00, title: "Lv.1 日文小白ㄔ 🐣", desc: "剛踏入日語修煉之門 (0% 起)" },
+        { threshold: 0.05, title: "Lv.2 日文小菜鳥 🐤", desc: "熟悉基本問候與簡單名詞 (5% 達成)" },
+        { threshold: 0.15, title: "Lv.3 日文初心者 🌿", desc: "掌握基礎五十音與日常詞彙 (15% 達成)" },
+        { threshold: 0.30, title: "Lv.4 單字小行家 ⚔️", desc: "具備核心基礎單字量 (30% 達成)" },
+        { threshold: 0.50, title: "Lv.5 文法修行僧 🛡️", desc: "突破動詞變化與句型難關 (50% 達成)" },
+        { threshold: 0.70, title: "Lv.6 假名魔法使 🧙‍♀️", desc: "掌握進階文法與細膩語感 (70% 達成)" },
+        { threshold: 0.85, title: "Lv.7 日語狂戰士 🐉", desc: "全方位制霸日語詞彙庫 (85% 達成)" },
+        { threshold: 0.95, title: "Lv.8 準・魔王領主 👑", desc: "即將登頂的頂級強者 (95% 達成)" },
+        { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
     let currentList = [];
@@ -1510,15 +1526,14 @@
         if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
     }
 
-    // 👑 階級指南彈窗操作 (動態計算大魔王數據)
+    // 👑 階級指南彈窗操作 (以戰力同步率呈現)
     function openRankGuideModal() {
         playClickSound();
         const totalWords = allSearchableWords.length || 1000;
         const info = getLevelAndTitle(getTotalEXP(), totalWords);
 
         document.getElementById('modal-my-rank-title').textContent = `${info.title} (${info.ratioPercent}%)`;
-        document.getElementById('modal-total-words-count').textContent = totalWords;
-        document.getElementById('modal-max-exp-count').textContent = info.maxExp;
+        document.getElementById('modal-sync-rate-text').textContent = `${info.ratioPercent}%`;
 
         const hintEl = document.getElementById('modal-my-rank-hint');
         if (info.nextRank) {
@@ -1536,7 +1551,7 @@
             const isUnlocked = (info.currentExp >= reqExp);
 
             let statusClass = isCurrent ? 'current' : (isUnlocked ? 'unlocked' : 'locked');
-            let badgeHtml = isCurrent ? `<span class="tier-badge-current">▶ 目前位置</span>` : (isUnlocked ? `<span style="color:#22c55e; font-size:11px; font-weight:bold;">✅ 已解鎖</span>` : `<span style="color:#64748b; font-size:11px;">🔒 ${reqExp} EXP</span>`);
+            let badgeHtml = isCurrent ? `<span class="tier-badge-current">▶ 目前位置</span>` : (isUnlocked ? `<span style="color:#22c55e; font-size:11px; font-weight:bold;">✅ 已達成</span>` : `<span style="color:#64748b; font-size:11px;">🔒 ${Math.floor(tier.threshold * 100)}% 同步</span>`);
 
             tierListEl.innerHTML += `
                 <div class="rank-tier-item ${statusClass}">
