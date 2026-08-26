@@ -1493,7 +1493,9 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1568,6 +1570,9 @@
             oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
 
             osc.connect(oscGain);
+            oscGain.connect(ctx.destination);
+
+            noise.start(now);
             osc.start(now);
             osc.stop(now + 0.12);
         } catch(e) {}
@@ -1687,6 +1692,8 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
+    // ⚡ 記憶體即時快取池（消除重複請求，實現秒開）
+    let sheetDataCache = {}; 
     let fullSourceList = [];
     let currentList = [];
     let currentIndex = 0;
@@ -1698,7 +1705,7 @@
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
-    allSearchableWords = [];
+    let allSearchableWords = [];
 
     function getTotalEXP() {
         const exp = localStorage.getItem('jp_rpg_exp');
@@ -2088,11 +2095,9 @@
         return x - Math.floor(x);
     }
 
+    // ⚡ 漸進式載入 + 零重複請求架構
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
-        const promises = [];
-        allSearchableWords = [];
-
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -2104,54 +2109,63 @@
             dateTagEl.textContent = `📢 今日必學・${dateString}`;
         }
 
-        for (let i = 0; i < selectElement.options.length; i++) {
-            const opt = selectElement.options[i];
-            if (opt.value === 'all') continue;
-            
-            const catName = opt.text;
-            const sheetKey = opt.value;
-            const url = SHEETS_CONFIG[sheetKey];
-            if (!url) continue;
+        allSearchableWords = [];
+        sheetDataCache = {};
 
-            const p = fetch(url).then(res => res.text()).then(text => {
+        let hasLoadedFirstBatch = false;
+
+        const promises = Object.entries(SHEETS_CONFIG).map(async ([sheetKey, url]) => {
+            const optElement = Array.from(selectElement.options).find(o => o.value === sheetKey);
+            const catName = optElement ? optElement.text : sheetKey;
+
+            try {
+                const res = await fetch(url);
+                const text = await res.text();
                 const parsedData = parseCSVText(text);
+
                 if (parsedData.length >= 2) {
                     const headers = parsedData[0];
+                    const sheetWords = [];
 
                     parsedData.slice(1).forEach(cols => {
-                        const jp = cols[0] || '';
-                        if (jp && jp.length <= 15 && !/[。，、！？,,]/.test(jp)) {
-                            const wordObj = {
-                                jp: jp,
-                                kanji: cols[1] || '',
-                                level: cols[2] || '',
-                                type: cols[3] || '',
-                                rawCols: cols,
-                                rawHeaders: headers,
-                                catKey: sheetKey,
-                                catName: catName
-                            };
-
-                            globalWordCategoryMap[jp] = catName;
-                            globalWordDataMap[jp] = wordObj;
-                            allSearchableWords.push(wordObj);
+                        const item = {
+                            jp: cols[0] || '',
+                            kanji: cols[1] || '',
+                            level: cols[2] || '',
+                            type: cols[3] || '',
+                            rawCols: cols,
+                            rawHeaders: headers,
+                            catKey: sheetKey,
+                            catName: catName
+                        };
+                        if (isValidWord(item)) {
+                            globalWordCategoryMap[item.jp] = catName;
+                            globalWordDataMap[item.jp] = item;
+                            sheetWords.push(item);
+                            allSearchableWords.push(item);
                         }
                     });
-                }
-            }).catch(() => {});
 
-            promises.push(p);
-        }
+                    sheetDataCache[sheetKey] = sheetWords;
+
+                    // 🚀 只要第一批資料下載完成，立刻先顯示卡片，不需要等全部下完！
+                    if (!hasLoadedFirstBatch && sheetWords.length > 0) {
+                        hasLoadedFirstBatch = true;
+                        loadSheetData(document.getElementById('sheetSelect').value);
+                    }
+                }
+            } catch (err) {}
+        });
 
         await Promise.all(promises);
 
-        if (allSearchableWords.length > 0) {
-            pickDailyFiveWords(dateString);
-            updateHUDLevel();
-            if (fullSourceList.length === 0) {
-                loadSheetData('all');
-            }
-        }
+        // 全部收齊後，更新完整「綜合大亂鬥」快取、跑馬燈與等級條
+        sheetDataCache['all'] = [...allSearchableWords];
+        pickDailyFiveWords(dateString);
+        updateHUDLevel();
+
+        // 刷新當前畫面
+        loadSheetData(document.getElementById('sheetSelect').value);
     }
 
     function pickDailyFiveWords(dateString) {
@@ -2297,86 +2311,44 @@
         loadSheetData(sheetKey, targetWordJp);
     }
 
-    async function loadSheetData(urlKey, targetWordJp = null) {
-        document.getElementById('card-sub-front').textContent = '資料載入中...';
-        document.getElementById('card-main-front').textContent = '';
-        
-        try {
-            if (urlKey === 'all') {
-                let allData = [];
-                const urls = Object.values(SHEETS_CONFIG);
-                const responses = await Promise.all(urls.map(url => fetch(url).catch(() => null)));
-                
-                for (let res of responses) {
-                    if (!res) continue;
-                    const text = await res.text();
-                    const parsedData = parseCSVText(text);
-                    if (parsedData.length < 2) continue;
-                    
-                    const headers = parsedData[0];
-                    const parsed = parsedData.slice(1).map(cols => {
-                        const item = { 
-                            jp: cols[0] || '', kanji: cols[1] || '', level: cols[2] || '', type: cols[3] || '',
-                            rawCols: cols, rawHeaders: headers 
-                        };
-                        if (isValidWord(item)) {
-                            globalWordDataMap[item.jp] = item;
-                            return item;
-                        }
-                        return null;
-                    }).filter(Boolean);
-                    allData = allData.concat(parsed);
-                }
-                fullSourceList = allData;
-            } else {
-                const response = await fetch(SHEETS_CONFIG[urlKey]);
-                const text = await response.text();
-                const parsedData = parseCSVText(text);
-                
-                if (parsedData.length >= 2) {
-                    const headers = parsedData[0];
-                    fullSourceList = parsedData.slice(1).map(cols => {
-                        const item = { 
-                            jp: cols[0] || '', kanji: cols[1] || '', level: cols[2] || '', type: cols[3] || '',
-                            rawCols: cols, rawHeaders: headers 
-                        };
-                        if (isValidWord(item)) {
-                            globalWordDataMap[item.jp] = item;
-                            return item;
-                        }
-                        return null;
-                    }).filter(Boolean);
-                } else {
-                    fullSourceList = [];
-                }
-            }
-            
-            fullSourceList.sort(() => Math.random() - 0.5);
+    // ⚡ 秒級載入：直接從快取讀取，零延遲
+    function loadSheetData(urlKey, targetWordJp = null) {
+        let sourceData = [];
 
-            const settings = getQuestSettings();
-            const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
-
-            if (fullSourceList.length > targetLimit) {
-                currentList = fullSourceList.slice(0, targetLimit);
-                document.getElementById('btn-unlock-more-cards').style.display = 'block';
-            } else {
-                currentList = [...fullSourceList];
-                document.getElementById('btn-unlock-more-cards').style.display = 'none';
-            }
-
-            if (targetWordJp) {
-                const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
-                currentIndex = (foundIndex !== -1) ? foundIndex : 0;
-            } else {
-                currentIndex = 0;
-            }
-            
-            initMode(targetWordJp ? true : false);
-            
-        } catch (e) {
-            document.getElementById('card-sub-front').textContent = '載入失敗 (請檢查網路)';
-            console.log(e);
+        if (urlKey === 'all') {
+            sourceData = sheetDataCache['all'] || allSearchableWords || [];
+        } else {
+            sourceData = sheetDataCache[urlKey] || [];
         }
+
+        if (sourceData.length === 0) {
+            document.getElementById('card-sub-front').textContent = '資料加速載入中...';
+            document.getElementById('card-main-front').textContent = '';
+            return;
+        }
+
+        fullSourceList = [...sourceData];
+        fullSourceList.sort(() => Math.random() - 0.5);
+
+        const settings = getQuestSettings();
+        const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
+
+        if (fullSourceList.length > targetLimit) {
+            currentList = fullSourceList.slice(0, targetLimit);
+            document.getElementById('btn-unlock-more-cards').style.display = 'block';
+        } else {
+            currentList = [...fullSourceList];
+            document.getElementById('btn-unlock-more-cards').style.display = 'none';
+        }
+
+        if (targetWordJp) {
+            const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
+            currentIndex = (foundIndex !== -1) ? foundIndex : 0;
+        } else {
+            currentIndex = 0;
+        }
+        
+        initMode(targetWordJp ? true : false);
     }
 
     function unlockFullCards() {
@@ -2490,6 +2462,12 @@
                 </div>
             `;
         }
+        gridHtml += `
+            <div class="category-grid-item" onclick="expandCategoryByName('其他/未分類')" title="全範圍匯總">
+                <div class="grid-name">全範圍收錄</div>
+                <div class="grid-count">${allSearchableWords.length} 字</div>
+            </div>
+        `;
         gridContainer.innerHTML = gridHtml;
 
         let groupsHtml = '';
@@ -2699,7 +2677,6 @@
         return word.rawCols[6] || word.rawCols[5] || '';
     }
 
-    // 💖 可愛修飾版載入中判斷與測驗啟動流程
     function checkQuizStartFlow() {
         if (fullSourceList.length === 0) {
             alert('⏳ 單字庫正在全力加速傳送中！請稍微等我一下下嘛～( ＞＜ )✨');
@@ -2967,6 +2944,7 @@
         renderQuizQuestion();
     }
 
+    // 啟動加速載入程序
     preloadAllCategories();
 </script>
 
