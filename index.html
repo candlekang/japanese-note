@@ -148,15 +148,17 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
+            gap: 6px;
             background: rgba(0, 0, 0, 0.35);
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 8px;
             border: 1px solid #334155;
             font-family: 'DotGothic16', sans-serif;
             font-size: 11px;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
         }
         .rpg-level-bar:hover {
             border-color: var(--primary);
@@ -167,12 +169,14 @@
             font-weight: 700;
             white-space: nowrap;
             letter-spacing: 0.5px;
+            flex-shrink: 0;
         }
         .rpg-exp-wrapper {
             flex: 1;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            min-width: 0;
         }
         .rpg-exp-bar-bg {
             flex: 1;
@@ -181,6 +185,7 @@
             border-radius: 4px;
             overflow: hidden;
             border: 1px solid #475569;
+            min-width: 30px;
         }
         .rpg-exp-bar-fill {
             height: 100%;
@@ -192,15 +197,29 @@
             color: #94a3b8;
             font-size: 10px;
             white-space: nowrap;
+            flex-shrink: 0;
         }
         .rpg-sync-hint {
             font-size: 10px;
             color: #f59e0b;
-            animation: blink 2s infinite;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px dashed rgba(245, 158, 11, 0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.2s;
         }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+        .rpg-sync-hint:hover {
+            background: #f59e0b;
+            color: #000000;
+        }
+        .rpg-info-icon {
+            font-size: 11px;
+            color: #38bdf8;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .marquee-box {
@@ -508,7 +527,6 @@
             border: 1px solid rgba(56, 189, 248, 0.3); font-weight: 600;
         }
 
-        /* 💡 徽章自動換行與寬度防重疊修正 */
         .badge { 
             display: inline-block;
             font-size: 11px; padding: 4px 10px; border-radius: 16px; 
@@ -1124,7 +1142,8 @@
                     </div>
                     <span class="rpg-exp-text" id="hud-rpg-exp-text">0 EXP</span>
                 </div>
-                <span class="rpg-sync-hint" id="hud-sync-hint" style="display:none;">⚠️ 點此登入同步</span>
+                <!-- 💡 點擊直接觸發登入同步 -->
+                <span class="rpg-sync-hint" id="hud-sync-hint" onclick="triggerAuthFromHint(event)" style="display:none;" title="點此立即登入 Google 保存戰果">⚠️ 登入同步等級資料</span>
                 <span class="rpg-info-icon">📖指南</span>
             </div>
         </div>
@@ -1429,6 +1448,12 @@
                 alert('登入失敗，請確認是否已在 Firebase 授權 candlekang.github.io 網域！');
             }
         }
+    }
+
+    // 💡 點擊等級條中的提示，直接呼叫 Google 登入
+    function triggerAuthFromHint(event) {
+        if (event) event.stopPropagation();
+        toggleAuth();
     }
 
     function forceAppReload() {
@@ -2110,7 +2135,6 @@
         return x - Math.floor(x);
     }
 
-    // ⚡ 漸進式載入 + 零重複請求架構
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -2163,7 +2187,6 @@
 
                     sheetDataCache[sheetKey] = sheetWords;
 
-                    // 🚀 第一批資料進來時先顯示
                     if (!hasLoadedFirstBatch && sheetWords.length > 0) {
                         hasLoadedFirstBatch = true;
                         loadSheetData(document.getElementById('sheetSelect').value);
@@ -2174,12 +2197,10 @@
 
         await Promise.all(promises);
 
-        // 全部抓完後，更新完整「綜合大亂鬥」並重新按目標截取顯示
         sheetDataCache['all'] = [...allSearchableWords];
         pickDailyFiveWords(dateString);
         updateHUDLevel();
 
-        // 重新依目標設定加載完整清單
         loadSheetData(document.getElementById('sheetSelect').value);
     }
 
@@ -2326,7 +2347,6 @@
         loadSheetData(sheetKey, targetWordJp);
     }
 
-    // ⚡ 秒級載入與精確目標張數截取
     function loadSheetData(urlKey, targetWordJp = null) {
         let sourceData = [];
 
