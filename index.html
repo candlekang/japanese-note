@@ -312,7 +312,6 @@
         }
         .btn-tts-micro:hover { transform: scale(1.25); }
 
-        /* 📇 字卡外框與自適應留白 */
         .card-container { 
             perspective: 1000px; 
             width: 100%; 
@@ -346,7 +345,6 @@
         .card-back::-webkit-scrollbar { width: 6px; }
         .card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        /* 內容物強制向內縮限，絕對不會碰到兩側箭頭 */
         .card-body-wrapper {
             width: 100%;
             padding: 0 36px;
@@ -370,7 +368,6 @@
             pointer-events: none;
         }
 
-        /* 💡 輕巧微型箭頭 */
         .card-nav-arrow {
             position: absolute;
             top: 50%;
@@ -659,7 +656,7 @@
     <!-- 1. 翻卡模式 -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
-            <!-- 內建左右導覽箭頭 -->
+            <!-- 內建微型左右導覽箭頭 -->
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
             <div class="card-nav-arrow right" onclick="nextCard(event)" title="下一張">▶</div>
 
@@ -804,16 +801,33 @@
         }
     }
 
+    // 🔊 Web Audio API 手機全域喚醒機制
     let audioCtx = null;
     function getAudioContext() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
         return audioCtx;
     }
+
+    // 第一次使用者點擊或觸摸時，強制解鎖音訊通道
+    function unlockAudioOnMobile() {
+        getAudioContext();
+        window.speechSynthesis.getVoices();
+        document.removeEventListener('touchstart', unlockAudioOnMobile);
+        document.removeEventListener('click', unlockAudioOnMobile);
+    }
+    document.addEventListener('touchstart', unlockAudioOnMobile, { once: true });
+    document.addEventListener('click', unlockAudioOnMobile, { once: true });
 
     function playClickSound() {
         try {
             const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+
             const now = ctx.currentTime;
             const bufferSize = ctx.sampleRate * 0.005; 
             const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -855,6 +869,8 @@
     function playSuccessSound() {
         try {
             const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+
             const now = ctx.currentTime;
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
@@ -883,6 +899,8 @@
     function playWrongSound() {
         try {
             const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+
             const now = ctx.currentTime;
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
@@ -999,11 +1017,14 @@
         return text.replace(/[（\(][^）\)]*[）\)]/g, '');
     }
 
+    // 🔊 發音前先重置 cancel()，防止手機端語音引擎掛起
     function speakWordDirectly(event, wordText) {
         if (event) event.stopPropagation();
         if (!wordText) return;
         
         playClickSound();
+        window.speechSynthesis.cancel(); 
+
         let text = cleanTextForSpeech(wordText);
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ja-JP'; 
@@ -1015,6 +1036,8 @@
     function speakJP(event, elementId) {
         if (event) event.stopPropagation();
         playClickSound();
+        window.speechSynthesis.cancel();
+
         let text = document.getElementById(elementId).textContent;
         if (!text || text.includes('載入中') || text.includes('測驗完成') || text.includes('＿')) return;
         
@@ -1029,6 +1052,8 @@
     function speakExampleJP(event, rawText) {
         if (event) event.stopPropagation();
         playClickSound();
+        window.speechSynthesis.cancel();
+
         if (!rawText) return;
 
         const firstLine = rawText.split('\n')[0] || rawText;
