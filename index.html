@@ -75,6 +75,7 @@
             backdrop-filter: blur(8px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             margin-bottom: 12px;
+            gap: 8px;
         }
         .user-info { 
             display: flex; 
@@ -83,6 +84,10 @@
             color: #94a3b8; 
             font-size: 13px; 
             font-family: 'DotGothic16', sans-serif;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .user-status-dot {
             width: 8px;
@@ -90,6 +95,7 @@
             border-radius: 50%;
             background: #64748b;
             display: inline-block;
+            flex-shrink: 0;
         }
         .user-status-dot.online {
             background: #22c55e;
@@ -101,12 +107,18 @@
             border-radius: 50%; 
             border: 1px solid var(--primary);
             object-fit: cover;
+            flex-shrink: 0;
         }
-        .btn-auth {
+        .auth-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .btn-auth, .btn-refresh {
             background: #0f172a;
             color: #f8fafc;
             border: 1px solid #475569;
-            padding: 5px 12px;
+            padding: 5px 10px;
             border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
@@ -114,10 +126,11 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .btn-auth:hover { 
+        .btn-auth:hover, .btn-refresh:hover { 
             border-color: var(--primary);
             color: var(--primary);
             background: rgba(56, 189, 248, 0.1);
@@ -158,7 +171,7 @@
         .marquee-content {
             display: inline-block;
             white-space: nowrap;
-            animation: marquee 150s linear infinite;
+            animation: marquee 280s linear infinite; /* 280s 極致慢步 */
         }
         .marquee-viewport:hover .marquee-content {
             animation-play-state: paused;
@@ -312,6 +325,7 @@
         }
         .btn-tts-micro:hover { transform: scale(1.25); }
 
+        /* 📇 字卡外框與 3D 結構 */
         .card-container { 
             perspective: 1000px; 
             width: 100%; 
@@ -351,7 +365,8 @@
             box-sizing: border-box;
         }
 
-        .card-counter-inside {
+        /* 💡 固定式頁數標籤（不受 3D 翻轉影響，永不顛倒） */
+        .card-counter-fixed {
             position: absolute;
             top: 14px;
             left: 50%;
@@ -364,8 +379,9 @@
             padding: 3px 12px;
             border-radius: 12px;
             border: 1px solid #cbd5e1;
-            z-index: 10;
+            z-index: 30;
             pointer-events: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .card-nav-arrow {
@@ -396,7 +412,7 @@
         .card-nav-arrow.left { left: 6px !important; }
         .card-nav-arrow.right { right: 6px !important; }
 
-        .front-kanji-title {
+        .front-main-title {
             font-size: 36px;
             font-weight: 800;
             color: var(--text-main);
@@ -404,7 +420,7 @@
             line-height: 1.2;
             white-space: pre-wrap;
         }
-        .front-kana-sub {
+        .front-sub-title {
             font-size: 22px;
             font-weight: 600;
             color: var(--primary-dark);
@@ -589,15 +605,21 @@
                 <span class="user-status-dot"></span>
                 <span>訪客離線模式</span>
             </div>
-            <button class="btn-auth" id="btn-auth" onclick="toggleAuth()">
-                <svg width="13" height="13" viewBox="0 0 24 24">
-                    <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
-                    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
-                    <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.5s.7 4.8 1.9 7.2l3.7-2.9z"/>
-                    <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 17C3.7 20.7 7.5 24 12 24z"/>
-                </svg>
-                <span id="btn-auth-text">Google 登入同步</span>
-            </button>
+            <div class="auth-buttons">
+                <!-- 🔄 手機專屬重新整理按鈕 -->
+                <button class="btn-refresh" onclick="forceAppReload()" title="重新整理最新資料">
+                    🔄 重新整理
+                </button>
+                <button class="btn-auth" id="btn-auth" onclick="toggleAuth()">
+                    <svg width="13" height="13" viewBox="0 0 24 24">
+                        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+                        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                        <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.5s.7 4.8 1.9 7.2l3.7-2.9z"/>
+                        <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 17C3.7 20.7 7.5 24 12 24z"/>
+                    </svg>
+                    <span id="btn-auth-text">Google 登入同步</span>
+                </button>
+            </div>
         </div>
 
         <div class="marquee-box" id="marquee-box">
@@ -656,6 +678,9 @@
     <!-- 1. 翻卡模式 -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
+            <!-- 💡 獨立固定頁數標籤：在卡片翻轉層外，永不鏡射顛倒 -->
+            <div class="card-counter-fixed" id="card-counter-fixed">0 / 0</div>
+
             <!-- 內建微型左右導覽箭頭 -->
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
             <div class="card-nav-arrow right" onclick="nextCard(event)" title="下一張">▶</div>
@@ -663,19 +688,17 @@
             <div class="card-inner" onclick="flipCard()">
                 <!-- 正面 -->
                 <div class="card-face card-front">
-                    <div class="card-counter-inside" id="card-counter-front">0 / 0</div>
                     <div class="card-body-wrapper">
                         <span class="badge" id="card-badge-front">載入中...</span>
-                        <div class="front-kanji-title" id="card-kanji-front"></div>
-                        <div class="front-kana-sub" id="card-kana-front">載入中...</div>
-                        <button class="btn-tts" onclick="speakJP(event, 'card-kana-front')">🔊 發音</button>
+                        <div class="front-main-title" id="card-main-front"></div>
+                        <div class="front-sub-title" id="card-sub-front">載入中...</div>
+                        <button class="btn-tts" onclick="speakFrontCard(event)">🔊 發音</button>
                         <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
                     </div>
                     <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
                 </div>
                 <!-- 背面 -->
                 <div class="card-face card-back">
-                    <div class="card-counter-inside" id="card-counter-back">0 / 0</div>
                     <div class="card-body-wrapper" id="card-back-content"></div>
                 </div>
             </div>
@@ -769,6 +792,11 @@
         }
     }
 
+    function forceAppReload() {
+        playClickSound();
+        window.location.reload(true);
+    }
+
     async function syncCloudData() {
         if (!currentUser) return;
         try {
@@ -801,7 +829,6 @@
         }
     }
 
-    // 🔊 Web Audio API 手機全域喚醒機制
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) {
@@ -813,7 +840,6 @@
         return audioCtx;
     }
 
-    // 第一次使用者點擊或觸摸時，強制解鎖音訊通道
     function unlockAudioOnMobile() {
         getAudioContext();
         window.speechSynthesis.getVoices();
@@ -1017,7 +1043,6 @@
         return text.replace(/[（\(][^）\)]*[）\)]/g, '');
     }
 
-    // 🔊 發音前先重置 cancel()，防止手機端語音引擎掛起
     function speakWordDirectly(event, wordText) {
         if (event) event.stopPropagation();
         if (!wordText) return;
@@ -1031,6 +1056,13 @@
         utterance.rate = 1.0; 
         if (jpVoice) utterance.voice = jpVoice;
         window.speechSynthesis.speak(utterance);
+    }
+
+    function speakFrontCard(event) {
+        if (event) event.stopPropagation();
+        if (currentList.length === 0) return;
+        const current = currentList[currentIndex];
+        speakWordDirectly(event, current.jp);
     }
 
     function speakJP(event, elementId) {
@@ -1252,7 +1284,14 @@
 
         const resultsHtml = scoredMatches.slice(0, 15).map(({ item }) => {
             const zhText = getWordZhText(item);
-            const mainDisplay = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
+            let mainDisplay = item.jp;
+            if (item.kanji && item.kanji !== item.jp) {
+                if (/[a-zA-Z]/.test(item.kanji)) {
+                    mainDisplay = `${item.jp} (${item.kanji})`;
+                } else {
+                    mainDisplay = `${item.kanji} (${item.jp})`;
+                }
+            }
             const safeJp = item.jp.replace(/'/g, "\\'");
 
             return `
@@ -1290,7 +1329,14 @@
         if (!marqueeEl) return;
 
         const itemsHtml = items.map(item => {
-            const display = item.kanji && item.kanji !== item.jp ? `${item.kanji} (${item.jp})` : item.jp;
+            let display = item.jp;
+            if (item.kanji && item.kanji !== item.jp) {
+                if (/[a-zA-Z]/.test(item.kanji)) {
+                    display = `${item.jp} (${item.kanji})`;
+                } else {
+                    display = `${item.kanji} (${item.jp})`;
+                }
+            }
             const safeJp = item.jp.replace(/'/g, "\\'");
             return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}', '${safeJp}')">✨ [${dateString} 收錄・${item.catName}] ${display}</span>`;
         }).join('');
@@ -1308,8 +1354,8 @@
     }
 
     async function loadSheetData(urlKey, targetWordJp = null) {
-        document.getElementById('card-kana-front').textContent = '資料載入中...';
-        document.getElementById('card-kanji-front').textContent = '';
+        document.getElementById('card-sub-front').textContent = '資料載入中...';
+        document.getElementById('card-main-front').textContent = '';
         
         try {
             if (urlKey === 'all') {
@@ -1373,7 +1419,7 @@
             initMode(targetWordJp ? true : false);
             
         } catch (e) {
-            document.getElementById('card-kana-front').textContent = '載入失敗 (請檢查網路)';
+            document.getElementById('card-sub-front').textContent = '載入失敗 (請檢查網路)';
             console.log(e);
         }
     }
@@ -1490,14 +1536,17 @@
             let itemsHtml = '';
             wordsArray.forEach(item => {
                 const zhText = getWordZhText(item.wordObj);
-                const kanjiText = item.wordObj && item.wordObj.kanji ? item.wordObj.kanji : item.wordJp;
+                let kanjiText = item.wordJp;
+                if (item.wordObj && item.wordObj.kanji && item.wordObj.kanji !== item.wordJp) {
+                    kanjiText = /[a-zA-Z]/.test(item.wordObj.kanji) ? `${item.wordJp} (${item.wordObj.kanji})` : `${item.wordObj.kanji} (${item.wordJp})`;
+                }
                 const safeWordJp = item.wordJp.replace(/'/g, "\\'");
 
                 itemsHtml += `
                     <div class="progress-item">
                         <div class="progress-item-word">
                             <button class="btn-tts-micro" onclick="speakWordDirectly(event, '${safeWordJp}')" title="播放發音">🔊</button>
-                            <span>${kanjiText} (${item.wordJp})</span>
+                            <span>${kanjiText}</span>
                         </div>
                         <div class="progress-item-sub">${zhText}</div>
                         <div class="progress-item-counts">👀 ${item.prog.read} | 🏆 ${item.prog.quiz}</div>
@@ -1560,6 +1609,7 @@
         }
     }
 
+    // 📇 字卡渲染：精準辨識「外來語」與「漢字」的主副標題順序
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -1569,33 +1619,46 @@
         document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
         document.getElementById('card-badge-front').textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字'; 
         
+        // 更新頂部固定頁數（永不顛倒）
         const counterText = `${currentIndex + 1} / ${currentList.length}`;
-        const frontCounter = document.getElementById('card-counter-front');
-        const backCounter = document.getElementById('card-counter-back');
-        if (frontCounter) frontCounter.textContent = counterText;
-        if (backCounter) backCounter.textContent = counterText;
+        const fixedCounter = document.getElementById('card-counter-fixed');
+        if (fixedCounter) fixedCounter.textContent = counterText;
 
-        const frontKanjiEl = document.getElementById('card-kanji-front');
-        const frontKanaEl = document.getElementById('card-kana-front');
+        const mainTitleEl = document.getElementById('card-main-front');
+        const subTitleEl = document.getElementById('card-sub-front');
 
+        let fullBackTitle = current.jp;
+
+        // 判斷是否為外來語（包含英文字母）或漢字
         if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
-            frontKanjiEl.textContent = current.kanji;
-            frontKanjiEl.style.display = 'block';
-            frontKanaEl.textContent = current.jp;
+            const isEnglishForeign = /[a-zA-Z]/.test(current.kanji);
+            
+            if (isEnglishForeign) {
+                // 外來語：片假名在上面（大），英文原詞在下面（小）
+                mainTitleEl.textContent = current.jp;
+                subTitleEl.textContent = current.kanji;
+                fullBackTitle = `${current.jp} (${current.kanji})`;
+            } else {
+                // 漢字：漢字在上面（大），平假名讀音在下面（小）
+                mainTitleEl.textContent = current.kanji;
+                subTitleEl.textContent = current.jp;
+                fullBackTitle = `${current.kanji} (${current.jp})`;
+            }
+            mainTitleEl.style.display = 'block';
+            subTitleEl.style.display = 'block';
         } else {
-            frontKanjiEl.textContent = '';
-            frontKanjiEl.style.display = 'none';
-            frontKanaEl.textContent = current.jp;
+            // 純假名
+            mainTitleEl.textContent = current.jp;
+            subTitleEl.textContent = '';
+            subTitleEl.style.display = 'none';
+            fullBackTitle = current.jp;
         }
         
+        // 背面內容渲染
         const backContainer = document.getElementById('card-back-content');
         let backHTML = '';
 
-        const fullTitle = (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp)
-            ? `${current.kanji} (${current.jp})`
-            : current.jp;
-
-        backHTML += `<div class="kanji-title">${fullTitle}</div>`;
+        backHTML += `<div class="kanji-title">${fullBackTitle}</div>`;
 
         if (current.type) {
             backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
