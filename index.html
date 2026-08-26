@@ -1132,7 +1132,6 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1298,7 +1297,6 @@
             </div>
         </div>
 
-        <!-- 💡 精簡版分類導覽標題 -->
         <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 25 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
@@ -1551,7 +1549,9 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -2277,7 +2277,6 @@
         const rawExample = getQuizExampleText(currentBossWord);
         const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
         let questionText = '';
-        let targetAnswerText = '';
 
         if (exampleLine1 !== '') {
             let cloze = exampleLine1;
@@ -2288,10 +2287,8 @@
                 cloze = cloze.split(currentBossWord.jp).join('＿＿＿');
             }
             questionText = `【${currentBossWord.catName}】\n${cloze}`;
-            targetAnswerText = currentBossWord.jp;
         } else {
             questionText = `【${currentBossWord.catName}】\n${currentBossWord.jp}`;
-            targetAnswerText = getQuizZhText(currentBossWord);
         }
 
         document.getElementById('boss-question-text').textContent = questionText;
@@ -2345,7 +2342,7 @@
 
         if (selectedBossOption.jp === currentBossWord.jp) {
             playSuccessSound();
-            addEXP(200);
+            addEXP(200); // 只有驚喜任務答對才加 200 EXP
             feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
             feedbackEl.className = 'quiz-feedback success';
             localStorage.setItem('jp_surprise_last_date', getTodayKey());
@@ -2653,7 +2650,6 @@
         document.getElementById('stat-total-words').textContent = totalUnlocked;
         document.getElementById('stat-total-quizzes').textContent = totalQuizSuccess;
 
-        // 💡 25 格準確計算：已學數 / 總字數
         let gridHtml = '';
         for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
