@@ -921,7 +921,7 @@
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
 
-        /* 🐣 菜雞專區（子母切換與自適應手寫板） */
+        /* 🐣 菜雞專區（五十音手寫板與自適應畫布樣式） */
         #kana-section {
             background: var(--card-bg);
             border-radius: 20px;
@@ -1025,7 +1025,6 @@
             pointer-events: none;
         }
 
-        /* 手寫練習板卡片 */
         .writing-board-card {
             background: #0f172a;
             border: 2px solid #38bdf8;
@@ -1065,8 +1064,8 @@
             touch-action: none;
             overflow: hidden;
             transition: width 0.25s ease;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>') 0 24, crosshair !important;
         }
-        /* 拗音雙字自適應加寬 */
         .canvas-container.wide-mode {
             width: 320px;
         }
@@ -1076,7 +1075,6 @@
             width: 100%;
             height: 100%;
             z-index: 10;
-            cursor: crosshair;
         }
         .writing-controls {
             display: flex;
@@ -1471,7 +1469,6 @@
             <option value="sheet25">つけます的擴充包</option>
         </select>
 
-        <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
             <button id="mode-review" class="active" onclick="setMode('review')">📖 翻卡複習</button>
             <button id="mode-quiz" onclick="setMode('quiz')">🏆 選擇測驗</button>
@@ -1542,7 +1539,6 @@
 
     <!-- 3. 🐣 菜雞專區（子母切換與自適應手寫板） -->
     <div id="kana-section">
-        <!-- 頂部視圖切換器 -->
         <div class="kana-main-toggle">
             <button class="btn-sub-view active" id="btn-view-grid" onclick="setKanaSubView('grid')">📊 五十音總表</button>
             <button class="btn-sub-view" id="btn-view-writing" onclick="setKanaSubView('writing')">✍️ 筆順手寫板</button>
@@ -1571,7 +1567,7 @@
                     </div>
                 </div>
 
-                <!-- 自適應畫布（支援拗音加寬） -->
+                <!-- 自適應畫布 -->
                 <div class="canvas-container" id="canvas-wrapper">
                     <canvas id="strokeCanvas" width="240" height="240"></canvas>
                 </div>
@@ -2109,7 +2105,7 @@
         'dakuon': [
             { hira: 'が', kata: 'ガ', romaji: 'ga' }, { hira: 'ぎ', kata: 'ギ', romaji: 'gi' }, { hira: 'ぐ', kata: 'グ', romaji: 'gu' }, { hira: 'げ', kata: 'ゲ', romaji: 'ge' }, { hira: 'ご', kata: 'ゴ', romaji: 'go' },
             { hira: 'ざ', kata: 'ザ', romaji: 'za' }, { hira: 'じ', kata: 'ジ', romaji: 'ji' }, { hira: 'ず', kata: 'ズ', romaji: 'zu' }, { hira: 'ぜ', kata: 'ゼ', romaji: 'ze' }, { hira: 'ぞ', kata: 'ゾ', romaji: 'zo' },
-            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'де', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
+            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'で', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
             { hira: 'ば', kata: 'バ', romaji: 'ba' }, { hira: 'び', kata: 'ビ', romaji: 'bi' }, { hira: 'ぶ', kata: 'ブ', romaji: 'bu' }, { hira: 'べ', kata: 'ベ', romaji: 'be' }, { hira: 'ぼ', kata: 'ボ', romaji: 'bo' },
             { hira: 'ぱ', kata: 'パ', romaji: 'pa' }, { hira: 'ぴ', kata: 'ピ', romaji: 'pi' }, { hira: 'ぷ', kata: 'プ', romaji: 'pu' }, { hira: 'ぺ', kata: 'ペ', romaji: 'pe' }, { hira: 'ぽ', kata: 'ポ', romaji: 'po' }
         ],
@@ -3129,7 +3125,7 @@
             div.className = `kana-item ${idx === 0 ? 'active' : ''}`;
             div.onclick = () => {
                 selectKanaItem(item, div, isKataMode);
-                setKanaSubView('writing'); // 點選直接切換到手寫板
+                setKanaSubView('writing');
             };
 
             div.innerHTML = `
@@ -3193,32 +3189,50 @@
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 田字格輔助線
+        // 1. 繪製輔助田字格
         ctx.save();
         ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.5;
         ctx.setLineDash([4, 4]);
 
-        ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, 0);
-        ctx.lineTo(canvas.width / 2, canvas.height);
-        ctx.moveTo(0, canvas.height / 2);
-        ctx.lineTo(canvas.width, canvas.height / 2);
-        ctx.stroke();
+        if (char.length > 1) {
+            // 雙字雙格
+            const halfW = canvas.width / 2;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(halfW, 0); ctx.lineTo(halfW, canvas.height);
+            ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        } else {
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
         ctx.restore();
 
-        // 淺色輪廓字
+        // 2. 繪製導引底字
         ctx.save();
-        const fontSize = (char.length > 1) ? 115 : 155;
-        ctx.font = `bold ${fontSize}px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif`;
-        ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        if (char.length > 1) {
+            ctx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
+            ctx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
+        } else {
+            ctx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        }
         ctx.restore();
     }
 
-    // 🎬 模擬動態筆順演示
+    // 🎬 真實筆順軌跡與序號動態演示
     function playStrokeAnimation() {
         playClickSound();
         const isKataMode = (currentKanaTab === 'seion-kata');
@@ -3231,25 +3245,48 @@
 
         drawGhostKanaOnCanvas(char);
 
-        // 以筆劃軌跡模擬動畫
+        // 模擬筆劃軌跡與起筆序號指示
         ctx.save();
-        ctx.font = `bold ${(char.length > 1) ? 115 : 155}px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#db2777';
+        ctx.font = 'bold 14px "DotGothic16", sans-serif';
+        
+        if (char.length > 1) {
+            ctx.fillText('①', canvas.width * 0.15, 40);
+            ctx.fillText('②', canvas.width * 0.60, 50);
+        } else {
+            ctx.fillText('① 起筆', 24, 36);
+        }
+        ctx.restore();
 
-        let alpha = 0.1;
+        ctx.save();
+        let step = 0;
         let animTimer = setInterval(() => {
-            alpha += 0.15;
+            step++;
+            const alpha = Math.min(step * 0.18, 0.9);
+            
+            ctx.save();
             ctx.fillStyle = `rgba(236, 72, 153, ${alpha})`;
-            ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
 
-            if (alpha >= 0.85) {
+            if (char.length > 1) {
+                ctx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif';
+                ctx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
+                ctx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif';
+                ctx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
+            } else {
+                ctx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif';
+                ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+            }
+            ctx.restore();
+
+            if (step >= 6) {
                 clearInterval(animTimer);
                 setTimeout(() => {
                     drawGhostKanaOnCanvas(char);
-                }, 900);
+                }, 1000);
             }
-        }, 60);
+        }, 80);
         ctx.restore();
     }
 
@@ -3260,7 +3297,6 @@
         redrawCurrentKanaBoard();
     }
 
-    // ✨ 臨摹完成批改與經驗值發放
     function checkWritingGrade() {
         const feedbackEl = document.getElementById('writing-grade-feedback');
         if (!hasDrawnOnCanvas) {
@@ -3271,7 +3307,7 @@
         }
 
         playSuccessSound();
-        addEXP(5); // 手寫練習獎勵 +5 EXP
+        addEXP(5);
         feedbackEl.textContent = '🎉 完美達成！筆順修煉成功！(+5 EXP)';
         feedbackEl.style.color = '#22c55e';
     }
