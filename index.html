@@ -450,6 +450,12 @@
             z-index: 30;
             pointer-events: none;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            white-space: nowrap;
+        }
+        .card-counter-fixed.intro-mode {
+            color: #b45309;
+            background: #fef3c7;
+            border-color: #fde68a;
         }
 
         .card-nav-arrow {
@@ -1218,6 +1224,7 @@
                 </div>
             </div>
 
+            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1285,6 +1292,7 @@
     <!-- 1. 翻卡模式 -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
+            <!-- 💡 導讀卡專屬頂部標籤 -->
             <div class="card-counter-fixed" id="card-counter-fixed">0 / 0</div>
 
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
@@ -2268,7 +2276,6 @@
         return x - Math.floor(x);
     }
 
-    // ⚡ 核心升級：精準讀取第 2、3 列作為「結構化全方位導讀特卡」
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -2300,7 +2307,6 @@
                     const headers = parsedData[0];
                     const sheetWords = [];
 
-                    // 💡 檢查第 2、3 列是否包含獨立導讀卡定義
                     const row2 = parsedData[1] || [];
                     const row3 = parsedData[2] || [];
                     
@@ -2310,14 +2316,13 @@
                     let dataStartIndex = 1;
 
                     if (isDualRowIntro && row3.length > 0) {
-                        // 雙列導讀卡模式 (Row 2 為標題, Row 3 為內容)
                         const introItem = {
                             jp: row3[0] || catName,
                             kanji: '',
                             level: '觀念導讀',
                             type: catName,
                             rawCols: row3,
-                            rawHeaders: row2, // 將第 2 列標題傳入作為專屬標題
+                            rawHeaders: row2,
                             catKey: sheetKey,
                             catName: catName,
                             isIntroCard: true,
@@ -2326,9 +2331,8 @@
                             introValues: row3
                         };
                         sheetWords.push(introItem);
-                        dataStartIndex = 3; // 從第 4 列開始抓單字庫
+                        dataStartIndex = 3;
                     } else if (isSingleRowIntro) {
-                        // 單列導讀卡模式 (如形式名詞)
                         const introItem = {
                             jp: `📖 ${catName}・核心觀念`,
                             kanji: '',
@@ -2342,7 +2346,7 @@
                             introContent: row2[0]
                         };
                         sheetWords.push(introItem);
-                        dataStartIndex = 2; // 從第 3 列開始抓單字庫
+                        dataStartIndex = 2;
                     }
 
                     const dataRows = parsedData.slice(dataStartIndex);
@@ -2924,7 +2928,7 @@
         }
     }
 
-    // 🌟 核心升級：支援「雙列結構化導讀特卡」與「形式名詞特卡」
+    // 🌟 核心升級：導讀卡頂部標籤與計數顯示優化
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2933,9 +2937,19 @@
         const progress = getProgress(current.jp);
         document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
         
-        const counterText = `${currentIndex + 1} / ${currentList.length}`;
         const fixedCounter = document.getElementById('card-counter-fixed');
-        if (fixedCounter) fixedCounter.textContent = counterText;
+        const hasIntro = currentList.some(w => w.isIntroCard);
+
+        // 💡 導讀卡不顯示「1 / 20」，而是顯示專屬「💡 觀念導讀」
+        if (current.isIntroCard) {
+            fixedCounter.textContent = '💡 觀念導讀';
+            fixedCounter.classList.add('intro-mode');
+        } else {
+            const actualIndex = hasIntro ? currentIndex : currentIndex + 1;
+            const actualTotal = hasIntro ? currentList.length - 1 : currentList.length;
+            fixedCounter.textContent = `${actualIndex} / ${actualTotal}`;
+            fixedCounter.classList.remove('intro-mode');
+        }
 
         const badgeEl = document.getElementById('card-badge-front');
         const mainTitleEl = document.getElementById('card-main-front');
@@ -2944,14 +2958,13 @@
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
-        // 💡 1. 雙列結構化導讀特卡（接續詞、連體詞、接尾詞等第 2、3 列專屬）
+        // 💡 1. 雙列結構化導讀特卡（接續詞、連體詞、接尾詞等）
         if (current.isIntroCard && current.isStructuredIntro) {
             badgeEl.textContent = '💡 詞類總覽導讀';
-            mainTitleEl.textContent = current.introValues[0] || current.catName; // 我是誰
+            mainTitleEl.textContent = current.introValues[0] || current.catName;
             
-            // 平假名
             const hiragana = current.introValues[1] || '';
-            const canStandAlone = current.introValues[4] || ''; // 我可以單獨使用嗎
+            const canStandAlone = current.introValues[4] || '';
 
             if (hiragana) {
                 subTitleEl.textContent = `${hiragana} ${canStandAlone ? `・ ${canStandAlone}` : ''}`;
@@ -2963,7 +2976,6 @@
                 subTitleEl.style.display = 'none';
             }
 
-            // 定義與功能
             const defAndFunc = current.introValues[2] || '';
             if (defAndFunc) {
                 meanBoxEl.innerHTML = `<b>📖 定義與功能：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
@@ -2974,7 +2986,6 @@
 
             ttsBtnEl.style.display = 'none';
 
-            // 背面：連接對象與位置、家屬範例、例句寶寶
             const connectPos = current.introValues[3] || '';
             const familyExamples = current.introValues[5] || '';
             const exampleBaby = current.introValues[6] || '';
@@ -3203,7 +3214,7 @@
         
         if (!isFlipped) {
             const current = currentList[currentIndex];
-            if (!current.hasReadThisTime) {
+            if (!current.hasReadThisTime && !current.isIntroCard) {
                 saveProgress(current.jp, 'read');
                 current.hasReadThisTime = true;
                 const progress = getProgress(current.jp);
