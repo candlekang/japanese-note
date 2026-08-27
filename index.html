@@ -2787,6 +2787,7 @@
         return wordObj.rawCols[4] || wordObj.rawCols[2] || '';
     }
 
+    // 💡 徹底移除「其他/未分類」，只保留乾淨的 24 個主題
     function renderStatsDashboard() {
         renderQuestBoard();
         const gridContainer = document.getElementById('stats-category-grid');
@@ -2805,7 +2806,6 @@
                 categoryMap[opt.text] = [];
             }
         }
-        categoryMap['其他/未分類'] = [];
 
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -2813,16 +2813,19 @@
                 const wordJp = key.replace('jp_progress_', '');
                 const prog = JSON.parse(localStorage.getItem(key));
                 
-                if (prog.read > 0 || prog.quiz > 0) {
-                    totalUnlocked++;
-                    totalQuizSuccess += prog.quiz;
+                // 排除導讀卡與殘留測試雜訊
+                if (wordJp.includes('我是誰') || wordJp.includes('導讀字卡') || wordJp.includes('核心觀念')) {
+                    continue;
+                }
 
-                    let catName = globalWordCategoryMap[wordJp] || '其他/未分類';
-                    if (!categoryMap[catName]) {
-                        categoryMap[catName] = [];
+                if (prog.read > 0 || prog.quiz > 0) {
+                    let catName = globalWordCategoryMap[wordJp];
+                    if (catName && categoryMap[catName]) {
+                        totalUnlocked++;
+                        totalQuizSuccess += prog.quiz;
+                        const wordObj = globalWordDataMap[wordJp] || null;
+                        categoryMap[catName].push({ wordJp, prog, wordObj });
                     }
-                    const wordObj = globalWordDataMap[wordJp] || null;
-                    categoryMap[catName].push({ wordJp, prog, wordObj });
                 }
             }
         }
@@ -2928,7 +2931,6 @@
         }
     }
 
-    // 🌟 核心升級：精準導讀卡版面調校（防止重疊、美化正面大標與副標）
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2959,10 +2961,9 @@
 
         // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等專屬）
         if (current.isIntroCard && current.isStructuredIntro) {
-            badgeEl.style.display = 'none'; // 隱藏重複的徽章，避免與上方標籤黏在一起
+            badgeEl.style.display = 'none';
             mainTitleEl.textContent = current.introValues[0] || current.catName;
             
-            // 正面副標：只放純粹的讀音或體系名稱，不放長篇大論
             const subTitleVal = current.introValues[1] || '';
             if (subTitleVal) {
                 subTitleEl.textContent = subTitleVal;
@@ -2971,7 +2972,6 @@
                 subTitleEl.style.display = 'none';
             }
 
-            // 正面定義框：核心定義與兩大體系
             const defAndFunc = current.introValues[2] || '';
             if (defAndFunc) {
                 meanBoxEl.innerHTML = `<b>📖 核心觀念：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
@@ -2982,7 +2982,6 @@
 
             ttsBtnEl.style.display = 'none';
 
-            // 背面：結構化呈現對比速查、使用時機與語感、經典範例、例句
             const col3Header = current.introHeaders[3] || '🔗 體系對照速查';
             const col3Val = current.introValues[3] || '';
             
