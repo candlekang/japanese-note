@@ -487,7 +487,7 @@
         .card-nav-arrow.right { right: 6px !important; }
 
         .front-main-title {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
             color: var(--text-main);
             margin-bottom: 6px;
@@ -495,14 +495,14 @@
             white-space: pre-wrap;
         }
         .front-sub-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--primary-dark);
             margin-bottom: 12px;
             white-space: pre-wrap;
         }
         .front-mean-box {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: #b45309;
             background: var(--pixel-yellow-bg);
@@ -528,7 +528,7 @@
             border: 1.5px solid var(--primary);
             border-radius: 10px;
             padding: 10px 12px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             width: 100%;
             box-sizing: border-box;
         }
@@ -542,7 +542,7 @@
             gap: 4px;
         }
         .grammar-rule-content {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #0369a1;
             line-height: 1.5;
@@ -1292,7 +1292,6 @@
     <!-- 1. 翻卡模式 -->
     <div id="review-section">
         <div class="card-container" id="flashcard">
-            <!-- 💡 導讀卡專屬頂部標籤 -->
             <div class="card-counter-fixed" id="card-counter-fixed">0 / 0</div>
 
             <div class="card-nav-arrow left" onclick="prevCard(event)" title="上一張">◀</div>
@@ -2310,8 +2309,8 @@
                     const row2 = parsedData[1] || [];
                     const row3 = parsedData[2] || [];
                     
-                    const isDualRowIntro = row2.length > 0 && row2.some(c => c.includes('定義與功能') || c.includes('我是誰？') || c.includes('平假名'));
-                    const isSingleRowIntro = !isDualRowIntro && row2.length > 0 && row2[0] && (row2[0].includes('特色') || row2[0].includes('定義') || row2[0].includes('文法中') || row2[0].includes('像中文的'));
+                    const isDualRowIntro = row2.length > 0 && row2.some(c => c.includes('定義與功能') || c.includes('我是誰？') || c.includes('平假名') || c.includes('核心定義'));
+                    const isSingleRowIntro = !isDualRowIntro && row2.length > 0 && row2[0] && (row2[0].includes('特色') || row2[0].includes('定義') || row2[0].includes('文法中') || row2[0].includes('像中文的') || row2[0].includes('計數系統'));
 
                     let dataStartIndex = 1;
 
@@ -2428,7 +2427,7 @@
             }
         }
 
-        const grammarTrapKeys = ['sheet2', 'sheet10', 'sheet11', 'sheet13', 'sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
+        const grammarTrapKeys = ['sheet2', 'sheet3', 'sheet10', 'sheet11', 'sheet13', 'sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
         let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey) && !item.isIntroCard);
 
         let isWeakness = false;
@@ -2928,7 +2927,6 @@
         }
     }
 
-    // 🌟 核心升級：導讀卡頂部標籤與計數顯示優化
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2940,7 +2938,6 @@
         const fixedCounter = document.getElementById('card-counter-fixed');
         const hasIntro = currentList.some(w => w.isIntroCard);
 
-        // 💡 導讀卡不顯示「1 / 20」，而是顯示專屬「💡 觀念導讀」
         if (current.isIntroCard) {
             fixedCounter.textContent = '💡 觀念導讀';
             fixedCounter.classList.add('intro-mode');
@@ -2958,16 +2955,16 @@
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
-        // 💡 1. 雙列結構化導讀特卡（接續詞、連體詞、接尾詞等）
+        // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等專屬）
         if (current.isIntroCard && current.isStructuredIntro) {
             badgeEl.textContent = '💡 詞類總覽導讀';
             mainTitleEl.textContent = current.introValues[0] || current.catName;
             
-            const hiragana = current.introValues[1] || '';
+            const subTitleVal = current.introValues[1] || '';
             const canStandAlone = current.introValues[4] || '';
 
-            if (hiragana) {
-                subTitleEl.textContent = `${hiragana} ${canStandAlone ? `・ ${canStandAlone}` : ''}`;
+            if (subTitleVal) {
+                subTitleEl.textContent = `${subTitleVal} ${canStandAlone ? `・ ${canStandAlone}` : ''}`;
                 subTitleEl.style.display = 'block';
             } else if (canStandAlone) {
                 subTitleEl.textContent = canStandAlone;
@@ -2978,7 +2975,7 @@
 
             const defAndFunc = current.introValues[2] || '';
             if (defAndFunc) {
-                meanBoxEl.innerHTML = `<b>📖 定義與功能：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
+                meanBoxEl.innerHTML = `<b>📖 核心定義與體系：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
                 meanBoxEl.style.display = 'inline-block';
             } else {
                 meanBoxEl.style.display = 'none';
@@ -2986,33 +2983,38 @@
 
             ttsBtnEl.style.display = 'none';
 
-            const connectPos = current.introValues[3] || '';
-            const familyExamples = current.introValues[5] || '';
-            const exampleBaby = current.introValues[6] || '';
+            // 背面：結構化呈現連接對象/體系、家屬範例、例句寶寶
+            const col3Header = current.introHeaders[3] || '🔗 連接對象與體系';
+            const col3Val = current.introValues[3] || '';
+            
+            const col5Header = current.introHeaders[5] || '👨‍👩‍👧‍👦 範例速查';
+            const col5Val = current.introValues[5] || '';
+            
+            const col6Val = current.introValues[6] || '';
 
             let backHTML = `<div class="kanji-title">📖 ${current.catName}・核心特性</div>`;
 
-            if (connectPos) {
+            if (col3Val) {
                 backHTML += `
                     <div class="grammar-rule-card">
-                        <div class="grammar-rule-title">🔗 連接對象與位置</div>
-                        <div class="grammar-rule-content">${connectPos}</div>
+                        <div class="grammar-rule-title">${col3Header}</div>
+                        <div class="grammar-rule-content">${col3Val}</div>
                     </div>
                 `;
             }
 
-            if (familyExamples) {
+            if (col5Val) {
                 backHTML += `
                     <div class="notes-block">
-                        <div class="notes-title">👨‍👩‍👧‍👦 家屬範例</div>
-                        <div class="notes-content">${familyExamples}</div>
+                        <div class="notes-title">${col5Header}</div>
+                        <div class="notes-content">${col5Val}</div>
                     </div>
                 `;
             }
 
-            if (exampleBaby) {
-                const lines = exampleBaby.split('\n').filter(Boolean);
-                const jpLine = lines[0] || exampleBaby;
+            if (col6Val) {
+                const lines = col6Val.split('\n').filter(Boolean);
+                const jpLine = lines[0] || col6Val;
                 const zhLine = lines.slice(1).join('\n') || '';
                 const escapedJp = encodeURIComponent(jpLine);
 
