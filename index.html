@@ -489,11 +489,24 @@
             white-space: pre-wrap;
         }
         .front-sub-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             color: var(--primary-dark);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             white-space: pre-wrap;
+        }
+        .front-mean-box {
+            font-size: 16px;
+            font-weight: bold;
+            color: #b45309;
+            background: var(--pixel-yellow-bg);
+            border: 1.5px dashed rgba(245, 158, 11, 0.5);
+            padding: 8px 16px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            line-height: 1.4;
+            max-width: 90%;
+            word-break: break-word;
         }
 
         .kanji-title {
@@ -503,7 +516,7 @@
             white-space: pre-wrap;
         }
 
-        /* 💡 結構化區塊：文法接續卡片 */
+        /* 💡 形式名詞/文法專用結構化卡片 */
         .grammar-rule-card {
             background: rgba(56, 189, 248, 0.12);
             border: 1.5px solid var(--primary);
@@ -523,44 +536,35 @@
             gap: 4px;
         }
         .grammar-rule-content {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: #0369a1;
-            line-height: 1.4;
+            line-height: 1.5;
+            white-space: pre-wrap;
         }
 
-        /* 💡 結構化區塊：動詞變化 2x3 膠囊網格 */
-        .conjugation-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 14px;
+        .notes-block {
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
             width: 100%;
             box-sizing: border-box;
         }
-        .conjugation-item {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        .notes-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #b45309;
+            margin-bottom: 4px;
         }
-        .conjugation-label {
-            font-size: 11px;
-            font-weight: bold;
-            color: var(--pixel-pink);
-            margin-bottom: 2px;
-        }
-        .conjugation-val {
-            font-size: 14px;
-            font-weight: bold;
-            color: var(--text-main);
-            word-break: break-all;
+        .notes-content {
+            font-size: 13px;
+            color: #78350f;
+            line-height: 1.6;
+            white-space: pre-wrap;
         }
 
-        /* 💡 結構化區塊：例句卡片分行 */
         .example-block {
             background: #ffffff;
             border: 1px solid #cbd5e1;
@@ -1214,6 +1218,7 @@
                 </div>
             </div>
 
+            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1294,12 +1299,13 @@
                         <span class="badge" id="card-badge-front">載入中...</span>
                         <div class="front-main-title" id="card-main-front"></div>
                         <div class="front-sub-title" id="card-sub-front">載入中...</div>
-                        <button class="btn-tts" onclick="speakFrontCard(event)">🔊 發音</button>
+                        <div class="front-mean-box" id="card-mean-front" style="display:none;"></div>
+                        <button class="btn-tts" id="btn-card-tts" onclick="speakFrontCard(event)">🔊 發音</button>
                         <div class="progress-text" id="card-progress">👀 翻閱: 0 次 | 🏆 測驗答對: 0 次</div>
                     </div>
                     <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
                 </div>
-                <!-- 背面 (結構化排版容器) -->
+                <!-- 背面 -->
                 <div class="card-face card-back">
                     <div class="card-body-wrapper" id="card-back-content"></div>
                 </div>
@@ -1477,7 +1483,7 @@
     </div>
 </div>
 
-<!-- 👾 每 3 天突發驚喜任務彈窗 (Surprise Boss Modal) -->
+<!-- 👾 每 3 天突發驚喜任務彈窗 -->
 <div class="modal-overlay" id="surpriseBossModal">
     <div class="modal-box boss-modal-box" onclick="event.stopPropagation()">
         <div class="modal-header" style="background: rgba(219, 39, 119, 0.25);">
@@ -1725,7 +1731,7 @@
 
             noise.start(now);
             osc.start(now);
-            osc.stop(now + 0.012);
+            osc.stop(now + 0.12);
         } catch(e) {}
     }
 
@@ -2137,7 +2143,7 @@
 
     function cleanTextForSpeech(text) {
         if (!text) return '';
-        return text.replace(/[（\(][^）\)]*[）\)]/g, '');
+        return text.replace(/[（\(][^）\)]*[）\)]/g, '').replace(/〜/g, '');
     }
 
     let globalTTSAudio = new Audio();
@@ -2247,7 +2253,8 @@
 
     function isValidWord(item) {
         if (!item.jp || item.jp.trim() === '') return false;
-        if (item.jp.length > 15 || /[。，、！？,,]/.test(item.jp)) return false;
+        if (item.isIntroCard) return true; // 觀念導讀前置卡放行
+        if (item.jp.length > 30) return false;
         return true;
     }
 
@@ -2264,6 +2271,7 @@
         return x - Math.floor(x);
     }
 
+    // ⚡ 漸進式載入與形式名詞（A2 定義前置卡）解析
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -2295,22 +2303,47 @@
                     const headers = parsedData[0];
                     const sheetWords = [];
 
-                    parsedData.slice(1).forEach(cols => {
-                        const item = {
-                            jp: cols[0] || '',
-                            kanji: cols[1] || '',
-                            level: cols[2] || '',
-                            type: cols[3] || '',
-                            rawCols: cols,
+                    // 💡 檢查是否有 A2 定義說明（如形式名詞）
+                    const firstRow = parsedData[1];
+                    const isFirstRowIntro = firstRow && firstRow[0] && (firstRow[0].includes('特色') || firstRow[0].includes('定義') || firstRow[0].includes('文法中'));
+
+                    if (isFirstRowIntro) {
+                        const introItem = {
+                            jp: `📖 ${catName}・核心觀念`,
+                            kanji: '',
+                            level: '觀念導讀',
+                            type: catName,
+                            rawCols: firstRow,
                             rawHeaders: headers,
                             catKey: sheetKey,
-                            catName: catName
+                            catName: catName,
+                            isIntroCard: true,
+                            introContent: firstRow[0]
                         };
-                        if (isValidWord(item)) {
-                            globalWordCategoryMap[item.jp] = catName;
-                            globalWordDataMap[item.jp] = item;
-                            sheetWords.push(item);
-                            allSearchableWords.push(item);
+                        sheetWords.push(introItem);
+                    }
+
+                    const dataRows = isFirstRowIntro ? parsedData.slice(2) : parsedData.slice(1);
+
+                    dataRows.forEach(cols => {
+                        const wordTitle = cols[0] || '';
+                        if (wordTitle && wordTitle.trim() !== '') {
+                            const item = {
+                                jp: wordTitle,
+                                kanji: cols[1] || '',
+                                level: cols[2] || '',
+                                type: cols[3] || '',
+                                rawCols: cols,
+                                rawHeaders: headers,
+                                catKey: sheetKey,
+                                catName: catName
+                            };
+                            if (isValidWord(item)) {
+                                globalWordCategoryMap[item.jp] = catName;
+                                globalWordDataMap[item.jp] = item;
+                                sheetWords.push(item);
+                                allSearchableWords.push(item);
+                            }
                         }
                     });
 
@@ -2363,14 +2396,14 @@
             if (k.startsWith('jp_progress_')) {
                 const w = k.replace('jp_progress_', '');
                 const p = JSON.parse(localStorage.getItem(k));
-                if (p.read > 0 && p.quiz === 0 && globalWordDataMap[w]) {
+                if (p.read > 0 && p.quiz === 0 && globalWordDataMap[w] && !globalWordDataMap[w].isIntroCard) {
                     weakCandidates.push(globalWordDataMap[w]);
                 }
             }
         }
 
-        const grammarTrapKeys = ['sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
-        let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey));
+        const grammarTrapKeys = ['sheet2', 'sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
+        let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey) && !item.isIntroCard);
 
         let isWeakness = false;
         if (weakCandidates.length > 0 && Math.random() > 0.4) {
@@ -2380,7 +2413,8 @@
             currentBossWord = grammarCandidates[Math.floor(Math.random() * grammarCandidates.length)];
             isWeakness = false;
         } else {
-            currentBossWord = allSearchableWords[Math.floor(Math.random() * allSearchableWords.length)];
+            const pool = allSearchableWords.filter(w => !w.isIntroCard);
+            currentBossWord = pool[Math.floor(Math.random() * pool.length)];
         }
 
         document.getElementById('boss-quest-badge').textContent = isWeakness ? '🎯 弱點狙擊（遺忘盲區狙擊）' : '⚔️ 文法魔王陷阱（句型助詞特訓）';
@@ -2404,7 +2438,7 @@
 
         document.getElementById('boss-question-text').textContent = questionText;
 
-        let wrongCandidates = allSearchableWords.filter(w => w.jp !== currentBossWord.jp).sort(() => Math.random() - 0.5).slice(0, 3);
+        let wrongCandidates = allSearchableWords.filter(w => w.jp !== currentBossWord.jp && !w.isIntroCard).sort(() => Math.random() - 0.5).slice(0, 3);
         let options = [currentBossWord].concat(wrongCandidates).sort(() => Math.random() - 0.5);
 
         const optionsContainer = document.getElementById('boss-quiz-options');
@@ -2489,7 +2523,7 @@
 
     function pickDailyFiveWords(dateString) {
         let seed = getDailyRandomSeed();
-        const pool = [...allSearchableWords];
+        const pool = allSearchableWords.filter(w => !w.isIntroCard);
         const selectedDailyWords = [];
 
         for (let i = 0; i < 5 && pool.length > 0; i++) {
@@ -2526,6 +2560,7 @@
         let scoredMatches = [];
 
         allSearchableWords.forEach(item => {
+            if (item.isIntroCard) return;
             let score = 0;
             const jp = item.jp.toLowerCase();
             const kanji = (item.kanji || '').toLowerCase();
@@ -2645,8 +2680,12 @@
             return;
         }
 
-        fullSourceList = [...sourceData];
-        fullSourceList.sort(() => Math.random() - 0.5);
+        // 分離導讀卡與一般字卡
+        const introCard = sourceData.find(w => w.isIntroCard);
+        let normalWords = sourceData.filter(w => !w.isIntroCard);
+        normalWords.sort(() => Math.random() - 0.5);
+
+        fullSourceList = introCard ? [introCard, ...normalWords] : [...normalWords];
 
         const settings = getQuestSettings();
         const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
@@ -2771,7 +2810,7 @@
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
             const catName = optElement ? optElement.text : catKey;
             
-            const totalWordsInCat = (sheetDataCache[catKey] || []).length;
+            const totalWordsInCat = (sheetDataCache[catKey] || []).filter(w => !w.isIntroCard).length;
             const learnedWordsInCat = categoryMap[catName] ? categoryMap[catName].length : 0;
             const isCompleted = totalWordsInCat > 0 && learnedWordsInCat >= totalWordsInCat;
 
@@ -2864,7 +2903,7 @@
         }
     }
 
-    // 🌟 核心升級：字卡結構化排版引擎
+    // 🌟 核心升級：形式名詞（我是誰、漢字寫法、意思放正面，用法/例句/備註放背面）
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2872,20 +2911,138 @@
         
         const progress = getProgress(current.jp);
         document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
-        document.getElementById('card-badge-front').textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字'; 
         
         const counterText = `${currentIndex + 1} / ${currentList.length}`;
         const fixedCounter = document.getElementById('card-counter-fixed');
         if (fixedCounter) fixedCounter.textContent = counterText;
 
+        const badgeEl = document.getElementById('card-badge-front');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
+        const meanBoxEl = document.getElementById('card-mean-front');
+        const ttsBtnEl = document.getElementById('btn-card-tts');
+        const backContainer = document.getElementById('card-back-content');
+
+        // 💡 1. 形式名詞 A2 核心觀念導讀特卡
+        if (current.isIntroCard) {
+            badgeEl.textContent = '💡 觀念導讀';
+            mainTitleEl.textContent = current.catName;
+            subTitleEl.textContent = '核心概念與特色';
+            subTitleEl.style.display = 'block';
+            meanBoxEl.style.display = 'none';
+            ttsBtnEl.style.display = 'none';
+
+            backContainer.innerHTML = `
+                <div class="kanji-title">📖 ${current.catName}・定義說明</div>
+                <div class="grammar-rule-card" style="border-color:#f59e0b; background:rgba(245, 158, 11, 0.12);">
+                    <div class="grammar-rule-title" style="color:#b45309;">💡 核心定義</div>
+                    <div class="grammar-rule-content" style="color:#78350f;">${current.introContent}</div>
+                </div>
+                <div class="notes-block">
+                    <div class="notes-title">🎯 修煉心法</div>
+                    <div class="notes-content">形式名詞本身沒有具體實質意義，但用來構成豐富的句型與時態表達。學習時請重點注意「前面的接續形態」與「整體句型意思」！</div>
+                </div>
+                <div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>
+            `;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 2. 形式名詞（sheet2）專屬正面排版
+        if (current.catKey === 'sheet2') {
+            badgeEl.textContent = '🧩 形式名詞';
+            mainTitleEl.textContent = current.jp; // 我是誰
+            
+            // 漢字寫法
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                subTitleEl.textContent = `漢字：${current.kanji}`;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.style.display = 'none';
+            }
+
+            // 意思
+            const meaning = getWordZhText(current);
+            if (meaning) {
+                meanBoxEl.textContent = `💡 意思：${meaning}`;
+                meanBoxEl.style.display = 'inline-block';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            // 背面：用法、備註、例句
+            let usageVal = '';
+            let noteVal = '';
+            let exampleVal = '';
+
+            for (let i = 0; i < current.rawHeaders.length; i++) {
+                const h = current.rawHeaders[i] || '';
+                const v = current.rawCols[i] || '';
+                if (h.includes('用法')) usageVal = v;
+                if (h.includes('備註') || h.includes('備注')) noteVal = v;
+                if (h.includes('例句')) exampleVal = v;
+            }
+
+            let backHTML = `<div class="kanji-title">${current.jp}</div>`;
+
+            if (usageVal) {
+                backHTML += `
+                    <div class="grammar-rule-card">
+                        <div class="grammar-rule-title">⚡ 用法與句型規則</div>
+                        <div class="grammar-rule-content">${usageVal}</div>
+                    </div>
+                `;
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">📝 備註與解析</div>
+                        <div class="notes-content">${noteVal}</div>
+                    </div>
+                `;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split('\n\n').filter(Boolean);
+                const listToRender = exBlocks.length > 1 ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').filter(Boolean);
+                    const jpLine = lines[0] || exText;
+                    const zhLine = lines.slice(1).join('\n') || '';
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 3. 其他分類標準排版
+        badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
+        meanBoxEl.style.display = 'none';
+        ttsBtnEl.style.display = 'inline-flex';
 
         let fullBackTitle = current.jp;
 
         if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
             const isEnglishForeign = /[a-zA-Z]/.test(current.kanji);
-            
             if (isEnglishForeign) {
                 mainTitleEl.textContent = current.jp;
                 subTitleEl.textContent = current.kanji;
@@ -2903,93 +3060,44 @@
             subTitleEl.style.display = 'none';
             fullBackTitle = current.jp;
         }
-        
-        const backContainer = document.getElementById('card-back-content');
-        let backHTML = '';
 
-        backHTML += `<div class="kanji-title">${fullBackTitle}</div>`;
-
+        let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
         if (current.type) {
             backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
         }
-
-        // 收集欄位資料
-        let grammarRule = '';
-        let conjugations = [];
-        let examples = [];
-        let generalNotes = [];
 
         for (let i = 2; i < current.rawHeaders.length; i++) {
             const h = current.rawHeaders[i] ? current.rawHeaders[i].trim() : '';
             const val = current.rawCols[i] ? current.rawCols[i].trim() : '';
             if (!val || (i === 3 && val === current.type)) continue;
 
-            if (h.includes('接續') || h.includes('句型') || h.includes('規則')) {
-                grammarRule = val;
-            } else if (h.includes('形') || h.includes('變化') || h.includes('ます') || h.includes('て形') || h.includes('ない形')) {
-                conjugations.push({ label: h, val: val });
-            } else if (h.includes('例句')) {
-                examples.push({ label: h, val: val });
+            if (h.includes('例句')) {
+                const lines = val.split('\n').filter(Boolean);
+                const jpLine = lines[0] || val;
+                const zhLine = lines.slice(1).join('\n') || '';
+                const escapedJp = encodeURIComponent(jpLine);
+
+                backHTML += `
+                    <div class="example-block">
+                        <div class="example-jp-line">
+                            <span>💬 ${jpLine}</span>
+                            <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                        </div>
+                        ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                    </div>
+                `;
             } else {
-                generalNotes.push({ label: h, val: val });
+                backHTML += `
+                    <div class="detail-section">
+                        <span class="section-title">💡 ${h}：</span>
+                        <span class="section-text">${val}</span>
+                    </div>
+                `;
             }
         }
 
-        // 1. 若有接續規則，以專屬結構化卡片置頂
-        if (grammarRule) {
-            backHTML += `
-                <div class="grammar-rule-card">
-                    <div class="grammar-rule-title">⚡ 接續規則 / 句型公式</div>
-                    <div class="grammar-rule-content">${grammarRule}</div>
-                </div>
-            `;
-        }
-
-        // 2. 若為動詞/變化類，以 2x3 膠囊網格排版
-        if (conjugations.length > 0) {
-            backHTML += `<div class="conjugation-grid">`;
-            conjugations.forEach(c => {
-                backHTML += `
-                    <div class="conjugation-item">
-                        <span class="conjugation-label">${c.label}</span>
-                        <span class="conjugation-val">${c.val}</span>
-                    </div>
-                `;
-            });
-            backHTML += `</div>`;
-        }
-
-        // 3. 一般意思與筆記
-        generalNotes.forEach(item => {
-            backHTML += `
-                <div class="detail-section">
-                    <span class="section-title">💡 ${item.label}：</span>
-                    <span class="section-text">${item.val}</span>
-                </div>
-            `;
-        });
-
-        // 4. 例句結構化分行排版
-        examples.forEach(ex => {
-            const lines = ex.val.split('\n').filter(Boolean);
-            const jpLine = lines[0] || ex.val;
-            const zhLine = lines.slice(1).join('\n') || '';
-            const escapedJp = encodeURIComponent(jpLine);
-
-            backHTML += `
-                <div class="example-block">
-                    <div class="example-jp-line">
-                        <span>💬 ${jpLine}</span>
-                        <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
-                    </div>
-                    ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
-                </div>
-            `;
-        });
-
         backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
         backContainer.innerHTML = backHTML;
-
         document.getElementById('flashcard').classList.remove('is-flipped');
     }
 
@@ -3052,7 +3160,8 @@
             return;
         }
 
-        if (fullSourceList.length < 4) {
+        const validQuizPool = fullSourceList.filter(w => !w.isIntroCard);
+        if (validQuizPool.length < 4) {
             alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
             setMode('review');
             return;
@@ -3080,22 +3189,23 @@
     }
 
     function startQuiz(infiniteMode = false, forceWild = false) {
-        if (fullSourceList.length < 4) {
+        const pool = fullSourceList.filter(w => !w.isIntroCard);
+        if (pool.length < 4) {
             alert('⏳ 單字庫正在全力加速傳送中！請稍微等我一下下嘛～( ＞＜ )✨');
             setMode('review');
             return;
         }
 
         const settings = getQuestSettings();
-        const targetCount = infiniteMode ? fullSourceList.length : settings.quizTarget;
+        const targetCount = infiniteMode ? pool.length : settings.quizTarget;
 
         let selectedQuestions = [];
 
         if (forceWild || infiniteMode) {
-            selectedQuestions = [...fullSourceList].sort(() => Math.random() - 0.5);
+            selectedQuestions = [...pool].sort(() => Math.random() - 0.5);
         } else {
             const learnedKeys = getTodayLearnedWords();
-            const learnedObjs = fullSourceList.filter(item => learnedKeys.includes(item.jp));
+            const learnedObjs = pool.filter(item => learnedKeys.includes(item.jp));
             
             const shuffledLearned = [...learnedObjs].sort(() => Math.random() - 0.5);
 
@@ -3104,7 +3214,7 @@
             } else {
                 selectedQuestions = [...shuffledLearned];
                 const remainCount = targetCount - selectedQuestions.length;
-                const poolWithoutLearned = fullSourceList.filter(item => !learnedKeys.includes(item.jp));
+                const poolWithoutLearned = pool.filter(item => !learnedKeys.includes(item.jp));
                 poolWithoutLearned.sort(() => Math.random() - 0.5);
                 selectedQuestions = selectedQuestions.concat(poolWithoutLearned.slice(0, remainCount));
             }
@@ -3178,7 +3288,8 @@
         document.getElementById('btn-submit-answer').style.display = 'none'; 
         document.getElementById('btn-next-quiz').style.display = 'none';
 
-        let wrongCandidates = fullSourceList.filter(word => {
+        const pool = fullSourceList.filter(w => !w.isIntroCard);
+        let wrongCandidates = pool.filter(word => {
             if (word.jp === currentWord.jp) return false;
             
             let textToShow;
