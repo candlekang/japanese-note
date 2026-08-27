@@ -496,17 +496,18 @@
             white-space: pre-wrap;
         }
         .front-mean-box {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: #b45309;
             background: var(--pixel-yellow-bg);
             border: 1.5px dashed rgba(245, 158, 11, 0.5);
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 12px;
             margin-bottom: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
             max-width: 90%;
             word-break: break-word;
+            text-align: left;
         }
 
         .kanji-title {
@@ -516,7 +517,6 @@
             white-space: pre-wrap;
         }
 
-        /* 💡 形式名詞/文法專用結構化卡片 */
         .grammar-rule-card {
             background: rgba(56, 189, 248, 0.12);
             border: 1.5px solid var(--primary);
@@ -827,7 +827,6 @@
         }
         .stat-label { font-size: 13px; color: var(--text-sub); }
         
-        /* 💡 24 分類乾淨排版 */
         .category-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -1219,7 +1218,6 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1385,7 +1383,6 @@
             </div>
         </div>
 
-        <!-- 💡 24 分類導覽標題 -->
         <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 24 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
@@ -1651,7 +1648,9 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1796,7 +1795,6 @@
         } catch(e) {}
     }
 
-    // 💡 已移除 sheet23，保留乾淨的 24 個主題
     const SHEETS_CONFIG = {
         sheet1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=938197036&single=true&output=csv',
         sheet2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1844228081&single=true&output=csv',
@@ -2270,7 +2268,7 @@
         return x - Math.floor(x);
     }
 
-    // ⚡ 24 分類加載與導讀卡解析
+    // ⚡ 核心升級：精準讀取第 2、3 列作為「結構化全方位導讀特卡」
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -2302,27 +2300,52 @@
                     const headers = parsedData[0];
                     const sheetWords = [];
 
-                    // 💡 檢查是否有 A2 定義說明（如形式名詞、接續詞等）
-                    const firstRow = parsedData[1];
-                    const isFirstRowIntro = firstRow && firstRow[0] && (firstRow[0].includes('特色') || firstRow[0].includes('定義') || firstRow[0].includes('文法中') || firstRow[0].includes('像中文的'));
+                    // 💡 檢查第 2、3 列是否包含獨立導讀卡定義
+                    const row2 = parsedData[1] || [];
+                    const row3 = parsedData[2] || [];
+                    
+                    const isDualRowIntro = row2.length > 0 && row2.some(c => c.includes('定義與功能') || c.includes('我是誰？') || c.includes('平假名'));
+                    const isSingleRowIntro = !isDualRowIntro && row2.length > 0 && row2[0] && (row2[0].includes('特色') || row2[0].includes('定義') || row2[0].includes('文法中') || row2[0].includes('像中文的'));
 
-                    if (isFirstRowIntro) {
+                    let dataStartIndex = 1;
+
+                    if (isDualRowIntro && row3.length > 0) {
+                        // 雙列導讀卡模式 (Row 2 為標題, Row 3 為內容)
+                        const introItem = {
+                            jp: row3[0] || catName,
+                            kanji: '',
+                            level: '觀念導讀',
+                            type: catName,
+                            rawCols: row3,
+                            rawHeaders: row2, // 將第 2 列標題傳入作為專屬標題
+                            catKey: sheetKey,
+                            catName: catName,
+                            isIntroCard: true,
+                            isStructuredIntro: true,
+                            introHeaders: row2,
+                            introValues: row3
+                        };
+                        sheetWords.push(introItem);
+                        dataStartIndex = 3; // 從第 4 列開始抓單字庫
+                    } else if (isSingleRowIntro) {
+                        // 單列導讀卡模式 (如形式名詞)
                         const introItem = {
                             jp: `📖 ${catName}・核心觀念`,
                             kanji: '',
                             level: '觀念導讀',
                             type: catName,
-                            rawCols: firstRow,
+                            rawCols: row2,
                             rawHeaders: headers,
                             catKey: sheetKey,
                             catName: catName,
                             isIntroCard: true,
-                            introContent: firstRow[0]
+                            introContent: row2[0]
                         };
                         sheetWords.push(introItem);
+                        dataStartIndex = 2; // 從第 3 列開始抓單字庫
                     }
 
-                    const dataRows = isFirstRowIntro ? parsedData.slice(2) : parsedData.slice(1);
+                    const dataRows = parsedData.slice(dataStartIndex);
 
                     dataRows.forEach(cols => {
                         const wordTitle = cols[0] || '';
@@ -2401,7 +2424,7 @@
             }
         }
 
-        const grammarTrapKeys = ['sheet2', 'sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
+        const grammarTrapKeys = ['sheet2', 'sheet10', 'sheet11', 'sheet13', 'sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
         let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey) && !item.isIntroCard);
 
         let isWeakness = false;
@@ -2803,7 +2826,6 @@
         document.getElementById('stat-total-words').textContent = totalUnlocked;
         document.getElementById('stat-total-quizzes').textContent = totalQuizSuccess;
 
-        // 💡 24 格乾淨呈現
         let gridHtml = '';
         for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
@@ -2902,6 +2924,7 @@
         }
     }
 
+    // 🌟 核心升級：支援「雙列結構化導讀特卡」與「形式名詞特卡」
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2921,7 +2944,85 @@
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
-        // 💡 1. 觀念導讀特卡（A2 說明）
+        // 💡 1. 雙列結構化導讀特卡（接續詞、連體詞、接尾詞等第 2、3 列專屬）
+        if (current.isIntroCard && current.isStructuredIntro) {
+            badgeEl.textContent = '💡 詞類總覽導讀';
+            mainTitleEl.textContent = current.introValues[0] || current.catName; // 我是誰
+            
+            // 平假名
+            const hiragana = current.introValues[1] || '';
+            const canStandAlone = current.introValues[4] || ''; // 我可以單獨使用嗎
+
+            if (hiragana) {
+                subTitleEl.textContent = `${hiragana} ${canStandAlone ? `・ ${canStandAlone}` : ''}`;
+                subTitleEl.style.display = 'block';
+            } else if (canStandAlone) {
+                subTitleEl.textContent = canStandAlone;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.style.display = 'none';
+            }
+
+            // 定義與功能
+            const defAndFunc = current.introValues[2] || '';
+            if (defAndFunc) {
+                meanBoxEl.innerHTML = `<b>📖 定義與功能：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
+                meanBoxEl.style.display = 'inline-block';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'none';
+
+            // 背面：連接對象與位置、家屬範例、例句寶寶
+            const connectPos = current.introValues[3] || '';
+            const familyExamples = current.introValues[5] || '';
+            const exampleBaby = current.introValues[6] || '';
+
+            let backHTML = `<div class="kanji-title">📖 ${current.catName}・核心特性</div>`;
+
+            if (connectPos) {
+                backHTML += `
+                    <div class="grammar-rule-card">
+                        <div class="grammar-rule-title">🔗 連接對象與位置</div>
+                        <div class="grammar-rule-content">${connectPos}</div>
+                    </div>
+                `;
+            }
+
+            if (familyExamples) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">👨‍👩‍👧‍👦 家屬範例</div>
+                        <div class="notes-content">${familyExamples}</div>
+                    </div>
+                `;
+            }
+
+            if (exampleBaby) {
+                const lines = exampleBaby.split('\n').filter(Boolean);
+                const jpLine = lines[0] || exampleBaby;
+                const zhLine = lines.slice(1).join('\n') || '';
+                const escapedJp = encodeURIComponent(jpLine);
+
+                backHTML += `
+                    <div class="example-block">
+                        <div class="example-jp-line">
+                            <span>💬 ${jpLine}</span>
+                            <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                        </div>
+                        ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 2. 單列觀念導讀特卡（如形式名詞 A2 說明）
         if (current.isIntroCard) {
             badgeEl.textContent = '💡 觀念導讀';
             mainTitleEl.textContent = current.catName;
@@ -2946,7 +3047,7 @@
             return;
         }
 
-        // 💡 2. 形式名詞（sheet2）專屬版型
+        // 💡 3. 形式名詞（sheet2）專屬版型
         if (current.catKey === 'sheet2') {
             badgeEl.textContent = '🧩 形式名詞';
             mainTitleEl.textContent = current.jp;
@@ -3028,7 +3129,7 @@
             return;
         }
 
-        // 💡 3. 其他分類標準版型
+        // 💡 4. 一般分類標準版型
         badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
         meanBoxEl.style.display = 'none';
         ttsBtnEl.style.display = 'inline-flex';
