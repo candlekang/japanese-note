@@ -827,9 +827,10 @@
         }
         .stat-label { font-size: 13px; color: var(--text-sub); }
         
+        /* 💡 24 分類乾淨排版 */
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 6px;
             margin-bottom: 20px;
             width: 100%;
@@ -837,7 +838,7 @@
         }
         .category-grid-item {
             background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px;
-            padding: 6px 2px; text-align: center; cursor: pointer; transition: 0.2s;
+            padding: 8px 2px; text-align: center; cursor: pointer; transition: 0.2s;
             overflow: hidden; box-sizing: border-box; color: var(--text-main);
         }
         .category-grid-item:hover { 
@@ -847,8 +848,8 @@
             font-weight: bold;
         }
         .category-grid-item:hover .grid-count { color: #ffffff; font-weight: bold; }
-        .grid-name { font-size: 10px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
-        .grid-count { font-size: 9px; color: var(--pixel-pink); margin-top: 2px; font-family: 'DotGothic16', sans-serif; font-weight: 700; }
+        .grid-name { font-size: 11px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+        .grid-count { font-size: 10px; color: var(--pixel-pink); margin-top: 3px; font-family: 'DotGothic16', sans-serif; font-weight: 700; }
 
         .progress-list { display: flex; flex-direction: column; gap: 10px; }
         .category-group { border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background: #f8fafc; }
@@ -1272,7 +1273,6 @@
             <option value="sheet20">終助詞</option>
             <option value="sheet21">「因為」的用法比較</option>
             <option value="sheet22">て形大魔王</option>
-            <option value="sheet23">日語的所有「詞」</option>
             <option value="sheet24">します的擴充包</option>
             <option value="sheet25">つけます的擴充包</option>
         </select>
@@ -1385,7 +1385,8 @@
             </div>
         </div>
 
-        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 25 分類快速導覽：</div>
+        <!-- 💡 24 分類導覽標題 -->
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 24 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
         <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
@@ -1650,9 +1651,7 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') {
-                ctx.resume();
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -1797,6 +1796,7 @@
         } catch(e) {}
     }
 
+    // 💡 已移除 sheet23，保留乾淨的 24 個主題
     const SHEETS_CONFIG = {
         sheet1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=938197036&single=true&output=csv',
         sheet2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1844228081&single=true&output=csv',
@@ -1820,7 +1820,6 @@
         sheet20: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=826241804&single=true&output=csv',
         sheet21: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=141438539&single=true&output=csv',
         sheet22: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=584642201&single=true&output=csv',
-        sheet23: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1592371998&single=true&output=csv',
         sheet24: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=942908072&single=true&output=csv',
         sheet25: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=219719106&single=true&output=csv'
     };
@@ -2253,7 +2252,7 @@
 
     function isValidWord(item) {
         if (!item.jp || item.jp.trim() === '') return false;
-        if (item.isIntroCard) return true; // 觀念導讀前置卡放行
+        if (item.isIntroCard) return true;
         if (item.jp.length > 30) return false;
         return true;
     }
@@ -2271,7 +2270,7 @@
         return x - Math.floor(x);
     }
 
-    // ⚡ 漸進式載入與形式名詞（A2 定義前置卡）解析
+    // ⚡ 24 分類加載與導讀卡解析
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -2303,9 +2302,9 @@
                     const headers = parsedData[0];
                     const sheetWords = [];
 
-                    // 💡 檢查是否有 A2 定義說明（如形式名詞）
+                    // 💡 檢查是否有 A2 定義說明（如形式名詞、接續詞等）
                     const firstRow = parsedData[1];
-                    const isFirstRowIntro = firstRow && firstRow[0] && (firstRow[0].includes('特色') || firstRow[0].includes('定義') || firstRow[0].includes('文法中'));
+                    const isFirstRowIntro = firstRow && firstRow[0] && (firstRow[0].includes('特色') || firstRow[0].includes('定義') || firstRow[0].includes('文法中') || firstRow[0].includes('像中文的'));
 
                     if (isFirstRowIntro) {
                         const introItem = {
@@ -2680,7 +2679,6 @@
             return;
         }
 
-        // 分離導讀卡與一般字卡
         const introCard = sourceData.find(w => w.isIntroCard);
         let normalWords = sourceData.filter(w => !w.isIntroCard);
         normalWords.sort(() => Math.random() - 0.5);
@@ -2805,6 +2803,7 @@
         document.getElementById('stat-total-words').textContent = totalUnlocked;
         document.getElementById('stat-total-quizzes').textContent = totalQuizSuccess;
 
+        // 💡 24 格乾淨呈現
         let gridHtml = '';
         for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
@@ -2903,7 +2902,6 @@
         }
     }
 
-    // 🌟 核心升級：形式名詞（我是誰、漢字寫法、意思放正面，用法/例句/備註放背面）
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2923,11 +2921,11 @@
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
-        // 💡 1. 形式名詞 A2 核心觀念導讀特卡
+        // 💡 1. 觀念導讀特卡（A2 說明）
         if (current.isIntroCard) {
             badgeEl.textContent = '💡 觀念導讀';
             mainTitleEl.textContent = current.catName;
-            subTitleEl.textContent = '核心概念與特色';
+            subTitleEl.textContent = '核心概念與用法特性';
             subTitleEl.style.display = 'block';
             meanBoxEl.style.display = 'none';
             ttsBtnEl.style.display = 'none';
@@ -2940,7 +2938,7 @@
                 </div>
                 <div class="notes-block">
                     <div class="notes-title">🎯 修煉心法</div>
-                    <div class="notes-content">形式名詞本身沒有具體實質意義，但用來構成豐富的句型與時態表達。學習時請重點注意「前面的接續形態」與「整體句型意思」！</div>
+                    <div class="notes-content">掌握該詞類的特性與語境位置，翻閱後續單字卡時請重點觀察接續形態與例句結構！</div>
                 </div>
                 <div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>
             `;
@@ -2948,12 +2946,11 @@
             return;
         }
 
-        // 💡 2. 形式名詞（sheet2）專屬正面排版
+        // 💡 2. 形式名詞（sheet2）專屬版型
         if (current.catKey === 'sheet2') {
             badgeEl.textContent = '🧩 形式名詞';
-            mainTitleEl.textContent = current.jp; // 我是誰
+            mainTitleEl.textContent = current.jp;
             
-            // 漢字寫法
             if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
                 subTitleEl.textContent = `漢字：${current.kanji}`;
                 subTitleEl.style.display = 'block';
@@ -2961,7 +2958,6 @@
                 subTitleEl.style.display = 'none';
             }
 
-            // 意思
             const meaning = getWordZhText(current);
             if (meaning) {
                 meanBoxEl.textContent = `💡 意思：${meaning}`;
@@ -2972,7 +2968,6 @@
 
             ttsBtnEl.style.display = 'inline-flex';
 
-            // 背面：用法、備註、例句
             let usageVal = '';
             let noteVal = '';
             let exampleVal = '';
@@ -3029,12 +3024,11 @@
 
             backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
             backContainer.innerHTML = backHTML;
-
             document.getElementById('flashcard').classList.remove('is-flipped');
             return;
         }
 
-        // 💡 3. 其他分類標準排版
+        // 💡 3. 其他分類標準版型
         badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
         meanBoxEl.style.display = 'none';
         ttsBtnEl.style.display = 'inline-flex';
