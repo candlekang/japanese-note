@@ -497,14 +497,96 @@
         }
 
         .kanji-title {
-            font-size: 26px; font-weight: 700; color: var(--text-main);
-            text-align: center; width: 100%; margin-bottom: 16px; 
-            padding-bottom: 16px; border-bottom: 2px dashed #cbd5e1;
+            font-size: 24px; font-weight: 800; color: var(--text-main);
+            text-align: center; width: 100%; margin-bottom: 14px; 
+            padding-bottom: 12px; border-bottom: 2px dashed #cbd5e1;
             white-space: pre-wrap;
         }
-        .detail-section { margin-bottom: 16px; width: 100%; }
-        .section-title { font-weight: 800; color: var(--primary-dark); font-size: 16px; margin-right: 6px; }
-        .section-text { color: var(--text-main); font-size: 16px; line-height: 1.6; white-space: pre-wrap; }
+
+        /* 💡 結構化區塊：文法接續卡片 */
+        .grammar-rule-card {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1.5px solid var(--primary);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .grammar-rule-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .grammar-rule-content {
+            font-size: 15px;
+            font-weight: bold;
+            color: #0369a1;
+            line-height: 1.4;
+        }
+
+        /* 💡 結構化區塊：動詞變化 2x3 膠囊網格 */
+        .conjugation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .conjugation-item {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .conjugation-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--pixel-pink);
+            margin-bottom: 2px;
+        }
+        .conjugation-val {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-main);
+            word-break: break-all;
+        }
+
+        /* 💡 結構化區塊：例句卡片分行 */
+        .example-block {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid var(--primary-dark);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .example-jp-line {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.5;
+            margin-bottom: 4px;
+        }
+        .example-zh-line {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .detail-section { margin-bottom: 12px; width: 100%; }
+        .section-title { font-weight: 800; color: var(--primary-dark); font-size: 15px; margin-right: 6px; }
+        .section-text { color: var(--text-main); font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
         .section-type-badge {
             display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 12px;
             background: rgba(56, 189, 248, 0.15); color: var(--primary-dark); margin-bottom: 12px;
@@ -1132,7 +1214,6 @@
                 </div>
             </div>
 
-            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1218,7 +1299,7 @@
                     </div>
                     <div class="hint">✨ 點擊卡片翻面看詳解 ✨</div>
                 </div>
-                <!-- 背面 -->
+                <!-- 背面 (結構化排版容器) -->
                 <div class="card-face card-back">
                     <div class="card-body-wrapper" id="card-back-content"></div>
                 </div>
@@ -1458,7 +1539,7 @@
         }
 
         updateHUDLevel();
-        renderQuestBoard(); // 確保重新整理後進度條立即恢復
+        renderQuestBoard();
         if (currentMode === 'review') updateReviewUI();
         if (currentMode === 'stats') renderStatsDashboard();
     });
@@ -1483,7 +1564,6 @@
         window.location.reload(true);
     }
 
-    // ⚡ 核心修正：將每日任務與每日已學清單 100% 完整雙向備份至雲端
     async function syncCloudData() {
         if (!currentUser) return;
         try {
@@ -1645,7 +1725,7 @@
 
             noise.start(now);
             osc.start(now);
-            osc.stop(now + 0.12);
+            osc.stop(now + 0.012);
         } catch(e) {}
     }
 
@@ -2784,6 +2864,7 @@
         }
     }
 
+    // 🌟 核心升級：字卡結構化排版引擎
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2832,28 +2913,81 @@
             backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
         }
 
-        for (let i = 2; i < current.rawHeaders.length; i++) {
-            if (current.rawCols[i] && current.rawCols[i].trim() !== '') {
-                const headerName = current.rawHeaders[i] ? current.rawHeaders[i].trim() : `補充 ${i-1}`;
-                if (i === 3 && current.rawCols[i] === current.type) continue;
+        // 收集欄位資料
+        let grammarRule = '';
+        let conjugations = [];
+        let examples = [];
+        let generalNotes = [];
 
-                if (headerName.includes('例句')) {
-                    const escapedRawText = encodeURIComponent(current.rawCols[i]);
-                    backHTML += `<div class="detail-section">
-                        <span class="section-title">💬 ${headerName}：</span>
-                        <span class="section-text" id="card-example-text-${i}">${current.rawCols[i]}</span>
-                        <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedRawText}'))">🔊 唸例句</button>
-                    </div>`;
-                } else {
-                    backHTML += `<div class="detail-section">
-                        <span class="section-title">💡 ${headerName}：</span>
-                        <span class="section-text">${current.rawCols[i]}</span>
-                    </div>`;
-                }
+        for (let i = 2; i < current.rawHeaders.length; i++) {
+            const h = current.rawHeaders[i] ? current.rawHeaders[i].trim() : '';
+            const val = current.rawCols[i] ? current.rawCols[i].trim() : '';
+            if (!val || (i === 3 && val === current.type)) continue;
+
+            if (h.includes('接續') || h.includes('句型') || h.includes('規則')) {
+                grammarRule = val;
+            } else if (h.includes('形') || h.includes('變化') || h.includes('ます') || h.includes('て形') || h.includes('ない形')) {
+                conjugations.push({ label: h, val: val });
+            } else if (h.includes('例句')) {
+                examples.push({ label: h, val: val });
+            } else {
+                generalNotes.push({ label: h, val: val });
             }
         }
 
-        backHTML += `<div class="hint" style="position:relative; margin-top:20px;">✨ 點擊空白處翻回正面 ✨</div>`;
+        // 1. 若有接續規則，以專屬結構化卡片置頂
+        if (grammarRule) {
+            backHTML += `
+                <div class="grammar-rule-card">
+                    <div class="grammar-rule-title">⚡ 接續規則 / 句型公式</div>
+                    <div class="grammar-rule-content">${grammarRule}</div>
+                </div>
+            `;
+        }
+
+        // 2. 若為動詞/變化類，以 2x3 膠囊網格排版
+        if (conjugations.length > 0) {
+            backHTML += `<div class="conjugation-grid">`;
+            conjugations.forEach(c => {
+                backHTML += `
+                    <div class="conjugation-item">
+                        <span class="conjugation-label">${c.label}</span>
+                        <span class="conjugation-val">${c.val}</span>
+                    </div>
+                `;
+            });
+            backHTML += `</div>`;
+        }
+
+        // 3. 一般意思與筆記
+        generalNotes.forEach(item => {
+            backHTML += `
+                <div class="detail-section">
+                    <span class="section-title">💡 ${item.label}：</span>
+                    <span class="section-text">${item.val}</span>
+                </div>
+            `;
+        });
+
+        // 4. 例句結構化分行排版
+        examples.forEach(ex => {
+            const lines = ex.val.split('\n').filter(Boolean);
+            const jpLine = lines[0] || ex.val;
+            const zhLine = lines.slice(1).join('\n') || '';
+            const escapedJp = encodeURIComponent(jpLine);
+
+            backHTML += `
+                <div class="example-block">
+                    <div class="example-jp-line">
+                        <span>💬 ${jpLine}</span>
+                        <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                    </div>
+                    ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                </div>
+            `;
+        });
+
+        backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
         backContainer.innerHTML = backHTML;
 
         document.getElementById('flashcard').classList.remove('is-flipped');
