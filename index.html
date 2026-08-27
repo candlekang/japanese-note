@@ -1053,6 +1053,8 @@
             align-items: center;
             gap: 6px;
         }
+        
+        /* 💡 筆尖對齊 (0,0) 的自製筆形游標 */
         .canvas-container {
             position: relative;
             width: 240px;
@@ -1064,7 +1066,7 @@
             touch-action: none;
             overflow: hidden;
             transition: width 0.25s ease;
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>') 0 24, crosshair !important;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><path d="M0,0 L10,2 L2,10 Z" fill="%23ec4899"/><path d="M2,10 L10,2 L24,16 L16,24 Z" fill="%2338bdf8" stroke="%230f172a" stroke-width="1.5"/><circle cx="1" cy="1" r="1.5" fill="%230f172a"/></svg>') 0 0, crosshair !important;
         }
         .canvas-container.wide-mode {
             width: 320px;
@@ -1469,6 +1471,7 @@
             <option value="sheet25">つけます的擴充包</option>
         </select>
 
+        <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
             <button id="mode-review" class="active" onclick="setMode('review')">📖 翻卡複習</button>
             <button id="mode-quiz" onclick="setMode('quiz')">🏆 選擇測驗</button>
@@ -1537,7 +1540,7 @@
         </div>
     </div>
 
-    <!-- 3. 🐣 菜雞專區（子母切換與自適應手寫板） -->
+    <!-- 3. 🐣 菜雞專區（五十音手寫板與自適應畫布） -->
     <div id="kana-section">
         <div class="kana-main-toggle">
             <button class="btn-sub-view active" id="btn-view-grid" onclick="setKanaSubView('grid')">📊 五十音總表</button>
@@ -1556,15 +1559,12 @@
             <div style="font-size:11px; color:#64748b; text-align:center; margin-top:8px;">💡 點擊任何假名立即朗讀，並自動開啟「手寫臨摹板」！</div>
         </div>
 
-        <!-- 視圖 B：全方位筆順手寫板 -->
+        <!-- 視圖 B：全方位筆順手寫板（① ② 標註 + 筆尖對齊 + 真比對） -->
         <div id="kana-writing-subview" style="display:none;">
             <div class="writing-board-card">
                 <div class="writing-header">
                     <span class="writing-title">✍️ 臨摹修煉：<span id="current-writing-label" style="color:#38bdf8;">あ (a)</span></span>
-                    <div style="display:flex; gap:4px;">
-                        <button class="btn-tts-small" onclick="playStrokeAnimation()">🎬 示範筆順</button>
-                        <button class="btn-tts-small" onclick="speakCurrentWritingKana()">🔊 聽發音</button>
-                    </div>
+                    <button class="btn-tts-small" onclick="speakCurrentWritingKana()">🔊 聽發音</button>
                 </div>
 
                 <!-- 自適應畫布 -->
@@ -1572,7 +1572,7 @@
                     <canvas id="strokeCanvas" width="240" height="240"></canvas>
                 </div>
 
-                <div id="writing-grade-feedback" style="min-height:20px; font-size:13px; font-weight:bold; font-family:'DotGothic16', sans-serif;"></div>
+                <div id="writing-grade-feedback" style="min-height:22px; font-size:13px; font-weight:bold; font-family:'DotGothic16', sans-serif;"></div>
 
                 <div class="writing-controls">
                     <button class="btn-writing-action" style="background:#334155; color:#ffffff;" onclick="prevWritingKana()">◀ 上一個</button>
@@ -1966,9 +1966,6 @@
             oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
 
             osc.connect(oscGain);
-            oscGain.connect(ctx.destination);
-
-            noise.start(now);
             osc.start(now);
             osc.stop(now + 0.12);
         } catch(e) {}
@@ -2087,7 +2084,6 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
-    // 🐣 五十音資料庫
     const KANA_DATA = {
         'seion-hira': [
             { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
@@ -3063,7 +3059,7 @@
         }
     }
 
-    // 🐣 五十音專區子母切換與動態筆順模組
+    // 🐣 五十音與筆順手寫板模組
     function initKanaSection() {
         switchKanaGroup(currentKanaTab);
         setupCanvasEvents();
@@ -3183,20 +3179,20 @@
         if (item) loadKanaToWritingBoard(item, isKataMode);
     }
 
+    // 💡 繪製田字格與清晰的「① ② 數字 + 箭頭 ➔ 靜態筆順指引」
     function drawGhostKanaOnCanvas(char) {
         const canvas = document.getElementById('strokeCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. 繪製輔助田字格
+        // 1. 繪製田字格輔助線
         ctx.save();
         ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([4, 4]);
 
         if (char.length > 1) {
-            // 雙字雙格
             const halfW = canvas.width / 2;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
@@ -3212,7 +3208,7 @@
         }
         ctx.restore();
 
-        // 2. 繪製導引底字
+        // 2. 繪製導引輪廓字
         ctx.save();
         if (char.length > 1) {
             ctx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
@@ -3230,63 +3226,18 @@
             ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
         }
         ctx.restore();
-    }
 
-    // 🎬 真實筆順軌跡與序號動態演示
-    function playStrokeAnimation() {
-        playClickSound();
-        const isKataMode = (currentKanaTab === 'seion-kata');
-        const item = currentWritingList[currentWritingIndex];
-        if (!item) return;
-
-        const char = isKataMode ? item.kata : item.hira;
-        const canvas = document.getElementById('strokeCanvas');
-        const ctx = canvas.getContext('2d');
-
-        drawGhostKanaOnCanvas(char);
-
-        // 模擬筆劃軌跡與起筆序號指示
+        // 3. 靜態筆順指引標記（① ② ③ 數字與箭頭）
         ctx.save();
-        ctx.fillStyle = '#db2777';
         ctx.font = 'bold 14px "DotGothic16", sans-serif';
+        ctx.fillStyle = '#ec4899';
         
         if (char.length > 1) {
-            ctx.fillText('①', canvas.width * 0.15, 40);
-            ctx.fillText('②', canvas.width * 0.60, 50);
+            ctx.fillText('① ➔', canvas.width * 0.12, 38);
+            ctx.fillText('② ➔', canvas.width * 0.58, 48);
         } else {
-            ctx.fillText('① 起筆', 24, 36);
+            ctx.fillText('① 起筆 ➔', 18, 32);
         }
-        ctx.restore();
-
-        ctx.save();
-        let step = 0;
-        let animTimer = setInterval(() => {
-            step++;
-            const alpha = Math.min(step * 0.18, 0.9);
-            
-            ctx.save();
-            ctx.fillStyle = `rgba(236, 72, 153, ${alpha})`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            if (char.length > 1) {
-                ctx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif';
-                ctx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
-                ctx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif';
-                ctx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
-            } else {
-                ctx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif';
-                ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
-            }
-            ctx.restore();
-
-            if (step >= 6) {
-                clearInterval(animTimer);
-                setTimeout(() => {
-                    drawGhostKanaOnCanvas(char);
-                }, 1000);
-            }
-        }, 80);
         ctx.restore();
     }
 
@@ -3297,19 +3248,78 @@
         redrawCurrentKanaBoard();
     }
 
+    // 🤖 真正基於像素重疊度（IoU）的嚴格批改演算法
     function checkWritingGrade() {
         const feedbackEl = document.getElementById('writing-grade-feedback');
-        if (!hasDrawnOnCanvas) {
-            feedbackEl.textContent = '🐣 還沒有動筆臨摹喔！請在白板上臨摹寫一次看看！';
+        const canvas = document.getElementById('strokeCanvas');
+        if (!hasDrawnOnCanvas || !canvas) {
+            feedbackEl.textContent = '🐣 還沒有動筆臨摹喔！請跟隨筆順在白板上臨摹寫一次！';
             feedbackEl.style.color = '#f59e0b';
             playWrongSound();
             return;
         }
 
-        playSuccessSound();
-        addEXP(5);
-        feedbackEl.textContent = '🎉 完美達成！筆順修煉成功！(+5 EXP)';
-        feedbackEl.style.color = '#22c55e';
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        const char = isKataMode ? item.kata : item.hira;
+
+        // 建立離屏比對 Canvas 生成標準假名黑白遮罩
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = canvas.width;
+        offCanvas.height = canvas.height;
+        const offCtx = offCanvas.getContext('2d');
+
+        offCtx.save();
+        if (char.length > 1) {
+            offCtx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillStyle = '#000000';
+            offCtx.textAlign = 'center';
+            offCtx.textBaseline = 'middle';
+            offCtx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
+            offCtx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
+        } else {
+            offCtx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillStyle = '#000000';
+            offCtx.textAlign = 'center';
+            offCtx.textBaseline = 'middle';
+            offCtx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        }
+        offCtx.restore();
+
+        const refData = offCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+        const userCtx = canvas.getContext('2d');
+        const userData = userCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        let refPixelCount = 0;
+        let matchedPixelCount = 0;
+        let userStrokeCount = 0;
+
+        for (let i = 0; i < refData.length; i += 4) {
+            const isRef = refData[i + 3] > 100;
+            // 判斷粉紅色筆跡 (#ec4899: r約236, g約72, b約153)
+            const isUserStroke = (userData[i] > 180 && userData[i + 1] < 120 && userData[i + 3] > 150);
+
+            if (isRef) refPixelCount++;
+            if (isUserStroke) userStrokeCount++;
+            if (isRef && isUserStroke) matchedPixelCount++;
+        }
+
+        // 計算覆蓋率與偏離率
+        const coverageRatio = refPixelCount > 0 ? (matchedPixelCount / refPixelCount) : 0;
+        const accuracyRatio = userStrokeCount > 0 ? (matchedPixelCount / userStrokeCount) : 0;
+
+        // 嚴格判定：覆蓋率需大於 40% 且 偏離不能過大
+        if (coverageRatio >= 0.40 && accuracyRatio >= 0.25) {
+            playSuccessSound();
+            addEXP(5);
+            feedbackEl.textContent = `🎉 完美達成！臨摹契合度 ${Math.floor(coverageRatio * 100)}%！(+5 EXP)`;
+            feedbackEl.style.color = '#22c55e';
+        } else {
+            playWrongSound();
+            feedbackEl.textContent = `💀 筆劃偏離過多（契合度 ${Math.floor(coverageRatio * 100)}%）！請對齊字形重新練習喔～`;
+            feedbackEl.style.color = '#ef4444';
+        }
     }
 
     function nextWritingKana() {
@@ -3355,7 +3365,7 @@
             if (!isDrawing) return;
             ctx.save();
             ctx.strokeStyle = '#ec4899';
-            ctx.lineWidth = 11;
+            ctx.lineWidth = 12;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
@@ -3583,7 +3593,6 @@
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
-        // 💡 1. 雙列結構化導讀特卡
         if (current.isIntroCard && current.isStructuredIntro) {
             badgeEl.style.display = 'none';
             mainTitleEl.textContent = current.introValues[0] || current.catName;
@@ -3669,7 +3678,6 @@
             return;
         }
 
-        // 💡 2. 單列觀念導讀特卡
         if (current.isIntroCard) {
             badgeEl.style.display = 'none';
             mainTitleEl.textContent = current.catName;
@@ -3694,7 +3702,6 @@
             return;
         }
 
-        // 💡 3. 形式名詞（sheet2）專屬版型
         if (current.catKey === 'sheet2') {
             badgeEl.style.display = 'inline-block';
             badgeEl.textContent = '🧩 形式名詞';
@@ -3777,7 +3784,6 @@
             return;
         }
 
-        // 💡 4. 一般分類標準版型
         badgeEl.style.display = 'inline-block';
         badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
         meanBoxEl.style.display = 'none';
