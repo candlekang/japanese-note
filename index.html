@@ -353,12 +353,19 @@
             font-weight: 600;
         }
 
-        .button-group { display: flex; gap: 8px; }
+        /* 💡 4 個主模式按鈕網格 */
+        .button-group { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 6px; 
+        }
         button {
-            flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px;
+            padding: 10px 4px; border: none; border-radius: 8px; font-size: 13px;
             cursor: pointer; transition: all 0.2s ease; background: #e2e8f0;
             color: var(--text-sub); font-weight: 700;
             border: 1px solid #cbd5e1;
+            white-space: nowrap;
+            text-align: center;
         }
         button.active { 
             background: var(--primary-dark); 
@@ -915,6 +922,152 @@
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
 
+        /* 🐣 菜雞專區（五十音圖鑑與手寫板）樣式 */
+        #kana-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            box-sizing: border-box;
+            border: 2px solid #334155;
+            padding: 20px 16px;
+            display: none;
+            margin-bottom: 20px;
+        }
+        .kana-nav-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            width: 100%;
+        }
+        .btn-kana-tab {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: var(--text-sub);
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'DotGothic16', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-kana-tab.active {
+            background: var(--primary-dark);
+            color: #ffffff;
+            border-color: var(--primary-dark);
+        }
+        .kana-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+        .kana-item {
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .kana-item:hover, .kana-item.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+        .kana-char {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+        .kana-romaji {
+            font-size: 11px;
+            color: var(--pixel-pink);
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .kana-empty {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* 手寫練習板專區 */
+        .writing-board-card {
+            background: #0f172a;
+            border: 2px solid #38bdf8;
+            border-radius: 16px;
+            padding: 16px;
+            box-sizing: border-box;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .writing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .writing-title {
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 16px;
+            color: #fde047;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .canvas-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            touch-action: none;
+            overflow: hidden;
+        }
+        #strokeCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            cursor: crosshair;
+        }
+        .writing-controls {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+        }
+        .btn-writing-action {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: 'DotGothic16', sans-serif;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -1283,9 +1436,11 @@
             <option value="sheet25">つけます的擴充包</option>
         </select>
 
+        <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
             <button id="mode-review" class="active" onclick="setMode('review')">📖 翻卡複習</button>
             <button id="mode-quiz" onclick="setMode('quiz')">🏆 選擇測驗</button>
+            <button id="mode-kana" onclick="setMode('kana')">🐣 菜雞專區</button>
             <button id="mode-stats" onclick="setMode('stats')">📊 學習進度</button>
         </div>
     </div>
@@ -1350,7 +1505,40 @@
         </div>
     </div>
 
-    <!-- 3. 📊 個人學習進度儀表板 -->
+    <!-- 3. 🐣 菜雞專區（五十音圖鑑與筆順練習） -->
+    <div id="kana-section">
+        <div class="kana-nav-tabs">
+            <button class="btn-kana-tab active" onclick="switchKanaGroup('seion-hira')">あ 平假名</button>
+            <button class="btn-kana-tab" onclick="switchKanaGroup('seion-kata')">ア 片假名</button>
+            <button class="btn-kana-tab" onclick="switchKanaGroup('dakuon')">が 濁音・半濁</button>
+            <button class="btn-kana-tab" onclick="switchKanaGroup('youon')">きゃ 拗音</button>
+        </div>
+
+        <!-- 五十音網格 -->
+        <div class="kana-grid" id="kana-grid-container"></div>
+
+        <!-- 筆順手寫練習板 -->
+        <div class="writing-board-card">
+            <div class="writing-header">
+                <span class="writing-title">✍️ 筆順手寫板：<span id="current-writing-label" style="color:#38bdf8;">あ (a)</span></span>
+                <button class="btn-tts-small" onclick="speakCurrentWritingKana()">🔊 聽發音</button>
+            </div>
+
+            <!-- 田字格 Canvas -->
+            <div class="canvas-container">
+                <canvas id="strokeCanvas" width="220" height="220"></canvas>
+            </div>
+
+            <div class="writing-controls">
+                <button class="btn-writing-action" style="background:#334155; color:#ffffff;" onclick="prevWritingKana()">◀ 上一個</button>
+                <button class="btn-writing-action" style="background:#ec4899; color:#ffffff;" onclick="clearStrokeCanvas()">🧹 清除重寫</button>
+                <button class="btn-writing-action" style="background:#0284c7; color:#ffffff;" onclick="nextWritingKana()">下一個 ▶</button>
+            </div>
+            <div style="font-size:11px; color:#94a3b8;">💡 提示：淺色為字形輪廓導引，可直接在白板上用手指或滑鼠臨摹練習！</div>
+        </div>
+    </div>
+
+    <!-- 4. 📊 個人學習進度儀表板 -->
     <div id="stats-section">
         <div class="quest-board">
             <div class="quest-header">
@@ -1854,6 +2042,49 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
+    // 🐣 五十音資料表
+    const KANA_DATA = {
+        'seion-hira': [
+            { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
+            { hira: 'か', kata: 'カ', romaji: 'ka' }, { hira: 'き', kata: 'キ', romaji: 'ki' }, { hira: 'く', kata: 'ク', romaji: 'ku' }, { hira: 'け', kata: 'ケ', romaji: 'ke' }, { hira: 'こ', kata: 'コ', romaji: 'ko' },
+            { hira: 'さ', kata: 'サ', romaji: 'sa' }, { hira: 'し', kata: 'シ', romaji: 'shi' }, { hira: 'す', kata: 'ス', romaji: 'su' }, { hira: 'せ', kata: 'セ', romaji: 'se' }, { hira: 'そ', kata: 'ソ', romaji: 'so' },
+            { hira: 'た', kata: 'タ', romaji: 'ta' }, { hira: 'ち', kata: 'チ', romaji: 'chi' }, { hira: 'つ', kata: 'ツ', romaji: 'tsu' }, { hira: 'て', kata: 'テ', romaji: 'te' }, { hira: 'と', kata: 'ト', romaji: 'to' },
+            { hira: 'な', kata: 'ナ', romaji: 'na' }, { hira: 'に', kata: 'ニ', romaji: 'ni' }, { hira: 'ぬ', kata: 'ヌ', romaji: 'nu' }, { hira: 'ね', kata: 'ネ', romaji: 'ne' }, { hira: 'の', kata: 'ノ', romaji: 'no' },
+            { hira: 'は', kata: 'ハ', romaji: 'ha' }, { hira: 'ひ', kata: 'ヒ', romaji: 'hi' }, { hira: 'ふ', kata: 'フ', romaji: 'fu' }, { hira: 'へ', kata: 'ヘ', romaji: 'he' }, { hira: 'ほ', kata: 'ホ', romaji: 'ho' },
+            { hira: 'ま', kata: 'マ', romaji: 'ma' }, { hira: 'み', kata: 'ミ', romaji: 'mi' }, { hira: 'む', kata: 'ム', romaji: 'mu' }, { hira: 'め', kata: 'メ', romaji: 'me' }, { hira: 'も', kata: 'モ', romaji: 'mo' },
+            { hira: 'や', kata: 'ヤ', romaji: 'ya' }, null, { hira: 'ゆ', kata: 'ユ', romaji: 'yu' }, null, { hira: 'よ', kata: 'ヨ', romaji: 'yo' },
+            { hira: 'ら', kata: 'ラ', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
+            { hira: 'わ', kata: 'ワ', romaji: 'wa' }, null, null, null, { hira: 'を', kata: 'ヲ', romaji: 'o/wo' },
+            { hira: 'ん', kata: 'ン', romaji: 'n' }, null, null, null, null
+        ],
+        'dakuon': [
+            { hira: 'が', kata: 'ガ', romaji: 'ga' }, { hira: 'ぎ', kata: 'ギ', romaji: 'gi' }, { hira: 'ぐ', kata: 'グ', romaji: 'gu' }, { hira: 'げ', kata: 'ゲ', romaji: 'ge' }, { hira: 'ご', kata: 'ゴ', romaji: 'go' },
+            { hira: 'ざ', kata: 'ザ', romaji: 'za' }, { hira: 'じ', kata: 'ジ', romaji: 'ji' }, { hira: 'ず', kata: 'ズ', romaji: 'zu' }, { hira: 'ぜ', kata: 'ゼ', romaji: 'ze' }, { hira: 'ぞ', kata: 'ゾ', romaji: 'zo' },
+            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'で', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
+            { hira: 'ば', kata: 'バ', romaji: 'ba' }, { hira: 'び', kata: 'ビ', romaji: 'bi' }, { hira: 'ぶ', kata: 'ブ', romaji: 'bu' }, { hira: 'べ', kata: 'ベ', romaji: 'be' }, { hira: 'ぼ', kata: 'ボ', romaji: 'bo' },
+            { hira: 'ぱ', kata: 'パ', romaji: 'pa' }, { hira: 'ぴ', kata: 'ピ', romaji: 'pi' }, { hira: 'ぷ', kata: 'プ', romaji: 'pu' }, { hira: 'ぺ', kata: 'ペ', romaji: 'pe' }, { hira: 'ぽ', kata: 'ポ', romaji: 'po' }
+        ],
+        'youon': [
+            { hira: 'きゃ', kata: 'キャ', romaji: 'kya' }, { hira: 'きゅ', kata: 'キュ', romaji: 'kyu' }, { hira: 'きょ', kata: 'キョ', romaji: 'kyo' },
+            { hira: 'しゃ', kata: 'シャ', romaji: 'sha' }, { hira: 'しゅ', kata: 'シュ', romaji: 'shu' }, { hira: 'しょ', kata: 'ショ', romaji: 'sho' },
+            { hira: 'ちゃ', kata: 'チャ', romaji: 'cha' }, { hira: 'ちゅ', kata: 'チュ', romaji: 'chu' }, { hira: 'ちょ', kata: 'チョ', romaji: 'cho' },
+            { hira: 'にゃ', kata: 'ニャ', romaji: 'nya' }, { hira: 'にゅ', kata: 'ニュ', romaji: 'nyu' }, { hira: 'にょ', kata: 'ニョ', romaji: 'nyo' },
+            { hira: 'ひゃ', kata: 'ヒャ', romaji: 'hya' }, { hira: 'ひゅ', kata: 'ヒュ', romaji: 'hyu' }, { hira: 'ひょ', kata: 'ヒョ', romaji: 'hyo' },
+            { hira: 'みゃ', kata: 'ミャ', romaji: 'mya' }, { hira: 'みゅ', kata: 'ミュ', romaji: 'myu' }, { hira: 'みょ', kata: 'ミョ', romaji: 'myo' },
+            { hira: 'りゃ', kata: 'リャ', romaji: 'rya' }, { hira: 'りゅ', kata: 'リュ', romaji: 'ryu' }, { hira: 'りょ', kata: 'リョ', romaji: 'ryo' },
+            { hira: 'ぎゃ', kata: 'ギャ', romaji: 'gya' }, { hira: 'ぎゅ', kata: 'ギュ', romaji: 'gyu' }, { hira: 'ぎょ', kata: 'ギョ', romaji: 'gyo' },
+            { hira: 'じゃ', kata: 'ジャ', romaji: 'ja' }, { hira: 'じゅ', kata: 'ジュ', romaji: 'ju' }, { hira: 'じょ', kata: 'ジョ', romaji: 'jo' },
+            { hira: 'びゃ', kata: 'ビャ', romaji: 'bya' }, { hira: 'びゅ', kata: 'ビュ', romaji: 'byu' }, { hira: 'びょ', kata: 'ビョ', romaji: 'byo' },
+            { hira: 'ぴゃ', kata: 'ピャ', romaji: 'pya' }, { hira: 'ぴゅ', kata: 'ピュ', romaji: 'pyu' }, { hira: 'ぴょ', kata: 'ピョ', romaji: 'pyo' }
+        ]
+    };
+
+    let currentKanaTab = 'seion-hira';
+    let currentWritingList = [];
+    let currentWritingIndex = 0;
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+
     let sheetDataCache = {}; 
     let fullSourceList = [];
     let currentList = [];
@@ -2276,6 +2507,7 @@
         return x - Math.floor(x);
     }
 
+    // ⚡ 24 分類加載與導讀卡解析
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -2752,10 +2984,12 @@
         currentMode = mode;
         document.getElementById('mode-review').classList.toggle('active', mode === 'review');
         document.getElementById('mode-quiz').classList.toggle('active', mode === 'quiz');
+        document.getElementById('mode-kana').classList.toggle('active', mode === 'kana');
         document.getElementById('mode-stats').classList.toggle('active', mode === 'stats');
         
         document.getElementById('review-section').style.display = (mode === 'review') ? 'block' : 'none';
         document.getElementById('quiz-section').style.display = (mode === 'quiz') ? 'block' : 'none';
+        document.getElementById('kana-section').style.display = (mode === 'kana') ? 'block' : 'none';
         document.getElementById('stats-section').style.display = (mode === 'stats') ? 'block' : 'none';
 
         if (mode === 'review') {
@@ -2764,6 +2998,8 @@
         } else if (mode === 'quiz') {
             document.getElementById('quiz-section').style.display = 'block';
             checkQuizStartFlow();
+        } else if (mode === 'kana') {
+            initKanaSection();
         } else if (mode === 'stats') {
             renderStatsDashboard();
         }
@@ -2775,9 +3011,218 @@
             updateReviewUI();
         } else if (currentMode === 'quiz') {
             checkQuizStartFlow();
+        } else if (currentMode === 'kana') {
+            initKanaSection();
         } else if (currentMode === 'stats') {
             renderStatsDashboard();
         }
+    }
+
+    // 🐣 五十音與手寫板核心模組
+    function initKanaSection() {
+        switchKanaGroup(currentKanaTab);
+        setupCanvasEvents();
+    }
+
+    function switchKanaGroup(tabKey) {
+        currentKanaTab = tabKey;
+        const allTabs = document.querySelectorAll('.btn-kana-tab');
+        allTabs.forEach(tab => tab.classList.remove('active'));
+
+        const targetBtn = Array.from(allTabs).find(b => b.getAttribute('onclick').includes(tabKey));
+        if (targetBtn) targetBtn.classList.add('active');
+
+        const gridContainer = document.getElementById('kana-grid-container');
+        gridContainer.innerHTML = '';
+
+        let list = KANA_DATA[tabKey] || KANA_DATA['seion-hira'];
+        if (tabKey === 'seion-kata') {
+            list = KANA_DATA['seion-hira']; // 片假名共用清音架構
+        }
+
+        // 過濾出可練習清單
+        currentWritingList = list.filter(Boolean);
+        currentWritingIndex = 0;
+
+        list.forEach((item, idx) => {
+            if (!item) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'kana-item kana-empty';
+                gridContainer.appendChild(emptyDiv);
+                return;
+            }
+
+            const isKataMode = (tabKey === 'seion-kata');
+            const mainChar = isKataMode ? item.kata : item.hira;
+            const subChar = isKataMode ? item.hira : item.kata;
+
+            const div = document.createElement('div');
+            div.className = `kana-item ${idx === 0 ? 'active' : ''}`;
+            div.onclick = () => selectKanaItem(item, div, isKataMode);
+
+            div.innerHTML = `
+                <span class="kana-char">${mainChar}</span>
+                <span class="kana-romaji">${item.romaji}</span>
+            `;
+            gridContainer.appendChild(div);
+        });
+
+        if (currentWritingList.length > 0) {
+            loadKanaToWritingBoard(currentWritingList[0], tabKey === 'seion-kata');
+        }
+    }
+
+    function selectKanaItem(item, element, isKataMode) {
+        playClickSound();
+        const allItems = document.querySelectorAll('.kana-item');
+        allItems.forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        const foundIdx = currentWritingList.findIndex(k => k.hira === item.hira);
+        if (foundIdx !== -1) currentWritingIndex = foundIdx;
+
+        loadKanaToWritingBoard(item, isKataMode);
+        speakWordDirectly(null, item.hira);
+    }
+
+    function loadKanaToWritingBoard(item, isKataMode) {
+        if (!item) return;
+        const char = isKataMode ? item.kata : item.hira;
+        document.getElementById('current-writing-label').textContent = `${char} (${item.romaji})`;
+        drawGhostKanaOnCanvas(char);
+    }
+
+    function drawGhostKanaOnCanvas(char) {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. 繪製田字格輔助線
+        ctx.save();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.moveTo(0, canvas.height / 2);
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 2. 繪製淺色假名輪廓導引字
+        ctx.save();
+        ctx.font = 'bold 150px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 10);
+        ctx.restore();
+    }
+
+    function clearStrokeCanvas() {
+        playClickSound();
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        if (item) {
+            const char = isKataMode ? item.kata : item.hira;
+            drawGhostKanaOnCanvas(char);
+        }
+    }
+
+    function nextWritingKana() {
+        playClickSound();
+        if (currentWritingIndex < currentWritingList.length - 1) {
+            currentWritingIndex++;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function prevWritingKana() {
+        playClickSound();
+        if (currentWritingIndex > 0) {
+            currentWritingIndex--;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function speakCurrentWritingKana() {
+        const item = currentWritingList[currentWritingIndex];
+        if (item) speakWordDirectly(null, item.hira);
+    }
+
+    function setupCanvasEvents() {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas || canvas.dataset.hasEvents) return;
+        canvas.dataset.hasEvents = 'true';
+
+        const ctx = canvas.getContext('2d');
+
+        function startDraw(x, y) {
+            isDrawing = true;
+            lastX = x;
+            lastY = y;
+        }
+
+        function draw(x, y) {
+            if (!isDrawing) return;
+            ctx.save();
+            ctx.strokeStyle = '#ec4899';
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.restore();
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
+        });
+        window.addEventListener('mouseup', stopDraw);
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', stopDraw);
     }
 
     function getWordZhText(wordObj) {
@@ -2787,7 +3232,6 @@
         return wordObj.rawCols[4] || wordObj.rawCols[2] || '';
     }
 
-    // 💡 徹底移除「其他/未分類」，只保留乾淨的 24 個主題
     function renderStatsDashboard() {
         renderQuestBoard();
         const gridContainer = document.getElementById('stats-category-grid');
@@ -2813,7 +3257,6 @@
                 const wordJp = key.replace('jp_progress_', '');
                 const prog = JSON.parse(localStorage.getItem(key));
                 
-                // 排除導讀卡與殘留測試雜訊
                 if (wordJp.includes('我是誰') || wordJp.includes('導讀字卡') || wordJp.includes('核心觀念')) {
                     continue;
                 }
@@ -2959,7 +3402,7 @@
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
-        // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等專屬）
+        // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等）
         if (current.isIntroCard && current.isStructuredIntro) {
             badgeEl.style.display = 'none';
             mainTitleEl.textContent = current.introValues[0] || current.catName;
