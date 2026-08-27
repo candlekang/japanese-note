@@ -413,7 +413,7 @@
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
             border-radius: 20px; box-shadow: var(--shadow); background: var(--card-bg);
             display: flex; flex-direction: column; 
-            padding: 20px 16px; 
+            padding: 24px 16px 20px 16px; 
             box-sizing: border-box;
             border: 2px solid #334155;
         }
@@ -430,7 +430,7 @@
 
         .card-body-wrapper {
             width: 100%;
-            padding: 0 28px;
+            padding: 0 20px;
             box-sizing: border-box;
         }
 
@@ -487,7 +487,7 @@
         .card-nav-arrow.right { right: 6px !important; }
 
         .front-main-title {
-            font-size: 34px;
+            font-size: 32px;
             font-weight: 800;
             color: var(--text-main);
             margin-bottom: 6px;
@@ -495,29 +495,30 @@
             white-space: pre-wrap;
         }
         .front-sub-title {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--primary-dark);
             margin-bottom: 12px;
             white-space: pre-wrap;
         }
         .front-mean-box {
-            font-size: 14px;
-            font-weight: bold;
-            color: #b45309;
-            background: var(--pixel-yellow-bg);
-            border: 1.5px dashed rgba(245, 158, 11, 0.5);
-            padding: 8px 14px;
-            border-radius: 12px;
-            margin-bottom: 14px;
-            line-height: 1.5;
-            max-width: 90%;
+            font-size: 13.5px;
+            color: #78350f;
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            max-width: 95%;
             word-break: break-word;
             text-align: left;
+            box-sizing: border-box;
         }
 
         .kanji-title {
-            font-size: 24px; font-weight: 800; color: var(--text-main);
+            font-size: 22px; font-weight: 800; color: var(--text-main);
             text-align: center; width: 100%; margin-bottom: 14px; 
             padding-bottom: 12px; border-bottom: 2px dashed #cbd5e1;
             white-space: pre-wrap;
@@ -582,21 +583,21 @@
             box-sizing: border-box;
         }
         .example-jp-line {
-            font-size: 15px;
+            font-size: 14.5px;
             font-weight: 700;
             color: var(--text-main);
             line-height: 1.5;
             margin-bottom: 4px;
         }
         .example-zh-line {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--text-sub);
             line-height: 1.4;
         }
 
         .detail-section { margin-bottom: 12px; width: 100%; }
-        .section-title { font-weight: 800; color: var(--primary-dark); font-size: 15px; margin-right: 6px; }
-        .section-text { color: var(--text-main); font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
+        .section-title { font-weight: 800; color: var(--primary-dark); font-size: 14px; margin-right: 6px; }
+        .section-text { color: var(--text-main); font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
         .section-type-badge {
             display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 12px;
             background: rgba(56, 189, 248, 0.15); color: var(--primary-dark); margin-bottom: 12px;
@@ -607,18 +608,18 @@
             display: inline-block;
             font-size: 11px; padding: 4px 10px; border-radius: 16px; 
             background: var(--pixel-yellow-bg); color: #b45309; 
-            margin-bottom: 12px; border: 1px solid rgba(245, 158, 11, 0.4);
+            margin-bottom: 10px; border: 1px solid rgba(245, 158, 11, 0.4);
             font-weight: 700;
             max-width: 90%;
             line-height: 1.4;
             word-break: break-word;
             white-space: normal;
         }
-        .hint { font-size: 12px; color: var(--text-sub); position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; }
+        .hint { font-size: 12px; color: var(--text-sub); position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; }
         
         .progress-text {
-            font-size: 13px; color: var(--text-main); margin-top: 16px; font-weight: 600;
-            background: #f1f5f9; padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; color: var(--text-main); margin-top: 10px; font-weight: 600;
+            background: #f1f5f9; padding: 5px 12px; border-radius: 20px;
             border: 1px solid #cbd5e1;
         }
 
@@ -2927,6 +2928,7 @@
         }
     }
 
+    // 🌟 核心升級：精準導讀卡版面調校（防止重疊、美化正面大標與副標）
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -2957,48 +2959,57 @@
 
         // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等專屬）
         if (current.isIntroCard && current.isStructuredIntro) {
-            badgeEl.textContent = '💡 詞類總覽導讀';
+            badgeEl.style.display = 'none'; // 隱藏重複的徽章，避免與上方標籤黏在一起
             mainTitleEl.textContent = current.introValues[0] || current.catName;
             
+            // 正面副標：只放純粹的讀音或體系名稱，不放長篇大論
             const subTitleVal = current.introValues[1] || '';
-            const canStandAlone = current.introValues[4] || '';
-
             if (subTitleVal) {
-                subTitleEl.textContent = `${subTitleVal} ${canStandAlone ? `・ ${canStandAlone}` : ''}`;
-                subTitleEl.style.display = 'block';
-            } else if (canStandAlone) {
-                subTitleEl.textContent = canStandAlone;
+                subTitleEl.textContent = subTitleVal;
                 subTitleEl.style.display = 'block';
             } else {
                 subTitleEl.style.display = 'none';
             }
 
+            // 正面定義框：核心定義與兩大體系
             const defAndFunc = current.introValues[2] || '';
             if (defAndFunc) {
-                meanBoxEl.innerHTML = `<b>📖 核心定義與體系：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
-                meanBoxEl.style.display = 'inline-block';
+                meanBoxEl.innerHTML = `<b>📖 核心觀念：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
+                meanBoxEl.style.display = 'block';
             } else {
                 meanBoxEl.style.display = 'none';
             }
 
             ttsBtnEl.style.display = 'none';
 
-            // 背面：結構化呈現連接對象/體系、家屬範例、例句寶寶
-            const col3Header = current.introHeaders[3] || '🔗 連接對象與體系';
+            // 背面：結構化呈現對比速查、使用時機與語感、經典範例、例句
+            const col3Header = current.introHeaders[3] || '🔗 體系對照速查';
             const col3Val = current.introValues[3] || '';
             
+            const col4Header = current.introHeaders[4] || '💡 使用時機與語感';
+            const col4Val = current.introValues[4] || '';
+
             const col5Header = current.introHeaders[5] || '👨‍👩‍👧‍👦 範例速查';
             const col5Val = current.introValues[5] || '';
             
             const col6Val = current.introValues[6] || '';
 
-            let backHTML = `<div class="kanji-title">📖 ${current.catName}・核心特性</div>`;
+            let backHTML = `<div class="kanji-title">📖 ${current.catName}・修煉秘笈</div>`;
 
             if (col3Val) {
                 backHTML += `
                     <div class="grammar-rule-card">
-                        <div class="grammar-rule-title">${col3Header}</div>
+                        <div class="grammar-rule-title">⚡ ${col3Header}</div>
                         <div class="grammar-rule-content">${col3Val}</div>
+                    </div>
+                `;
+            }
+
+            if (col4Val && !col4Val.includes('✅') && !col4Val.includes('❌')) {
+                backHTML += `
+                    <div class="notes-block" style="border-left: 4px solid #0284c7; background:#f0f9ff; border-color:#bae6fd;">
+                        <div class="notes-title" style="color:#0369a1;">💡 ${col4Header}</div>
+                        <div class="notes-content" style="color:#0c4a6e;">${col4Val}</div>
                     </div>
                 `;
             }
@@ -3006,7 +3017,7 @@
             if (col5Val) {
                 backHTML += `
                     <div class="notes-block">
-                        <div class="notes-title">${col5Header}</div>
+                        <div class="notes-title">🔢 ${col5Header}</div>
                         <div class="notes-content">${col5Val}</div>
                     </div>
                 `;
@@ -3037,7 +3048,7 @@
 
         // 💡 2. 單列觀念導讀特卡（如形式名詞 A2 說明）
         if (current.isIntroCard) {
-            badgeEl.textContent = '💡 觀念導讀';
+            badgeEl.style.display = 'none';
             mainTitleEl.textContent = current.catName;
             subTitleEl.textContent = '核心概念與用法特性';
             subTitleEl.style.display = 'block';
@@ -3062,6 +3073,7 @@
 
         // 💡 3. 形式名詞（sheet2）專屬版型
         if (current.catKey === 'sheet2') {
+            badgeEl.style.display = 'inline-block';
             badgeEl.textContent = '🧩 形式名詞';
             mainTitleEl.textContent = current.jp;
             
@@ -3075,7 +3087,7 @@
             const meaning = getWordZhText(current);
             if (meaning) {
                 meanBoxEl.textContent = `💡 意思：${meaning}`;
-                meanBoxEl.style.display = 'inline-block';
+                meanBoxEl.style.display = 'block';
             } else {
                 meanBoxEl.style.display = 'none';
             }
@@ -3143,6 +3155,7 @@
         }
 
         // 💡 4. 一般分類標準版型
+        badgeEl.style.display = 'inline-block';
         badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
         meanBoxEl.style.display = 'none';
         ttsBtnEl.style.display = 'inline-flex';
