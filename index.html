@@ -353,7 +353,6 @@
             font-weight: 600;
         }
 
-        /* 💡 4 個主模式按鈕網格 */
         .button-group { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
@@ -922,7 +921,7 @@
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
 
-        /* 🐣 菜雞專區（五十音圖鑑與手寫板）樣式 */
+        /* 🐣 菜雞專區（子母切換與自適應手寫板） */
         #kana-section {
             background: var(--card-bg);
             border-radius: 20px;
@@ -930,24 +929,51 @@
             width: 100%;
             box-sizing: border-box;
             border: 2px solid #334155;
-            padding: 20px 16px;
+            padding: 16px 14px;
             display: none;
             margin-bottom: 20px;
         }
-        .kana-nav-tabs {
+        .kana-main-toggle {
             display: flex;
             gap: 6px;
+            background: #0f172a;
+            padding: 4px;
+            border-radius: 12px;
             margin-bottom: 14px;
+        }
+        .btn-sub-view {
+            flex: 1;
+            background: none;
+            color: #94a3b8;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: 'DotGothic16', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-sub-view.active {
+            background: var(--primary-dark);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+        }
+
+        .kana-nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 12px;
             width: 100%;
         }
         .btn-kana-tab {
             flex: 1;
-            padding: 8px 4px;
+            padding: 7px 2px;
             border-radius: 8px;
             border: 1px solid #cbd5e1;
             background: #f8fafc;
             color: var(--text-sub);
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: bold;
             font-family: 'DotGothic16', sans-serif;
             cursor: pointer;
@@ -961,14 +987,14 @@
         .kana-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-            margin-bottom: 18px;
+            gap: 5px;
+            margin-bottom: 6px;
         }
         .kana-item {
             background: #f8fafc;
             border: 1.5px solid #cbd5e1;
             border-radius: 10px;
-            padding: 8px 4px;
+            padding: 8px 2px;
             text-align: center;
             cursor: pointer;
             transition: all 0.15s;
@@ -983,13 +1009,13 @@
             transform: scale(1.05);
         }
         .kana-char {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--text-main);
             line-height: 1.2;
         }
         .kana-romaji {
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--pixel-pink);
             font-weight: bold;
             margin-top: 2px;
@@ -999,12 +1025,12 @@
             pointer-events: none;
         }
 
-        /* 手寫練習板專區 */
+        /* 手寫練習板卡片 */
         .writing-board-card {
             background: #0f172a;
             border: 2px solid #38bdf8;
             border-radius: 16px;
-            padding: 16px;
+            padding: 16px 12px;
             box-sizing: border-box;
             color: #f8fafc;
             display: flex;
@@ -1012,6 +1038,7 @@
             align-items: center;
             gap: 12px;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+            animation: modalPop 0.2s ease;
         }
         .writing-header {
             display: flex;
@@ -1029,14 +1056,19 @@
         }
         .canvas-container {
             position: relative;
-            width: 220px;
-            height: 220px;
+            width: 240px;
+            height: 240px;
             background: #ffffff;
-            border-radius: 12px;
+            border-radius: 14px;
             border: 2px solid #cbd5e1;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             touch-action: none;
             overflow: hidden;
+            transition: width 0.25s ease;
+        }
+        /* 拗音雙字自適應加寬 */
+        .canvas-container.wide-mode {
+            width: 320px;
         }
         #strokeCanvas {
             position: absolute;
@@ -1048,15 +1080,17 @@
         }
         .writing-controls {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
             justify-content: center;
+            flex-wrap: wrap;
         }
         .btn-writing-action {
             flex: 1;
-            padding: 8px 10px;
+            min-width: 70px;
+            padding: 9px 4px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             font-family: 'DotGothic16', sans-serif;
             cursor: pointer;
@@ -1065,7 +1099,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 2px;
+            white-space: nowrap;
         }
 
         .modal-overlay {
@@ -1505,36 +1540,51 @@
         </div>
     </div>
 
-    <!-- 3. 🐣 菜雞專區（五十音圖鑑與筆順練習） -->
+    <!-- 3. 🐣 菜雞專區（子母切換與自適應手寫板） -->
     <div id="kana-section">
-        <div class="kana-nav-tabs">
-            <button class="btn-kana-tab active" onclick="switchKanaGroup('seion-hira')">あ 平假名</button>
-            <button class="btn-kana-tab" onclick="switchKanaGroup('seion-kata')">ア 片假名</button>
-            <button class="btn-kana-tab" onclick="switchKanaGroup('dakuon')">が 濁音・半濁</button>
-            <button class="btn-kana-tab" onclick="switchKanaGroup('youon')">きゃ 拗音</button>
+        <!-- 頂部視圖切換器 -->
+        <div class="kana-main-toggle">
+            <button class="btn-sub-view active" id="btn-view-grid" onclick="setKanaSubView('grid')">📊 五十音總表</button>
+            <button class="btn-sub-view" id="btn-view-writing" onclick="setKanaSubView('writing')">✍️ 筆順手寫板</button>
         </div>
 
-        <!-- 五十音網格 -->
-        <div class="kana-grid" id="kana-grid-container"></div>
-
-        <!-- 筆順手寫練習板 -->
-        <div class="writing-board-card">
-            <div class="writing-header">
-                <span class="writing-title">✍️ 筆順手寫板：<span id="current-writing-label" style="color:#38bdf8;">あ (a)</span></span>
-                <button class="btn-tts-small" onclick="speakCurrentWritingKana()">🔊 聽發音</button>
+        <!-- 視圖 A：五十音圖鑑總表 -->
+        <div id="kana-grid-subview">
+            <div class="kana-nav-tabs">
+                <button class="btn-kana-tab active" onclick="switchKanaGroup('seion-hira')">あ 平假</button>
+                <button class="btn-kana-tab" onclick="switchKanaGroup('seion-kata')">ア 片假</button>
+                <button class="btn-kana-tab" onclick="switchKanaGroup('dakuon')">が 濁・半濁</button>
+                <button class="btn-kana-tab" onclick="switchKanaGroup('youon')">きゃ 拗音</button>
             </div>
+            <div class="kana-grid" id="kana-grid-container"></div>
+            <div style="font-size:11px; color:#64748b; text-align:center; margin-top:8px;">💡 點擊任何假名立即朗讀，並自動開啟「手寫臨摹板」！</div>
+        </div>
 
-            <!-- 田字格 Canvas -->
-            <div class="canvas-container">
-                <canvas id="strokeCanvas" width="220" height="220"></canvas>
-            </div>
+        <!-- 視圖 B：全方位筆順手寫板 -->
+        <div id="kana-writing-subview" style="display:none;">
+            <div class="writing-board-card">
+                <div class="writing-header">
+                    <span class="writing-title">✍️ 臨摹修煉：<span id="current-writing-label" style="color:#38bdf8;">あ (a)</span></span>
+                    <div style="display:flex; gap:4px;">
+                        <button class="btn-tts-small" onclick="playStrokeAnimation()">🎬 示範筆順</button>
+                        <button class="btn-tts-small" onclick="speakCurrentWritingKana()">🔊 聽發音</button>
+                    </div>
+                </div>
 
-            <div class="writing-controls">
-                <button class="btn-writing-action" style="background:#334155; color:#ffffff;" onclick="prevWritingKana()">◀ 上一個</button>
-                <button class="btn-writing-action" style="background:#ec4899; color:#ffffff;" onclick="clearStrokeCanvas()">🧹 清除重寫</button>
-                <button class="btn-writing-action" style="background:#0284c7; color:#ffffff;" onclick="nextWritingKana()">下一個 ▶</button>
+                <!-- 自適應畫布（支援拗音加寬） -->
+                <div class="canvas-container" id="canvas-wrapper">
+                    <canvas id="strokeCanvas" width="240" height="240"></canvas>
+                </div>
+
+                <div id="writing-grade-feedback" style="min-height:20px; font-size:13px; font-weight:bold; font-family:'DotGothic16', sans-serif;"></div>
+
+                <div class="writing-controls">
+                    <button class="btn-writing-action" style="background:#334155; color:#ffffff;" onclick="prevWritingKana()">◀ 上一個</button>
+                    <button class="btn-writing-action" style="background:#64748b; color:#ffffff;" onclick="clearStrokeCanvas()">🧹 清除重寫</button>
+                    <button class="btn-writing-action" style="background:#22c55e; color:#ffffff;" onclick="checkWritingGrade()">✨ 完成批改</button>
+                    <button class="btn-writing-action" style="background:#0284c7; color:#ffffff;" onclick="nextWritingKana()">下一個 ▶</button>
+                </div>
             </div>
-            <div style="font-size:11px; color:#94a3b8;">💡 提示：淺色為字形輪廓導引，可直接在白板上用手指或滑鼠臨摹練習！</div>
         </div>
     </div>
 
@@ -1626,6 +1676,7 @@
                 💡 <b>EXP 獲取規則</b>：<br>
                 • 首次翻閱新單字：+10 EXP<br>
                 • 測驗答對一題：+25 EXP<br>
+                • 完成五十音手寫臨摹：+5 EXP<br>
                 • 擊破 3 天驚喜任務：+200 EXP 🔥<br>
                 • 完成每日雙修煉任務：+100 EXP<br>
                 • 記得登入 Google 帳號，跨手機與電腦同步你的戰果！
@@ -1844,9 +1895,7 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') {
-                ctx.resume();
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -2042,7 +2091,7 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
-    // 🐣 五十音資料表
+    // 🐣 五十音資料庫
     const KANA_DATA = {
         'seion-hira': [
             { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
@@ -2060,7 +2109,7 @@
         'dakuon': [
             { hira: 'が', kata: 'ガ', romaji: 'ga' }, { hira: 'ぎ', kata: 'ギ', romaji: 'gi' }, { hira: 'ぐ', kata: 'グ', romaji: 'gu' }, { hira: 'げ', kata: 'ゲ', romaji: 'ge' }, { hira: 'ご', kata: 'ゴ', romaji: 'go' },
             { hira: 'ざ', kata: 'ザ', romaji: 'za' }, { hira: 'じ', kata: 'ジ', romaji: 'ji' }, { hira: 'ず', kata: 'ズ', romaji: 'zu' }, { hira: 'ぜ', kata: 'ゼ', romaji: 'ze' }, { hira: 'ぞ', kata: 'ゾ', romaji: 'zo' },
-            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'で', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
+            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'де', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
             { hira: 'ば', kata: 'バ', romaji: 'ba' }, { hira: 'び', kata: 'ビ', romaji: 'bi' }, { hira: 'ぶ', kata: 'ブ', romaji: 'bu' }, { hira: 'べ', kata: 'ベ', romaji: 'be' }, { hira: 'ぼ', kata: 'ボ', romaji: 'bo' },
             { hira: 'ぱ', kata: 'パ', romaji: 'pa' }, { hira: 'ぴ', kata: 'ピ', romaji: 'pi' }, { hira: 'ぷ', kata: 'プ', romaji: 'pu' }, { hira: 'ぺ', kata: 'ペ', romaji: 'pe' }, { hira: 'ぽ', kata: 'ポ', romaji: 'po' }
         ],
@@ -2084,6 +2133,7 @@
     let currentWritingIndex = 0;
     let isDrawing = false;
     let lastX = 0, lastY = 0;
+    let hasDrawnOnCanvas = false;
 
     let sheetDataCache = {}; 
     let fullSourceList = [];
@@ -2507,7 +2557,6 @@
         return x - Math.floor(x);
     }
 
-    // ⚡ 24 分類加載與導讀卡解析
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -3018,10 +3067,32 @@
         }
     }
 
-    // 🐣 五十音與手寫板核心模組
+    // 🐣 五十音專區子母切換與動態筆順模組
     function initKanaSection() {
         switchKanaGroup(currentKanaTab);
         setupCanvasEvents();
+    }
+
+    function setKanaSubView(viewKey) {
+        playClickSound();
+        const btnGrid = document.getElementById('btn-view-grid');
+        const btnWriting = document.getElementById('btn-view-writing');
+        const viewGrid = document.getElementById('kana-grid-subview');
+        const viewWriting = document.getElementById('kana-writing-subview');
+
+        if (viewKey === 'grid') {
+            btnGrid.classList.add('active');
+            btnWriting.classList.remove('active');
+            viewGrid.style.display = 'block';
+            viewWriting.style.display = 'none';
+        } else {
+            btnWriting.classList.add('active');
+            btnGrid.classList.remove('active');
+            viewWriting.style.display = 'block';
+            viewGrid.style.display = 'none';
+            setupCanvasEvents();
+            redrawCurrentKanaBoard();
+        }
     }
 
     function switchKanaGroup(tabKey) {
@@ -3037,10 +3108,9 @@
 
         let list = KANA_DATA[tabKey] || KANA_DATA['seion-hira'];
         if (tabKey === 'seion-kata') {
-            list = KANA_DATA['seion-hira']; // 片假名共用清音架構
+            list = KANA_DATA['seion-hira'];
         }
 
-        // 過濾出可練習清單
         currentWritingList = list.filter(Boolean);
         currentWritingIndex = 0;
 
@@ -3054,11 +3124,13 @@
 
             const isKataMode = (tabKey === 'seion-kata');
             const mainChar = isKataMode ? item.kata : item.hira;
-            const subChar = isKataMode ? item.hira : item.kata;
 
             const div = document.createElement('div');
             div.className = `kana-item ${idx === 0 ? 'active' : ''}`;
-            div.onclick = () => selectKanaItem(item, div, isKataMode);
+            div.onclick = () => {
+                selectKanaItem(item, div, isKataMode);
+                setKanaSubView('writing'); // 點選直接切換到手寫板
+            };
 
             div.innerHTML = `
                 <span class="kana-char">${mainChar}</span>
@@ -3089,7 +3161,30 @@
         if (!item) return;
         const char = isKataMode ? item.kata : item.hira;
         document.getElementById('current-writing-label').textContent = `${char} (${item.romaji})`;
+        document.getElementById('writing-grade-feedback').textContent = '';
+        hasDrawnOnCanvas = false;
+
+        const wrapper = document.getElementById('canvas-wrapper');
+        const canvas = document.getElementById('strokeCanvas');
+        const isWide = (char.length > 1);
+
+        if (isWide) {
+            wrapper.classList.add('wide-mode');
+            canvas.width = 320;
+            canvas.height = 240;
+        } else {
+            wrapper.classList.remove('wide-mode');
+            canvas.width = 240;
+            canvas.height = 240;
+        }
+
         drawGhostKanaOnCanvas(char);
+    }
+
+    function redrawCurrentKanaBoard() {
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        if (item) loadKanaToWritingBoard(item, isKataMode);
     }
 
     function drawGhostKanaOnCanvas(char) {
@@ -3098,7 +3193,7 @@
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. 繪製田字格輔助線
+        // 田字格輔助線
         ctx.save();
         ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 1;
@@ -3112,24 +3207,73 @@
         ctx.stroke();
         ctx.restore();
 
-        // 2. 繪製淺色假名輪廓導引字
+        // 淺色輪廓字
         ctx.save();
-        ctx.font = 'bold 150px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+        const fontSize = (char.length > 1) ? 115 : 155;
+        ctx.font = `bold ${fontSize}px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif`;
         ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 10);
+        ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        ctx.restore();
+    }
+
+    // 🎬 模擬動態筆順演示
+    function playStrokeAnimation() {
+        playClickSound();
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        if (!item) return;
+
+        const char = isKataMode ? item.kata : item.hira;
+        const canvas = document.getElementById('strokeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        drawGhostKanaOnCanvas(char);
+
+        // 以筆劃軌跡模擬動畫
+        ctx.save();
+        ctx.font = `bold ${(char.length > 1) ? 115 : 155}px -apple-system, "Hiragino Kaku Gothic ProN", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        let alpha = 0.1;
+        let animTimer = setInterval(() => {
+            alpha += 0.15;
+            ctx.fillStyle = `rgba(236, 72, 153, ${alpha})`;
+            ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+
+            if (alpha >= 0.85) {
+                clearInterval(animTimer);
+                setTimeout(() => {
+                    drawGhostKanaOnCanvas(char);
+                }, 900);
+            }
+        }, 60);
         ctx.restore();
     }
 
     function clearStrokeCanvas() {
         playClickSound();
-        const isKataMode = (currentKanaTab === 'seion-kata');
-        const item = currentWritingList[currentWritingIndex];
-        if (item) {
-            const char = isKataMode ? item.kata : item.hira;
-            drawGhostKanaOnCanvas(char);
+        document.getElementById('writing-grade-feedback').textContent = '';
+        hasDrawnOnCanvas = false;
+        redrawCurrentKanaBoard();
+    }
+
+    // ✨ 臨摹完成批改與經驗值發放
+    function checkWritingGrade() {
+        const feedbackEl = document.getElementById('writing-grade-feedback');
+        if (!hasDrawnOnCanvas) {
+            feedbackEl.textContent = '🐣 還沒有動筆臨摹喔！請在白板上臨摹寫一次看看！';
+            feedbackEl.style.color = '#f59e0b';
+            playWrongSound();
+            return;
         }
+
+        playSuccessSound();
+        addEXP(5); // 手寫練習獎勵 +5 EXP
+        feedbackEl.textContent = '🎉 完美達成！筆順修煉成功！(+5 EXP)';
+        feedbackEl.style.color = '#22c55e';
     }
 
     function nextWritingKana() {
@@ -3166,6 +3310,7 @@
 
         function startDraw(x, y) {
             isDrawing = true;
+            hasDrawnOnCanvas = true;
             lastX = x;
             lastY = y;
         }
@@ -3174,7 +3319,7 @@
             if (!isDrawing) return;
             ctx.save();
             ctx.strokeStyle = '#ec4899';
-            ctx.lineWidth = 10;
+            ctx.lineWidth = 11;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
@@ -3402,7 +3547,7 @@
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
-        // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等）
+        // 💡 1. 雙列結構化導讀特卡
         if (current.isIntroCard && current.isStructuredIntro) {
             badgeEl.style.display = 'none';
             mainTitleEl.textContent = current.introValues[0] || current.catName;
@@ -3488,7 +3633,7 @@
             return;
         }
 
-        // 💡 2. 單列觀念導讀特卡（如形式名詞 A2 說明）
+        // 💡 2. 單列觀念導讀特卡
         if (current.isIntroCard) {
             badgeEl.style.display = 'none';
             mainTitleEl.textContent = current.catName;
