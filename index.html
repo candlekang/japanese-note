@@ -353,7 +353,6 @@
             font-weight: 600;
         }
 
-        /* 💡 4 個核心模式按鈕網格 */
         .button-group { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
@@ -1055,7 +1054,7 @@
             gap: 6px;
         }
         
-        /* 💡 筆尖對齊 (0,0) 的自製筆形游標 */
+        /* 💡 筆尖精準對齊 (0,0) 的自製鋼筆游標 */
         .canvas-container {
             position: relative;
             width: 240px;
@@ -2090,54 +2089,40 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
-    // 🐣 五十音真實筆順起筆坐標庫 (歸一化 0~1 比例坐標)
-    const STROKE_POINTS = {
-        'あ': [{ x: 0.28, y: 0.28 }, { x: 0.50, y: 0.15 }, { x: 0.40, y: 0.42 }],
-        'い': [{ x: 0.35, y: 0.28 }, { x: 0.65, y: 0.32 }],
-        'う': [{ x: 0.48, y: 0.20 }, { x: 0.36, y: 0.40 }],
-        'え': [{ x: 0.46, y: 0.20 }, { x: 0.32, y: 0.40 }],
-        'お': [{ x: 0.28, y: 0.28 }, { x: 0.48, y: 0.18 }, { x: 0.68, y: 0.28 }],
-        'か': [{ x: 0.32, y: 0.32 }, { x: 0.50, y: 0.22 }, { x: 0.68, y: 0.26 }],
-        'き': [{ x: 0.32, y: 0.30 }, { x: 0.28, y: 0.46 }, { x: 0.48, y: 0.18 }],
-        'く': [{ x: 0.60, y: 0.25 }],
-        'け': [{ x: 0.30, y: 0.22 }, { x: 0.45, y: 0.35 }, { x: 0.65, y: 0.25 }],
-        'こ': [{ x: 0.32, y: 0.32 }, { x: 0.32, y: 0.68 }],
-        'さ': [{ x: 0.30, y: 0.32 }, { x: 0.48, y: 0.20 }, { x: 0.42, y: 0.55 }],
-        'し': [{ x: 0.45, y: 0.20 }],
-        'す': [{ x: 0.28, y: 0.32 }, { x: 0.52, y: 0.18 }],
-        'せ': [{ x: 0.28, y: 0.36 }, { x: 0.65, y: 0.25 }, { x: 0.42, y: 0.20 }],
-        'そ': [{ x: 0.35, y: 0.25 }],
-        'た': [{ x: 0.28, y: 0.35 }, { x: 0.48, y: 0.20 }, { x: 0.55, y: 0.48 }, { x: 0.55, y: 0.65 }],
-        'ち': [{ x: 0.32, y: 0.32 }, { x: 0.48, y: 0.20 }],
-        'つ': [{ x: 0.35, y: 0.35 }],
-        'て': [{ x: 0.30, y: 0.28 }],
-        'と': [{ x: 0.42, y: 0.22 }, { x: 0.40, y: 0.42 }],
-        'な': [{ x: 0.30, y: 0.32 }, { x: 0.45, y: 0.22 }, { x: 0.62, y: 0.32 }, { x: 0.52, y: 0.55 }],
-        'に': [{ x: 0.32, y: 0.25 }, { x: 0.55, y: 0.40 }, { x: 0.55, y: 0.68 }],
-        'ぬ': [{ x: 0.38, y: 0.28 }, { x: 0.48, y: 0.18 }],
-        'ね': [{ x: 0.35, y: 0.22 }, { x: 0.32, y: 0.42 }],
-        'の': [{ x: 0.52, y: 0.30 }],
-        'は': [{ x: 0.30, y: 0.22 }, { x: 0.50, y: 0.35 }, { x: 0.62, y: 0.22 }],
-        'ひ': [{ x: 0.32, y: 0.32 }],
-        'ふ': [{ x: 0.48, y: 0.20 }, { x: 0.42, y: 0.42 }, { x: 0.28, y: 0.52 }, { x: 0.68, y: 0.52 }],
-        'へ': [{ x: 0.30, y: 0.52 }],
-        'ほ': [{ x: 0.30, y: 0.22 }, { x: 0.48, y: 0.32 }, { x: 0.48, y: 0.48 }, { x: 0.60, y: 0.25 }],
-        'ま': [{ x: 0.30, y: 0.32 }, { x: 0.30, y: 0.48 }, { x: 0.50, y: 0.20 }],
-        'み': [{ x: 0.32, y: 0.28 }, { x: 0.65, y: 0.38 }],
-        'む': [{ x: 0.30, y: 0.36 }, { x: 0.48, y: 0.22 }, { x: 0.68, y: 0.32 }],
-        'め': [{ x: 0.42, y: 0.28 }, { x: 0.50, y: 0.20 }],
-        'も': [{ x: 0.48, y: 0.20 }, { x: 0.32, y: 0.38 }, { x: 0.32, y: 0.55 }],
-        'や': [{ x: 0.35, y: 0.35 }, { x: 0.48, y: 0.22 }, { x: 0.65, y: 0.35 }],
-        'ゆ': [{ x: 0.40, y: 0.25 }, { x: 0.58, y: 0.18 }],
-        'よ': [{ x: 0.35, y: 0.35 }, { x: 0.58, y: 0.22 }],
-        'ら': [{ x: 0.45, y: 0.22 }, { x: 0.40, y: 0.42 }],
-        'り': [{ x: 0.38, y: 0.32 }, { x: 0.62, y: 0.25 }],
-        'る': [{ x: 0.35, y: 0.28 }],
-        'れ': [{ x: 0.35, y: 0.22 }, { x: 0.35, y: 0.45 }],
-        'ろ': [{ x: 0.35, y: 0.28 }],
-        'わ': [{ x: 0.35, y: 0.22 }, { x: 0.35, y: 0.45 }],
-        'を': [{ x: 0.32, y: 0.32 }, { x: 0.42, y: 0.22 }, { x: 0.50, y: 0.55 }],
-        'ん': [{ x: 0.35, y: 0.32 }]
+    const KANA_DATA = {
+        'seion-hira': [
+            { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
+            { hira: 'か', kata: 'カ', romaji: 'ka' }, { hira: 'き', kata: 'キ', romaji: 'ki' }, { hira: 'く', kata: 'ク', romaji: 'ku' }, { hira: 'け', kata: 'ケ', romaji: 'ke' }, { hira: 'こ', kata: 'コ', romaji: 'ko' },
+            { hira: 'さ', kata: 'サ', romaji: 'sa' }, { hira: 'し', kata: 'シ', romaji: 'shi' }, { hira: 'す', kata: 'ス', romaji: 'su' }, { hira: 'せ', kata: 'セ', romaji: 'se' }, { hira: 'そ', kata: 'ソ', romaji: 'so' },
+            { hira: 'た', kata: 'タ', romaji: 'ta' }, { hira: 'ち', kata: 'チ', romaji: 'chi' }, { hira: 'つ', kata: 'ツ', romaji: 'tsu' }, { hira: 'て', kata: 'テ', romaji: 'te' }, { hira: 'と', kata: 'ト', romaji: 'to' },
+            { hira: 'な', kata: 'ナ', romaji: 'na' }, { hira: 'に', kata: 'ニ', romaji: 'ni' }, { hira: 'ぬ', kata: 'ヌ', romaji: 'nu' }, { hira: 'ね', kata: 'ネ', romaji: 'ne' }, { hira: 'の', kata: 'ノ', romaji: 'no' },
+            { hira: 'は', kata: 'ハ', romaji: 'ha' }, { hira: 'ひ', kata: 'ヒ', romaji: 'hi' }, { hira: 'ふ', kata: 'フ', romaji: 'fu' }, { hira: 'へ', kata: 'ヘ', romaji: 'he' }, { hira: 'ほ', kata: 'ホ', romaji: 'ho' },
+            { hira: 'ま', kata: 'マ', romaji: 'ma' }, { hira: 'み', kata: 'ミ', romaji: 'mi' }, { hira: 'む', kata: 'ム', romaji: 'mu' }, { hira: 'め', kata: 'メ', romaji: 'me' }, { hira: 'も', kata: 'モ', romaji: 'mo' },
+            { hira: 'や', kata: 'ヤ', romaji: 'ya' }, null, { hira: 'ゆ', kata: 'ユ', romaji: 'yu' }, null, { hira: 'よ', kata: 'ヨ', romaji: 'yo' },
+            { hira: 'ら', kata: 'ラ', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
+            { hira: 'わ', kata: 'ワ', romaji: 'wa' }, null, null, null, { hira: 'を', kata: 'ヲ', romaji: 'o/wo' },
+            { hira: 'ん', kata: 'ン', romaji: 'n' }, null, null, null, null
+        ],
+        'dakuon': [
+            { hira: 'が', kata: 'ガ', romaji: 'ga' }, { hira: 'ぎ', kata: 'ギ', romaji: 'gi' }, { hira: 'ぐ', kata: 'グ', romaji: 'gu' }, { hira: 'げ', kata: 'ゲ', romaji: 'ge' }, { hira: 'ご', kata: 'ゴ', romaji: 'go' },
+            { hira: 'ざ', kata: 'ザ', romaji: 'za' }, { hira: 'じ', kata: 'ジ', romaji: 'ji' }, { hira: 'ず', kata: 'ズ', romaji: 'zu' }, { hira: 'ぜ', kata: 'ゼ', romaji: 'ze' }, { hira: 'ぞ', kata: 'ゾ', romaji: 'zo' },
+            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'で', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
+            { hira: 'ば', kata: 'バ', romaji: 'ba' }, { hira: 'び', kata: 'ビ', romaji: 'bi' }, { hira: 'ぶ', kata: 'ブ', romaji: 'bu' }, { hira: 'べ', kata: 'ベ', romaji: 'be' }, { hira: 'ぼ', kata: 'ボ', romaji: 'bo' },
+            { hira: 'ぱ', kata: 'パ', romaji: 'pa' }, { hira: 'ぴ', kata: 'ピ', romaji: 'pi' }, { hira: 'ぷ', kata: 'プ', romaji: 'pu' }, { hira: 'ぺ', kata: 'ペ', romaji: 'pe' }, { hira: 'ぽ', kata: 'ポ', romaji: 'po' }
+        ],
+        'youon': [
+            { hira: 'きゃ', kata: 'キャ', romaji: 'kya' }, { hira: 'きゅ', kata: 'キュ', romaji: 'kyu' }, { hira: 'きょ', kata: 'キョ', romaji: 'kyo' },
+            { hira: 'しゃ', kata: 'シャ', romaji: 'sha' }, { hira: 'しゅ', kata: 'シュ', romaji: 'shu' }, { hira: 'しょ', kata: 'ショ', romaji: 'sho' },
+            { hira: 'ちゃ', kata: 'チャ', romaji: 'cha' }, { hira: 'ちゅ', kata: 'チュ', romaji: 'chu' }, { hira: 'ちょ', kata: 'チョ', romaji: 'cho' },
+            { hira: 'にゃ', kata: 'ニャ', romaji: 'nya' }, { hira: 'にゅ', kata: 'ニュ', romaji: 'nyu' }, { hira: 'にょ', kata: 'ニョ', romaji: 'nyo' },
+            { hira: 'ひゃ', kata: 'ヒャ', romaji: 'hya' }, { hira: 'ひゅ', kata: 'ヒュ', romaji: 'hyu' }, { hira: 'ひょ', kata: 'ヒョ', romaji: 'hyo' },
+            { hira: 'みゃ', kata: 'ミャ', romaji: 'mya' }, { hira: 'みゅ', kata: 'ミュ', romaji: 'myu' }, { hira: 'みょ', kata: 'ミョ', romaji: 'myo' },
+            { hira: 'りゃ', kata: 'リャ', romaji: 'rya' }, { hira: 'りゅ', kata: 'リュ', romaji: 'ryu' }, { hira: 'りょ', kata: 'リョ', romaji: 'ryo' },
+            { hira: 'ぎゃ', kata: 'ギャ', romaji: 'gya' }, { hira: 'ぎゅ', kata: 'ギュ', romaji: 'gyu' }, { hira: 'ぎょ', kata: 'ギョ', romaji: 'gyo' },
+            { hira: 'じゃ', kata: 'ジャ', romaji: 'ja' }, { hira: 'じゅ', kata: 'ジュ', romaji: 'ju' }, { hira: 'じょ', kata: 'ジョ', romaji: 'jo' },
+            { hira: 'びゃ', kata: 'ビャ', romaji: 'bya' }, { hira: 'びゅ', kata: 'ビュ', romaji: 'byu' }, { hira: 'びょ', kata: 'ビョ', romaji: 'byo' },
+            { hira: 'ぴゃ', kata: 'ピャ', romaji: 'pya' }, { hira: 'ぴゅ', kata: 'ピュ', romaji: 'pyu' }, { hira: 'ぴょ', kata: 'ピョ', romaji: 'pyo' }
+        ]
     };
 
     let currentKanaTab = 'seion-hira';
@@ -3256,7 +3241,6 @@
             const strokeNum = idx + 1;
 
             ctx.save();
-            // 繪製序號粉紅圓點背景
             ctx.fillStyle = '#ec4899';
             ctx.shadowColor = 'rgba(236, 72, 153, 0.5)';
             ctx.shadowBlur = 6;
@@ -3264,14 +3248,12 @@
             ctx.arc(px, py, 11, 0, Math.PI * 2);
             ctx.fill();
 
-            // 繪製序號數字
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 12px "DotGothic16", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(strokeNum, px, py + 1);
 
-            // 繪製導引箭頭提示
             ctx.fillStyle = '#db2777';
             ctx.font = 'bold 11px sans-serif';
             ctx.fillText('➔', px + 16, py + 1);
@@ -3286,7 +3268,6 @@
         redrawCurrentKanaBoard();
     }
 
-    // 🤖 基於像素重疊度（IoU）的批改演算法
     function checkWritingGrade() {
         const feedbackEl = document.getElementById('writing-grade-feedback');
         const canvas = document.getElementById('strokeCanvas');
