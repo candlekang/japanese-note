@@ -1132,6 +1132,7 @@
                 </div>
             </div>
 
+            <!-- 👑 像素等級與頭銜狀態列 -->
             <div class="rpg-level-bar" onclick="openRankGuideModal()" title="點擊查看修煉階級指南">
                 <span class="rpg-title-badge" id="hud-rpg-title">Lv.1 日文小白ㄔ 🐣</span>
                 <div class="rpg-exp-wrapper">
@@ -1457,6 +1458,7 @@
         }
 
         updateHUDLevel();
+        renderQuestBoard(); // 確保重新整理後進度條立即恢復
         if (currentMode === 'review') updateReviewUI();
         if (currentMode === 'stats') renderStatsDashboard();
     });
@@ -1481,6 +1483,7 @@
         window.location.reload(true);
     }
 
+    // ⚡ 核心修正：將每日任務與每日已學清單 100% 完整雙向備份至雲端
     async function syncCloudData() {
         if (!currentUser) return;
         try {
@@ -1491,7 +1494,11 @@
             for (let i = 0; i < localStorage.length; i++) {
                 const k = localStorage.key(i);
                 if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_') || k.startsWith('jp_learned_') || k.startsWith('jp_surprise_')) {
-                    localData[k] = JSON.parse(localStorage.getItem(k));
+                    try {
+                        localData[k] = JSON.parse(localStorage.getItem(k));
+                    } catch(e) {
+                        localData[k] = localStorage.getItem(k);
+                    }
                 }
             }
 
@@ -1506,14 +1513,22 @@
                         };
                     } else if (key === 'jp_rpg_exp') {
                         localData[key] = Math.max(localData[key] || 0, cVal || 0);
+                    } else if (key.startsWith('jp_quest_daily_')) {
+                        const lProg = localData[key] || { readCount: 0, quizCount: 0, rewardClaimed: false };
+                        localData[key] = {
+                            readCount: Math.max(lProg.readCount || 0, cVal.readCount || 0),
+                            quizCount: Math.max(lProg.quizCount || 0, cVal.quizCount || 0),
+                            rewardClaimed: lProg.rewardClaimed || cVal.rewardClaimed || false
+                        };
                     } else {
                         localData[key] = cVal;
                     }
-                    localStorage.setItem(key, JSON.stringify(localData[key]));
+                    localStorage.setItem(key, typeof localData[key] === 'object' ? JSON.stringify(localData[key]) : localData[key]);
                 }
             }
 
             await docRef.set({ progress: localData, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            renderQuestBoard();
         } catch (e) {
             console.error('雲端同步失敗:', e);
         }
@@ -1889,6 +1904,11 @@
         if (!list.includes(wordJp)) {
             list.push(wordJp);
             localStorage.setItem(`jp_learned_${today}`, JSON.stringify(list));
+            if (currentUser) {
+                const obj = {};
+                obj[`progress.jp_learned_${today}`] = list;
+                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+            }
         }
     }
 
@@ -1924,6 +1944,13 @@
         }
 
         localStorage.setItem(`jp_quest_daily_${today}`, JSON.stringify(prog));
+
+        if (currentUser) {
+            const obj = {};
+            obj[`progress.jp_quest_daily_${today}`] = prog;
+            db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+        }
+
         renderQuestBoard();
     }
 
@@ -1964,6 +1991,10 @@
             quizTarget: Math.max(quizVal, 1)
         };
         localStorage.setItem('jp_quest_settings', JSON.stringify(targetObj));
+
+        if (currentUser) {
+            db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_quest_settings: targetObj } }, { merge: true });
+        }
         
         document.getElementById('questSettingsModal').style.display = 'none';
         renderQuestBoard();
@@ -2342,10 +2373,15 @@
 
         if (selectedBossOption.jp === currentBossWord.jp) {
             playSuccessSound();
-            addEXP(200); // 只有驚喜任務答對才加 200 EXP
+            addEXP(200);
             feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
             feedbackEl.className = 'quiz-feedback success';
             localStorage.setItem('jp_surprise_last_date', getTodayKey());
+            if (currentUser) {
+                const obj = {};
+                obj['progress.jp_surprise_last_date'] = getTodayKey();
+                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+            }
         } else {
             playWrongSound();
             feedbackEl.textContent = `💀 挑戰失敗！正解是：${currentBossWord.jp} (${getQuizZhText(currentBossWord)})`;
