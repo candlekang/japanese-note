@@ -3105,7 +3105,15 @@
             updateReviewUI();
         } else if (mode === 'quiz') {
             document.getElementById('quiz-section').style.display = 'block';
-            checkQuizStartFlow();
+
+            // 9.3.1：若測驗已經開始，切去其他分頁再回來時保留原進度，
+            // 不重新呼叫 startQuiz()，避免題目回到第 1 題。
+            if (quizList.length > 0) {
+                document.getElementById('quiz-guide-box').style.display = 'none';
+                document.getElementById('quiz-main-container').style.display = 'block';
+            } else {
+                checkQuizStartFlow();
+            }
         } else if (mode === 'kana') {
             currentKanaView = 'grid';
             initKanaSection();
