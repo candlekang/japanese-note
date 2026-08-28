@@ -353,6 +353,7 @@
             font-weight: 600;
         }
 
+        /* 💡 4 個主模式按鈕網格 */
         .button-group { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
@@ -921,7 +922,7 @@
 
         .score-board { font-size: 14px; color: var(--primary-dark); margin-bottom: 10px; font-weight: bold; }
 
-        /* 🐣 菜雞互啄樣式 */
+        /* 🐣 菜雞互啄（五十音圖鑑與手寫板）樣式 */
         #kana-section {
             background: var(--card-bg);
             border-radius: 20px;
@@ -929,7 +930,7 @@
             width: 100%;
             box-sizing: border-box;
             border: 2px solid #334155;
-            padding: 16px 14px;
+            padding: 20px 16px;
             display: none;
             margin-bottom: 20px;
         }
@@ -940,40 +941,48 @@
             padding: 4px;
             border-radius: 12px;
             margin-bottom: 14px;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .btn-sub-view {
+        .btn-kana-view {
             flex: 1;
-            background: none;
+            background: transparent;
             color: #94a3b8;
             border: none;
-            padding: 8px;
+            padding: 9px 6px;
             border-radius: 8px;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 700;
             font-family: 'DotGothic16', sans-serif;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
-        .btn-sub-view.active {
+        .btn-kana-view.active {
             background: var(--primary-dark);
             color: #ffffff;
             box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
         }
+        .kana-subview {
+            width: 100%;
+        }
+        .kana-subview[hidden] {
+            display: none !important;
+        }
 
         .kana-nav-tabs {
             display: flex;
-            gap: 5px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 14px;
             width: 100%;
         }
         .btn-kana-tab {
             flex: 1;
-            padding: 7px 2px;
+            padding: 8px 4px;
             border-radius: 8px;
             border: 1px solid #cbd5e1;
             background: #f8fafc;
             color: var(--text-sub);
-            font-size: 11.5px;
+            font-size: 12px;
             font-weight: bold;
             font-family: 'DotGothic16', sans-serif;
             cursor: pointer;
@@ -987,14 +996,14 @@
         .kana-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            margin-bottom: 6px;
+            gap: 6px;
+            margin-bottom: 18px;
         }
         .kana-item {
             background: #f8fafc;
             border: 1.5px solid #cbd5e1;
             border-radius: 10px;
-            padding: 8px 2px;
+            padding: 8px 4px;
             text-align: center;
             cursor: pointer;
             transition: all 0.15s;
@@ -1009,13 +1018,13 @@
             transform: scale(1.05);
         }
         .kana-char {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
             color: var(--text-main);
             line-height: 1.2;
         }
         .kana-romaji {
-            font-size: 10.5px;
+            font-size: 11px;
             color: var(--pixel-pink);
             font-weight: bold;
             margin-top: 2px;
@@ -1025,11 +1034,12 @@
             pointer-events: none;
         }
 
+        /* 手寫練習板專區 */
         .writing-board-card {
             background: #0f172a;
             border: 2px solid #38bdf8;
             border-radius: 16px;
-            padding: 16px 12px;
+            padding: 16px;
             box-sizing: border-box;
             color: #f8fafc;
             display: flex;
@@ -1037,7 +1047,6 @@
             align-items: center;
             gap: 12px;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
-            animation: modalPop 0.2s ease;
         }
         .writing-header {
             display: flex;
@@ -1053,22 +1062,16 @@
             align-items: center;
             gap: 6px;
         }
-        
         .canvas-container {
             position: relative;
-            width: 240px;
-            height: 240px;
+            width: 220px;
+            height: 220px;
             background: #ffffff;
-            border-radius: 14px;
+            border-radius: 12px;
             border: 2px solid #cbd5e1;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             touch-action: none;
             overflow: hidden;
-            transition: width 0.25s ease;
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><path d="M0,0 L10,2 L2,10 Z" fill="%23ec4899"/><path d="M2,10 L10,2 L24,16 L16,24 Z" fill="%2338bdf8" stroke="%230f172a" stroke-width="1.5"/><circle cx="1" cy="1" r="1.5" fill="%230f172a"/></svg>') 0 0, crosshair !important;
-        }
-        .canvas-container.wide-mode {
-            width: 320px;
         }
         #strokeCanvas {
             position: absolute;
@@ -1076,20 +1079,19 @@
             width: 100%;
             height: 100%;
             z-index: 10;
+            cursor: crosshair;
         }
         .writing-controls {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             width: 100%;
             justify-content: center;
-            flex-wrap: wrap;
         }
         .btn-writing-action {
             flex: 1;
-            min-width: 70px;
-            padding: 9px 4px;
+            padding: 8px 10px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             font-family: 'DotGothic16', sans-serif;
             cursor: pointer;
@@ -1098,8 +1100,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            white-space: nowrap;
+            gap: 4px;
         }
 
         .modal-overlay {
@@ -1510,7 +1511,7 @@
     </div>
 
     <!-- 2. 測驗模式 -->
-    <div id="quiz-section" style="display:none;">
+    <div id="quiz-section">
         <div id="quiz-guide-box" class="quiz-guide-box" style="display:none;">
             <div class="quiz-guide-title">⚔️ 勇者注意！今日修煉尚未開始 🐣</div>
             <div class="quiz-guide-desc">
@@ -1539,52 +1540,60 @@
         </div>
     </div>
 
-    <!-- 3. 🐣 菜雞互啄專區 -->
-    <div id="kana-section" style="display:none;">
-        <div class="kana-main-toggle">
-            <button class="btn-sub-view active" id="btn-view-grid" onclick="setKanaSubView('grid')">📊 五十音總表</button>
-            <button class="btn-sub-view" id="btn-view-writing" onclick="setKanaSubView('writing')">✍️ 臨摹手寫板</button>
+    <!-- 3. 🐣 菜雞互啄（五十音圖鑑與筆順練習） -->
+    <div id="kana-section">
+        <!-- 菜雞互啄內部功能切換 -->
+        <div class="kana-main-toggle" role="tablist" aria-label="菜雞互啄功能切換">
+            <button id="kana-view-grid-btn" class="btn-kana-view active" type="button"
+                    role="tab" aria-selected="true" aria-controls="kana-grid-view"
+                    onclick="setKanaView('grid')">📊 五十音總表</button>
+            <button id="kana-view-writing-btn" class="btn-kana-view" type="button"
+                    role="tab" aria-selected="false" aria-controls="kana-writing-view"
+                    onclick="setKanaView('writing')">✍️ 筆順手寫板</button>
         </div>
 
-        <!-- 視圖 A：五十音圖鑑總表 -->
-        <div id="kana-grid-subview">
+        <!-- 視圖 A：五十音總表 -->
+        <div id="kana-grid-view" class="kana-subview" role="tabpanel" aria-labelledby="kana-view-grid-btn">
             <div class="kana-nav-tabs">
-                <button class="btn-kana-tab active" onclick="switchKanaGroup('seion-hira')">あ 平假</button>
-                <button class="btn-kana-tab" onclick="switchKanaGroup('seion-kata')">ア 片假</button>
-                <button class="btn-kana-tab" onclick="switchKanaGroup('dakuon')">が 濁・半濁</button>
+                <button class="btn-kana-tab active" onclick="switchKanaGroup('seion-hira')">あ 平假名</button>
+                <button class="btn-kana-tab" onclick="switchKanaGroup('seion-kata')">ア 片假名</button>
+                <button class="btn-kana-tab" onclick="switchKanaGroup('dakuon')">が 濁音・半濁</button>
                 <button class="btn-kana-tab" onclick="switchKanaGroup('youon')">きゃ 拗音</button>
             </div>
+
             <div class="kana-grid" id="kana-grid-container"></div>
-            <div style="font-size:11px; color:#64748b; text-align:center; margin-top:8px;">💡 點擊任何假名立即朗讀，並自動開啟「臨摹手寫板」！</div>
+            <div style="font-size:11px; color:#64748b; text-align:center; margin-top:8px;">
+                💡 點擊假名可聽發音並設定練習字，再切到「筆順手寫板」開始臨摹。
+            </div>
         </div>
 
-        <!-- 視圖 B：純淨臨摹手寫板 -->
-        <div id="kana-writing-subview" style="display:none;">
+        <!-- 視圖 B：筆順手寫板 -->
+        <div id="kana-writing-view" class="kana-subview" role="tabpanel"
+             aria-labelledby="kana-view-writing-btn" hidden>
             <div class="writing-board-card">
                 <div class="writing-header">
-                    <span class="writing-title">✍️ 臨摹修煉：<span id="current-writing-label" style="color:#38bdf8;">あ (a)</span></span>
+                    <span class="writing-title">✍️ 筆順手寫板：<span id="current-writing-label" style="color:#38bdf8;">あ (a)</span></span>
                     <button class="btn-tts-small" onclick="speakCurrentWritingKana()">🔊 聽發音</button>
                 </div>
 
-                <!-- 自適應畫布 -->
-                <div class="canvas-container" id="canvas-wrapper">
-                    <canvas id="strokeCanvas" width="240" height="240"></canvas>
+                <div class="canvas-container">
+                    <canvas id="strokeCanvas" width="220" height="220"></canvas>
                 </div>
-
-                <div id="writing-grade-feedback" style="min-height:22px; font-size:13px; font-weight:bold; font-family:'DotGothic16', sans-serif;"></div>
 
                 <div class="writing-controls">
                     <button class="btn-writing-action" style="background:#334155; color:#ffffff;" onclick="prevWritingKana()">◀ 上一個</button>
-                    <button class="btn-writing-action" style="background:#64748b; color:#ffffff;" onclick="clearStrokeCanvas()">🧹 清除重寫</button>
-                    <button class="btn-writing-action" style="background:#22c55e; color:#ffffff;" onclick="checkWritingGrade()">✨ 完成批改</button>
+                    <button class="btn-writing-action" style="background:#ec4899; color:#ffffff;" onclick="clearStrokeCanvas()">🧹 清除重寫</button>
                     <button class="btn-writing-action" style="background:#0284c7; color:#ffffff;" onclick="nextWritingKana()">下一個 ▶</button>
+                </div>
+                <div style="font-size:11px; color:#94a3b8;">
+                    💡 淺色字形是臨摹導引，可直接用手指或滑鼠練習。
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 4. 📊 個人學習進度儀表板 -->
-    <div id="stats-section" style="display:none;">
+    <div id="stats-section">
         <div class="quest-board">
             <div class="quest-header">
                 <div class="quest-title">📜 今日修煉委託 <span id="quest-date-indicator"></span></div>
@@ -1671,7 +1680,6 @@
                 💡 <b>EXP 獲取規則</b>：<br>
                 • 首次翻閱新單字：+10 EXP<br>
                 • 測驗答對一題：+25 EXP<br>
-                • 完成五十音手寫臨摹：+5 EXP<br>
                 • 擊破 3 天驚喜任務：+200 EXP 🔥<br>
                 • 完成每日雙修煉任務：+100 EXP<br>
                 • 記得登入 Google 帳號，跨手機與電腦同步你的戰果！
@@ -1753,7 +1761,808 @@
 </div>
 
 <script>
-    // --- 1. 資料抓取、解析與安全載入 ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyClHAkJZ8EJuLHtksAsl8OoXYgdlKtjQZQ",
+        authDomain: "japanese-note-4cb5a.firebaseapp.com",
+        projectId: "japanese-note-4cb5a",
+        storageBucket: "japanese-note-4cb5a.firebasestorage.app",
+        messagingSenderId: "931372617510",
+        appId: "1:931372617510:web:36823175438ac2618b7be7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let currentUser = null;
+
+    auth.onAuthStateChanged(async (user) => {
+        const userInfoEl = document.getElementById('user-info');
+        const authBtnText = document.getElementById('btn-auth-text');
+        
+        if (user) {
+            currentUser = user;
+            const photo = user.photoURL ? `<img src="${user.photoURL}" class="user-avatar">` : '<span class="user-status-dot online"></span>';
+            userInfoEl.innerHTML = `${photo} <span>${user.displayName || '使用者'} (已同步)</span>`;
+            authBtnText.textContent = '登出';
+            
+            await syncCloudData();
+        } else {
+            currentUser = null;
+            userInfoEl.innerHTML = `<span class="user-status-dot"></span> <span>訪客模式（點右側登入同步 ➔）</span>`;
+            authBtnText.textContent = 'Google 登入同步';
+        }
+
+        updateHUDLevel();
+        renderQuestBoard();
+        if (currentMode === 'review') updateReviewUI();
+        if (currentMode === 'stats') renderStatsDashboard();
+    });
+
+    async function toggleAuth() {
+        playClickSound();
+        if (currentUser) {
+            await auth.signOut();
+        } else {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+            } catch (err) {
+                console.error(err);
+                alert('登入失敗，請確認是否已在 Firebase 授權 candlekang.github.io 網域！');
+            }
+        }
+    }
+
+    function forceAppReload() {
+        playClickSound();
+        window.location.reload(true);
+    }
+
+    async function syncCloudData() {
+        if (!currentUser) return;
+        try {
+            const docRef = db.collection('user_progress').doc(currentUser.uid);
+            const docSnap = await docRef.get();
+            
+            let localData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_') || k.startsWith('jp_learned_') || k.startsWith('jp_surprise_')) {
+                    try {
+                        localData[k] = JSON.parse(localStorage.getItem(k));
+                    } catch(e) {
+                        localData[k] = localStorage.getItem(k);
+                    }
+                }
+            }
+
+            if (docSnap.exists) {
+                const cloudData = docSnap.data().progress || {};
+                for (const [key, cVal] of Object.entries(cloudData)) {
+                    if (key.startsWith('jp_progress_')) {
+                        const lVal = localData[key] || { read: 0, quiz: 0 };
+                        localData[key] = {
+                            read: Math.max(lVal.read || 0, cVal.read || 0),
+                            quiz: Math.max(lVal.quiz || 0, cVal.quiz || 0)
+                        };
+                    } else if (key === 'jp_rpg_exp') {
+                        localData[key] = Math.max(localData[key] || 0, cVal || 0);
+                    } else if (key.startsWith('jp_quest_daily_')) {
+                        const lProg = localData[key] || { readCount: 0, quizCount: 0, rewardClaimed: false };
+                        localData[key] = {
+                            readCount: Math.max(lProg.readCount || 0, cVal.readCount || 0),
+                            quizCount: Math.max(lProg.quizCount || 0, cVal.quizCount || 0),
+                            rewardClaimed: lProg.rewardClaimed || cVal.rewardClaimed || false
+                        };
+                    } else {
+                        localData[key] = cVal;
+                    }
+                    localStorage.setItem(key, typeof localData[key] === 'object' ? JSON.stringify(localData[key]) : localData[key]);
+                }
+            }
+
+            await docRef.set({ progress: localData, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            renderQuestBoard();
+        } catch (e) {
+            console.error('雲端同步失敗:', e);
+        }
+    }
+
+    let audioCtx = null;
+    function getAudioContext() {
+        if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        return audioCtx;
+    }
+
+    function unlockAudioOnMobile() {
+        const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') ctx.resume();
+        try {
+            const dummyAudio = new Audio();
+            dummyAudio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
+            dummyAudio.play().catch(() => {});
+        } catch(e) {}
+        document.removeEventListener('touchstart', unlockAudioOnMobile);
+        document.removeEventListener('click', unlockAudioOnMobile);
+    }
+    document.addEventListener('touchstart', unlockAudioOnMobile, { passive: true });
+    document.addEventListener('click', unlockAudioOnMobile, { passive: true });
+
+    function playPageFlipSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+
+            const now = ctx.currentTime;
+            const duration = 0.08;
+            const bufferSize = Math.floor(ctx.sampleRate * duration);
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+
+            let lastOut = 0.0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                data[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = data[i];
+                data[i] *= 3.5;
+            }
+
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1400, now);
+            filter.frequency.exponentialRampToValueAtTime(700, now + duration);
+            filter.Q.setValueAtTime(1.8, now);
+
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.01, now);
+            gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+
+            noise.start(now);
+            noise.stop(now + duration);
+        } catch (e) {}
+    }
+
+    function playClickSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+            const bufferSize = ctx.sampleRate * 0.005; 
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(2500, now);
+
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.025, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.005);
+
+            noise.connect(filter);
+            filter.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+
+            const osc = ctx.createOscillator();
+            const oscGain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1400, now);
+            osc.frequency.exponentialRampToValueAtTime(300, now + 0.012);
+
+            oscGain.gain.setValueAtTime(0.035, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+
+            osc.connect(oscGain);
+            oscGain.connect(ctx.destination);
+
+            noise.start(now);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        } catch(e) {}
+    }
+
+    function playSuccessSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, now);
+            gain1.gain.setValueAtTime(0.08, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.12);
+
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(659.25, now + 0.09);
+            gain2.gain.setValueAtTime(0.1, now + 0.09);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.09);
+            osc2.stop(now + 0.28);
+        } catch(e) {}
+    }
+
+    function playWrongSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const now = ctx.currentTime;
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'triangle';
+            osc1.frequency.setValueAtTime(349.23, now);
+            gain1.gain.setValueAtTime(0.08, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.12);
+
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(277.18, now + 0.1);
+            gain2.gain.setValueAtTime(0.09, now + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.1);
+            osc2.stop(now + 0.28);
+        } catch(e) {}
+    }
+
+    const SHEETS_CONFIG = {
+        sheet1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=938197036&single=true&output=csv',
+        sheet2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1844228081&single=true&output=csv',
+        sheet3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1130260118&single=true&output=csv',
+        sheet4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=20080234&single=true&output=csv',
+        sheet5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=591299877&single=true&output=csv',
+        sheet6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1833922770&single=true&output=csv',
+        sheet7: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1447704017&single=true&output=csv',
+        sheet8: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=124325165&single=true&output=csv',
+        sheet9: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1679842630&single=true&output=csv',
+        sheet10: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1897403022&single=true&output=csv',
+        sheet11: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1587333217&single=true&output=csv',
+        sheet12: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1490497949&single=true&output=csv',
+        sheet13: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1342438350&single=true&output=csv',
+        sheet14: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=373655117&single=true&output=csv',
+        sheet15: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1550390723&single=true&output=csv',
+        sheet16: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1982280953&single=true&output=csv',
+        sheet17: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=369240348&single=true&output=csv',
+        sheet18: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1114398002&single=true&output=csv',
+        sheet19: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1377172328&single=true&output=csv',
+        sheet20: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=826241804&single=true&output=csv',
+        sheet21: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=141438539&single=true&output=csv',
+        sheet22: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=584642201&single=true&output=csv',
+        sheet24: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=942908072&single=true&output=csv',
+        sheet25: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=219719106&single=true&output=csv'
+    };
+
+    const SEMANTIC_SYNONYMS = [
+        { triggers: ['只', '僅', '僅僅', '只有', '光是', '淨是'], targets: ['だけ', 'しか', 'のみ', 'ばかり', 'きり', 'ただ'] },
+        { triggers: ['因為', '由於', '理由', '原因', '多虧', '怪罪'], targets: ['から', 'ので', 'ため', 'せいで', 'おかげ德', 'によって', 'つき'] },
+        { triggers: ['雖然', '但是', '儘管', '可是', '不過', '明明'], targets: ['けど', 'のに', 'くせに', '外', 'けれども', 'ものの', 'としても'] },
+        { triggers: ['打算', '計畫', '準備', '想要'], targets: ['つもり', '予定', 'ようとする', 'たい', 'ほしい'] },
+        { triggers: ['好像', '似乎', '聽說', '看起來'], targets: ['そう', 'よう', 'らしい', 'みたい'] },
+        { triggers: ['必須', '一定要', '非得'], targets: ['なければならない', 'ないと', 'ざるを得ない', 'べき'] },
+        { triggers: ['可以', '能夠', '能力', '會'], targets: ['できる', 'れる', 'られる', 'こと'] },
+        { triggers: ['一邊', '同時'], targets: ['ながら', 'つつ'] },
+        { triggers: ['越...越...', '隨著'], targets: ['ば...ほど', 'につれて', 'とともに'] }
+    ];
+
+    const RANK_TIERS_CONFIG = [
+        { threshold: 0.00, title: "Lv.1 日文小白ㄔ 🐣", desc: "剛踏入日語修煉之門 (0% 起)" },
+        { threshold: 0.05, title: "Lv.2 日文小菜鳥 🐤", desc: "熟悉基本問候與簡單名詞 (5% 達成)" },
+        { threshold: 0.15, title: "Lv.3 日文初心者 🌿", desc: "掌握基礎五十音與日常詞彙 (15% 達成)" },
+        { threshold: 0.30, title: "Lv.4 單字小行家 ⚔️", desc: "具備核心基礎單字量 (30% 達成)" },
+        { threshold: 0.50, title: "Lv.5 文法修行僧 🛡️", desc: "突破動詞變化與句型難關 (50% 達成)" },
+        { threshold: 0.70, title: "Lv.6 假名魔法使 🧙‍♀️", desc: "掌握進階文法與細膩語感 (70% 達成)" },
+        { threshold: 0.85, title: "Lv.7 日語狂戰士 🐉", desc: "全方位制霸日語詞彙庫 (85% 達成)" },
+        { threshold: 0.95, title: "Lv.8 準・魔王領主 👑", desc: "即將登頂的頂級強者 (95% 達成)" },
+        { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
+    ];
+
+    // 🐣 五十音資料表
+    const KANA_DATA = {
+        'seion-hira': [
+            { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
+            { hira: 'か', kata: 'カ', romaji: 'ka' }, { hira: 'き', kata: 'キ', romaji: 'ki' }, { hira: 'く', kata: 'ク', romaji: 'ku' }, { hira: 'け', kata: 'ケ', romaji: 'ke' }, { hira: 'こ', kata: 'コ', romaji: 'ko' },
+            { hira: 'さ', kata: 'サ', romaji: 'sa' }, { hira: 'し', kata: 'シ', romaji: 'shi' }, { hira: 'す', kata: 'ス', romaji: 'su' }, { hira: 'せ', kata: 'セ', romaji: 'se' }, { hira: 'そ', kata: 'ソ', romaji: 'so' },
+            { hira: 'た', kata: 'タ', romaji: 'ta' }, { hira: 'ち', kata: 'チ', romaji: 'chi' }, { hira: 'つ', kata: 'ツ', romaji: 'tsu' }, { hira: 'て', kata: 'テ', romaji: 'te' }, { hira: 'と', kata: 'ト', romaji: 'to' },
+            { hira: 'な', kata: 'ナ', romaji: 'na' }, { hira: 'に', kata: 'ニ', romaji: 'ni' }, { hira: 'ぬ', kata: 'ヌ', romaji: 'nu' }, { hira: 'ね', kata: 'ネ', romaji: 'ne' }, { hira: 'の', kata: 'ノ', romaji: 'no' },
+            { hira: 'は', kata: 'ハ', romaji: 'ha' }, { hira: 'ひ', kata: 'ヒ', romaji: 'hi' }, { hira: 'ふ', kata: 'フ', romaji: 'fu' }, { hira: 'へ', kata: 'ヘ', romaji: 'he' }, { hira: 'ほ', kata: 'ホ', romaji: 'ho' },
+            { hira: 'ま', kata: 'マ', romaji: 'ma' }, { hira: 'み', kata: 'ミ', romaji: 'mi' }, { hira: 'む', kata: 'ム', romaji: 'mu' }, { hira: 'め', kata: 'メ', romaji: 'me' }, { hira: 'も', kata: 'モ', romaji: 'mo' },
+            { hira: 'や', kata: 'ヤ', romaji: 'ya' }, null, { hira: 'ゆ', kata: 'ユ', romaji: 'yu' }, null, { hira: 'よ', kata: 'ヨ', romaji: 'yo' },
+            { hira: 'ら', kata: 'ラ', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
+            { hira: 'わ', kata: 'ワ', romaji: 'wa' }, null, null, null, { hira: 'を', kata: 'ヲ', romaji: 'o/wo' },
+            { hira: 'ん', kata: 'ン', romaji: 'n' }, null, null, null, null
+        ],
+        'dakuon': [
+            { hira: 'が', kata: 'ガ', romaji: 'ga' }, { hira: 'ぎ', kata: 'ギ', romaji: 'gi' }, { hira: 'ぐ', kata: 'グ', romaji: 'gu' }, { hira: 'げ', kata: 'ゲ', romaji: 'ge' }, { hira: 'ご', kata: 'ゴ', romaji: 'go' },
+            { hira: 'ざ', kata: 'ザ', romaji: 'za' }, { hira: 'じ', kata: 'ジ', romaji: 'ji' }, { hira: 'ず', kata: 'ズ', romaji: 'zu' }, { hira: 'ぜ', kata: 'ゼ', romaji: 'ze' }, { hira: 'ぞ', kata: 'ゾ', romaji: 'zo' },
+            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'で', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
+            { hira: 'ば', kata: 'バ', romaji: 'ba' }, { hira: 'び', kata: 'ビ', romaji: 'bi' }, { hira: 'ぶ', kata: 'ブ', romaji: 'bu' }, { hira: 'べ', kata: 'ベ', romaji: 'be' }, { hira: 'ぼ', kata: 'ボ', romaji: 'bo' },
+            { hira: 'ぱ', kata: 'パ', romaji: 'pa' }, { hira: 'ぴ', kata: 'ピ', romaji: 'pi' }, { hira: 'ぷ', kata: 'プ', romaji: 'pu' }, { hira: 'ぺ', kata: 'ペ', romaji: 'pe' }, { hira: 'ぽ', kata: 'ポ', romaji: 'po' }
+        ],
+        'youon': [
+            { hira: 'きゃ', kata: 'キャ', romaji: 'kya' }, { hira: 'きゅ', kata: 'キュ', romaji: 'kyu' }, { hira: 'きょ', kata: 'キョ', romaji: 'kyo' },
+            { hira: 'しゃ', kata: 'シャ', romaji: 'sha' }, { hira: 'しゅ', kata: 'シュ', romaji: 'shu' }, { hira: 'しょ', kata: 'ショ', romaji: 'sho' },
+            { hira: 'ちゃ', kata: 'チャ', romaji: 'cha' }, { hira: 'ちゅ', kata: 'チュ', romaji: 'chu' }, { hira: 'ちょ', kata: 'チョ', romaji: 'cho' },
+            { hira: 'にゃ', kata: 'ニャ', romaji: 'nya' }, { hira: 'にゅ', kata: 'ニュ', romaji: 'nyu' }, { hira: 'にょ', kata: 'ニョ', romaji: 'nyo' },
+            { hira: 'ひゃ', kata: 'ヒャ', romaji: 'hya' }, { hira: 'ひゅ', kata: 'ヒュ', romaji: 'hyu' }, { hira: 'ひょ', kata: 'ヒョ', romaji: 'hyo' },
+            { hira: 'みゃ', kata: 'ミャ', romaji: 'mya' }, { hira: 'みゅ', kata: 'ミュ', romaji: 'myu' }, { hira: 'みょ', kata: 'ミョ', romaji: 'myo' },
+            { hira: 'りゃ', kata: 'リャ', romaji: 'rya' }, { hira: 'りゅ', kata: 'リュ', romaji: 'ryu' }, { hira: 'りょ', kata: 'リョ', romaji: 'ryo' },
+            { hira: 'ぎゃ', kata: 'ギャ', romaji: 'gya' }, { hira: 'ぎゅ', kata: 'ギュ', romaji: 'gyu' }, { hira: 'ぎょ', kata: 'ギョ', romaji: 'gyo' },
+            { hira: 'じゃ', kata: 'ジャ', romaji: 'ja' }, { hira: 'じゅ', kata: 'ジュ', romaji: 'ju' }, { hira: 'じょ', kata: 'ジョ', romaji: 'jo' },
+            { hira: 'びゃ', kata: 'ビャ', romaji: 'bya' }, { hira: 'びゅ', kata: 'ビュ', romaji: 'byu' }, { hira: 'びょ', kata: 'ビョ', romaji: 'byo' },
+            { hira: 'ぴゃ', kata: 'ピャ', romaji: 'pya' }, { hira: 'ぴゅ', kata: 'ピュ', romaji: 'pyu' }, { hira: 'ぴょ', kata: 'ピョ', romaji: 'pyo' }
+        ]
+    };
+
+    let currentKanaTab = 'seion-hira';
+    let currentKanaView = 'grid';
+    let currentWritingList = [];
+    let currentWritingIndex = 0;
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+
+    let sheetDataCache = {}; 
+    let fullSourceList = [];
+    let currentList = [];
+    let currentIndex = 0;
+    let currentMode = 'review';
+    let quizList = [];
+    let quizIndex = 0;
+    let currentCorrectAnswer = null;
+    let selectedOptionData = null;
+
+    let currentBossWord = null;
+    let selectedBossOption = null;
+
+    let globalWordCategoryMap = {};
+    let globalWordDataMap = {};
+    let allSearchableWords = [];
+
+    function getTotalEXP() {
+        const exp = localStorage.getItem('jp_rpg_exp');
+        return exp ? parseInt(exp, 10) : 0;
+    }
+
+    function addEXP(points) {
+        let currentExp = getTotalEXP() + points;
+        localStorage.setItem('jp_rpg_exp', currentExp);
+
+        if (currentUser) {
+            db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_rpg_exp: currentExp } }, { merge: true });
+        }
+        updateHUDLevel();
+    }
+
+    function getLevelAndTitle(exp, totalWords) {
+        const maxExpCap = Math.max(totalWords * 35, 1000);
+        const progressRatio = Math.min(exp / maxExpCap, 1.0);
+
+        let currentRank = RANK_TIERS_CONFIG[0];
+        let nextRank = null;
+
+        for (let i = RANK_TIERS_CONFIG.length - 1; i >= 0; i--) {
+            if (progressRatio >= RANK_TIERS_CONFIG[i].threshold) {
+                currentRank = RANK_TIERS_CONFIG[i];
+                nextRank = RANK_TIERS_CONFIG[i + 1] || null;
+                break;
+            }
+        }
+
+        let nextExpReq = 0;
+        let expToNext = 0;
+        if (nextRank) {
+            nextExpReq = Math.ceil(nextRank.threshold * maxExpCap);
+            expToNext = Math.max(nextExpReq - exp, 0);
+        }
+
+        return {
+            title: currentRank.title,
+            ratioPercent: Math.floor(progressRatio * 100),
+            currentExp: exp,
+            maxExp: maxExpCap,
+            nextRank: nextRank,
+            expToNext: expToNext,
+            totalWords: totalWords
+        };
+    }
+
+    function updateHUDLevel() {
+        const totalWords = allSearchableWords.length || 1000;
+        const info = getLevelAndTitle(getTotalEXP(), totalWords);
+
+        const titleEl = document.getElementById('hud-rpg-title');
+        const fillEl = document.getElementById('hud-rpg-exp-fill');
+        const textEl = document.getElementById('hud-rpg-exp-text');
+
+        if (titleEl) titleEl.textContent = info.title;
+        if (fillEl) fillEl.style.width = `${info.ratioPercent}%`;
+        if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
+    }
+
+    function openRankGuideModal() {
+        playClickSound();
+        const totalWords = allSearchableWords.length || 1000;
+        const info = getLevelAndTitle(getTotalEXP(), totalWords);
+
+        document.getElementById('modal-my-rank-title').textContent = `${info.title} (${info.ratioPercent}%)`;
+        document.getElementById('modal-sync-rate-text').textContent = `${info.ratioPercent}%`;
+
+        const hintEl = document.getElementById('modal-my-rank-hint');
+        if (info.nextRank) {
+            hintEl.textContent = `⚡ 距離下一位階【${info.nextRank.title}】還差 ${info.expToNext} EXP！`;
+        } else {
+            hintEl.textContent = `👾 恭喜登頂！你已達成【日文大魔王】的最高境界！🔥`;
+        }
+
+        const tierListEl = document.getElementById('modal-rank-tier-list');
+        tierListEl.innerHTML = '';
+
+        RANK_TIERS_CONFIG.forEach(tier => {
+            const reqExp = Math.ceil(tier.threshold * info.maxExp);
+            const isCurrent = (tier.title === info.title);
+            const isUnlocked = (info.currentExp >= reqExp);
+
+            let statusClass = isCurrent ? 'current' : (isUnlocked ? 'unlocked' : 'locked');
+            let badgeHtml = isCurrent ? `<span class="tier-badge-current">▶ 目前位置</span>` : (isUnlocked ? `<span style="color:#22c55e; font-size:11px; font-weight:bold;">✅ 已達成</span>` : `<span style="color:#64748b; font-size:11px;">🔒 ${Math.floor(tier.threshold * 100)}% 同步</span>`);
+
+            tierListEl.innerHTML += `
+                <div class="rank-tier-item ${statusClass}">
+                    <div>
+                        <div class="tier-name">${tier.title}</div>
+                        <div class="tier-req">${tier.desc}</div>
+                    </div>
+                    <div>${badgeHtml}</div>
+                </div>
+            `;
+        });
+
+        document.getElementById('rankGuideModal').style.display = 'flex';
+    }
+
+    function closeRankGuideModal(e) {
+        if (e && e.target !== document.getElementById('rankGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('rankGuideModal').style.display = 'none';
+    }
+
+    function getTodayKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getTodayLearnedWords() {
+        const today = getTodayKey();
+        const data = localStorage.getItem(`jp_learned_${today}`);
+        return data ? JSON.parse(data) : [];
+    }
+
+    function recordTodayLearnedWord(wordJp) {
+        const today = getTodayKey();
+        let list = getTodayLearnedWords();
+        if (!list.includes(wordJp)) {
+            list.push(wordJp);
+            localStorage.setItem(`jp_learned_${today}`, JSON.stringify(list));
+            if (currentUser) {
+                const obj = {};
+                obj[`progress.jp_learned_${today}`] = list;
+                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+            }
+        }
+    }
+
+    function getQuestSettings() {
+        const data = localStorage.getItem('jp_quest_settings');
+        return data ? JSON.parse(data) : { readTarget: 20, quizTarget: 10 };
+    }
+
+    function getTodayQuestProgress() {
+        const today = getTodayKey();
+        const data = localStorage.getItem(`jp_quest_daily_${today}`);
+        return data ? JSON.parse(data) : { readCount: 0, quizCount: 0, rewardClaimed: false };
+    }
+
+    function saveTodayQuestProgress(type) {
+        const today = getTodayKey();
+        const prog = getTodayQuestProgress();
+        const settings = getQuestSettings();
+
+        if (type === 'read') prog.readCount++;
+        if (type === 'quiz') prog.quizCount++;
+
+        if (!prog.rewardClaimed && prog.readCount >= settings.readTarget && prog.quizCount >= settings.quizTarget) {
+            prog.rewardClaimed = true;
+            addEXP(100);
+            playSuccessSound();
+            
+            let msg = '🎉 恭喜達成今日所有修煉委託！額外獲得 +100 EXP 🌟';
+            if (!currentUser) {
+                msg += '\n\n💡 溫馨提醒：登入 Google 帳號可永久保存你的等級與修煉進度喔！';
+            }
+            alert(msg);
+        }
+
+        localStorage.setItem(`jp_quest_daily_${today}`, JSON.stringify(prog));
+
+        if (currentUser) {
+            const obj = {};
+            obj[`progress.jp_quest_daily_${today}`] = prog;
+            db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+        }
+
+        renderQuestBoard();
+    }
+
+    function openQuestSettings() {
+        playClickSound();
+        const current = getQuestSettings();
+        document.getElementById('input-read-target').value = current.readTarget;
+        document.getElementById('input-quiz-target').value = current.quizTarget;
+        document.getElementById('questSettingsModal').style.display = 'flex';
+    }
+
+    function closeQuestSettingsModal(e) {
+        if (e && e.target !== document.getElementById('questSettingsModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('questSettingsModal').style.display = 'none';
+    }
+
+    function stepQuestInput(inputId, delta) {
+        playClickSound();
+        const input = document.getElementById(inputId);
+        let val = (parseInt(input.value, 10) || 5) + delta;
+        if (val < 1) val = 1;
+        input.value = val;
+    }
+
+    function setQuestInputValue(inputId, value) {
+        playClickSound();
+        document.getElementById(inputId).value = value;
+    }
+
+    function saveQuestSettingsFromModal() {
+        playClickSound();
+        const readVal = parseInt(document.getElementById('input-read-target').value, 10) || 20;
+        const quizVal = parseInt(document.getElementById('input-quiz-target').value, 10) || 10;
+
+        const targetObj = {
+            readTarget: Math.max(readVal, 1),
+            quizTarget: Math.max(quizVal, 1)
+        };
+        localStorage.setItem('jp_quest_settings', JSON.stringify(targetObj));
+
+        if (currentUser) {
+            db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_quest_settings: targetObj } }, { merge: true });
+        }
+        
+        document.getElementById('questSettingsModal').style.display = 'none';
+        renderQuestBoard();
+        loadSheetData(document.getElementById('sheetSelect').value);
+    }
+
+    function renderQuestBoard() {
+        const settings = getQuestSettings();
+        const todayProg = getTodayQuestProgress();
+        const dateEl = document.getElementById('quest-date-indicator');
+        if (dateEl) dateEl.textContent = `(${getTodayKey()})`;
+
+        const readPercent = Math.min(Math.floor((todayProg.readCount / settings.readTarget) * 100), 100);
+        const quizPercent = Math.min(Math.floor((todayProg.quizCount / settings.quizTarget) * 100), 100);
+
+        const readTextEl = document.getElementById('quest-read-text');
+        const readBarEl = document.getElementById('quest-read-bar');
+        if (readTextEl) readTextEl.textContent = `${todayProg.readCount} / ${settings.readTarget} (${readPercent}%) ${readPercent >= 100 ? '✅' : ''}`;
+        if (readBarEl) readBarEl.style.width = `${readPercent}%`;
+
+        const quizTextEl = document.getElementById('quest-quiz-text');
+        const quizBarEl = document.getElementById('quest-quiz-bar');
+        if (quizTextEl) quizTextEl.textContent = `${todayProg.quizCount} / ${settings.quizTarget} (${quizPercent}%) ${quizPercent >= 100 ? '✅' : ''}`;
+        if (quizBarEl) quizBarEl.style.width = `${quizPercent}%`;
+    }
+
+    function getProgress(wordJp) {
+        const key = `jp_progress_${wordJp}`;
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : { read: 0, quiz: 0 };
+    }
+    
+    function saveProgress(wordJp, type) {
+        const key = `jp_progress_${wordJp}`;
+        const progress = getProgress(wordJp);
+        const isFirstRead = (type === 'read' && progress.read === 0);
+
+        if (type === 'read') {
+            progress.read++;
+            recordTodayLearnedWord(wordJp);
+        }
+        if (type === 'quiz') progress.quiz++;
+        localStorage.setItem(key, JSON.stringify(progress));
+
+        if (isFirstRead) addEXP(10); 
+        if (type === 'quiz') addEXP(25);
+
+        saveTodayQuestProgress(type);
+
+        if (currentUser) {
+            const updateObj = {};
+            updateObj[`progress.${key}`] = progress;
+            db.collection('user_progress').doc(currentUser.uid).update(updateObj).catch(() => {
+                const fullObj = {};
+                fullObj[key] = progress;
+                db.collection('user_progress').doc(currentUser.uid).set({ progress: fullObj }, { merge: true });
+            });
+        }
+    }
+
+    function cleanTextForSpeech(text) {
+        if (!text) return '';
+        return text.replace(/[（\(][^）\)]*[）\)]/g, '').replace(/〜/g, '');
+    }
+
+    let globalTTSAudio = new Audio();
+
+    function speakWordDirectly(event, wordText) {
+        if (event) event.stopPropagation();
+        if (!wordText) return;
+        
+        playClickSound();
+
+        let text = cleanTextForSpeech(wordText).trim();
+        if (!text) return;
+
+        try {
+            globalTTSAudio.pause();
+            globalTTSAudio.currentTime = 0;
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        } catch(e) {}
+
+        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`;
+
+        globalTTSAudio.src = ttsUrl;
+        const playPromise = globalTTSAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ja-JP';
+                    utterance.rate = 0.95;
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+    }
+
+    function speakFrontCard(event) {
+        if (event) event.stopPropagation();
+        if (currentList.length === 0) return;
+        const current = currentList[currentIndex];
+        speakWordDirectly(event, current.jp);
+    }
+
+    function speakJP(event, elementId) {
+        if (event) event.stopPropagation();
+        let text = document.getElementById(elementId).textContent;
+        if (!text || text.includes('載入中') || text.includes('測驗完成') || text.includes('＿')) return;
+        speakWordDirectly(event, text);
+    }
+
+    function speakExampleJP(event, rawText) {
+        if (event) event.stopPropagation();
+        if (!rawText) return;
+        const firstLine = rawText.split('\n')[0] || rawText;
+        speakWordDirectly(event, firstLine);
+    }
+
+    function speakQuizPrompt(event) {
+        if (event) event.stopPropagation();
+        if (!currentCorrectAnswer) return;
+
+        playClickSound();
+        const questionType = currentCorrectAnswer.activeQuestionType;
+        if (questionType === 1) {
+            speakWordDirectly(event, currentCorrectAnswer.jp);
+        } else {
+            speakJP(event, 'quiz-jp');
+        }
+    }
+
+    function parseCSVText(text) {
+        let result = [];
+        let row = [];
+        let current = '';
+        let insideQuote = false;
+
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            let nextChar = text[i + 1];
+
+            if (char === '"') {
+                if (insideQuote && nextChar === '"') {
+                    current += '"';
+                    i++; 
+                } else {
+                    insideQuote = !insideQuote;
+                }
+            } else if (char === ',' && !insideQuote) {
+                row.push(current.trim());
+                current = '';
+            } else if ((char === '\n' || char === '\r') && !insideQuote) {
+                if (char === '\r' && nextChar === '\n') i++; 
+                row.push(current.trim());
+                result.push(row);
+                row = [];
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        if (current !== '' || row.length > 0) {
+            row.push(current.trim());
+            result.push(row);
+        }
+        return result;
+    }
+
+    function isValidWord(item) {
+        if (!item.jp || item.jp.trim() === '') return false;
+        if (item.isIntroCard) return true;
+        if (item.jp.length > 30) return false;
+        return true;
+    }
+
+    function getDailyRandomSeed() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth() + 1;
+        const d = now.getDate();
+        return y * 10000 + m * 100 + d;
+    }
+
+    function pseudoRandom(seed) {
+        const x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    // ⚡ 24 分類加載與導讀卡解析
     async function preloadAllCategories() {
         const selectElement = document.getElementById('sheetSelect');
         const now = new Date();
@@ -1769,6 +2578,8 @@
 
         allSearchableWords = [];
         sheetDataCache = {};
+
+        let hasLoadedFirstBatch = false;
 
         const promises = Object.entries(SHEETS_CONFIG).map(async ([sheetKey, url]) => {
             const optElement = Array.from(selectElement.options).find(o => o.value === sheetKey);
@@ -1851,9 +2662,8 @@
 
                     sheetDataCache[sheetKey] = sheetWords;
 
-                    // 💡 關鍵：任何第一個分頁完成時，若畫面仍在等待，即刻更新全範圍並渲染！
-                    if (currentList.length === 0 && sheetWords.length > 0) {
-                        sheetDataCache['all'] = [...allSearchableWords];
+                    if (!hasLoadedFirstBatch && sheetWords.length > 0) {
+                        hasLoadedFirstBatch = true;
                         loadSheetData(document.getElementById('sheetSelect').value);
                     }
                 }
@@ -1866,51 +2676,176 @@
         pickDailyFiveWords(dateString);
         updateHUDLevel();
 
-        // 全部下載完畢，確保當前分頁卡片刷新出內容
         loadSheetData(document.getElementById('sheetSelect').value);
         checkSurpriseBossTrigger();
     }
 
-    function loadSheetData(urlKey, targetWordJp = null) {
-        let sourceData = [];
-
-        if (urlKey === 'all') {
-            sourceData = sheetDataCache['all'] || allSearchableWords || [];
-        } else {
-            sourceData = sheetDataCache[urlKey] || [];
-        }
-
-        if (sourceData.length === 0) {
-            document.getElementById('card-sub-front').textContent = '資料載入中...';
-            document.getElementById('card-main-front').textContent = '';
+    function checkSurpriseBossTrigger() {
+        const lastTrigger = localStorage.getItem('jp_surprise_last_date');
+        const today = getTodayKey();
+        
+        if (!lastTrigger) {
+            localStorage.setItem('jp_surprise_last_date', today);
             return;
         }
 
-        const introCard = sourceData.find(w => w.isIntroCard);
-        let normalWords = sourceData.filter(w => !w.isIntroCard);
-        normalWords.sort(() => Math.random() - 0.5);
+        const d1 = new Date(lastTrigger);
+        const d2 = new Date(today);
+        const diffDays = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
 
-        fullSourceList = introCard ? [introCard, ...normalWords] : [...normalWords];
+        if (diffDays >= 3) {
+            setTimeout(() => {
+                triggerSurpriseBossQuest();
+            }, 1200);
+        }
+    }
 
-        const settings = getQuestSettings();
-        const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
+    function triggerSurpriseBossQuest() {
+        if (allSearchableWords.length < 4) return;
 
-        if (fullSourceList.length > targetLimit) {
-            currentList = fullSourceList.slice(0, targetLimit);
-            document.getElementById('btn-unlock-more-cards').style.display = 'block';
-        } else {
-            currentList = [...fullSourceList];
-            document.getElementById('btn-unlock-more-cards').style.display = 'none';
+        let weakCandidates = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k.startsWith('jp_progress_')) {
+                const w = k.replace('jp_progress_', '');
+                const p = JSON.parse(localStorage.getItem(k));
+                if (p.read > 0 && p.quiz === 0 && globalWordDataMap[w] && !globalWordDataMap[w].isIntroCard) {
+                    weakCandidates.push(globalWordDataMap[w]);
+                }
+            }
         }
 
-        if (targetWordJp) {
-            const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
-            currentIndex = (foundIndex !== -1) ? foundIndex : 0;
+        const grammarTrapKeys = ['sheet2', 'sheet3', 'sheet10', 'sheet11', 'sheet13', 'sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
+        let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey) && !item.isIntroCard);
+
+        let isWeakness = false;
+        if (weakCandidates.length > 0 && Math.random() > 0.4) {
+            currentBossWord = weakCandidates[Math.floor(Math.random() * weakCandidates.length)];
+            isWeakness = true;
+        } else if (grammarCandidates.length > 0) {
+            currentBossWord = grammarCandidates[Math.floor(Math.random() * grammarCandidates.length)];
+            isWeakness = false;
         } else {
-            currentIndex = 0;
+            const pool = allSearchableWords.filter(w => !w.isIntroCard);
+            currentBossWord = pool[Math.floor(Math.random() * pool.length)];
         }
-        
-        initMode(targetWordJp ? true : false);
+
+        document.getElementById('boss-quest-badge').textContent = isWeakness ? '🎯 弱點狙擊（遺忘盲區狙擊）' : '⚔️ 文法魔王陷阱（句型助詞特訓）';
+
+        const rawExample = getQuizExampleText(currentBossWord);
+        const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
+        let questionText = '';
+
+        if (exampleLine1 !== '') {
+            let cloze = exampleLine1;
+            if (currentBossWord.kanji && currentBossWord.kanji.trim() !== '') {
+                cloze = cloze.split(currentBossWord.kanji).join('＿＿＿');
+            }
+            if (currentBossWord.jp && currentBossWord.jp.trim() !== '') {
+                cloze = cloze.split(currentBossWord.jp).join('＿＿＿');
+            }
+            questionText = `【${currentBossWord.catName}】\n${cloze}`;
+        } else {
+            questionText = `【${currentBossWord.catName}】\n${currentBossWord.jp}`;
+        }
+
+        document.getElementById('boss-question-text').textContent = questionText;
+
+        let wrongCandidates = allSearchableWords.filter(w => w.jp !== currentBossWord.jp && !w.isIntroCard).sort(() => Math.random() - 0.5).slice(0, 3);
+        let options = [currentBossWord].concat(wrongCandidates).sort(() => Math.random() - 0.5);
+
+        const optionsContainer = document.getElementById('boss-quiz-options');
+        optionsContainer.innerHTML = '';
+        selectedBossOption = null;
+
+        options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-btn';
+            const optText = (exampleLine1 !== '') ? opt.jp : getQuizZhText(opt);
+            btn.innerHTML = `<span>[${idx + 1}] ${optText}</span>`;
+            btn.onclick = () => selectBossOption(btn, opt);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('boss-quiz-feedback').textContent = '';
+        document.getElementById('boss-quiz-feedback').className = 'quiz-feedback';
+        document.getElementById('btn-boss-submit').style.display = 'none';
+        document.getElementById('btn-boss-close').style.display = 'none';
+        document.getElementById('btn-boss-flee').style.display = 'block';
+
+        playWrongSound();
+        document.getElementById('surpriseBossModal').style.display = 'flex';
+    }
+
+    function selectBossOption(btn, opt) {
+        playClickSound();
+        const allBtns = document.querySelectorAll('#boss-quiz-options .quiz-btn');
+        allBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedBossOption = opt;
+        document.getElementById('btn-boss-submit').style.display = 'block';
+    }
+
+    function submitBossAnswer() {
+        if (!selectedBossOption) return;
+        const allBtns = document.querySelectorAll('#boss-quiz-options .quiz-btn');
+        allBtns.forEach(b => {
+            b.disabled = true;
+            b.classList.remove('selected');
+        });
+
+        document.getElementById('btn-boss-submit').style.display = 'none';
+        document.getElementById('btn-boss-flee').style.display = 'none';
+        const feedbackEl = document.getElementById('boss-quiz-feedback');
+
+        if (selectedBossOption.jp === currentBossWord.jp) {
+            playSuccessSound();
+            addEXP(200);
+            feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
+            feedbackEl.className = 'quiz-feedback success';
+            localStorage.setItem('jp_surprise_last_date', getTodayKey());
+            if (currentUser) {
+                const obj = {};
+                obj['progress.jp_surprise_last_date'] = getTodayKey();
+                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+            }
+        } else {
+            playWrongSound();
+            feedbackEl.textContent = `💀 挑戰失敗！正解是：${currentBossWord.jp} (${getQuizZhText(currentBossWord)})`;
+            feedbackEl.className = 'quiz-feedback error';
+        }
+
+        allBtns.forEach(b => {
+            if (b.textContent.includes(currentBossWord.jp) || b.textContent.includes(getQuizZhText(currentBossWord))) {
+                b.classList.add('correct');
+            }
+        });
+
+        document.getElementById('btn-boss-close').style.display = 'block';
+    }
+
+    function closeSurpriseModal() {
+        playClickSound();
+        document.getElementById('surpriseBossModal').style.display = 'none';
+    }
+
+    function fleeSurpriseModal() {
+        playClickSound();
+        document.getElementById('surpriseBossModal').style.display = 'none';
+    }
+
+    function pickDailyFiveWords(dateString) {
+        let seed = getDailyRandomSeed();
+        const pool = allSearchableWords.filter(w => !w.isIntroCard);
+        const selectedDailyWords = [];
+
+        for (let i = 0; i < 5 && pool.length > 0; i++) {
+            const randIndex = Math.floor(pseudoRandom(seed + i * 17) * pool.length);
+            selectedDailyWords.push(pool[randIndex]);
+            pool.splice(randIndex, 1);
+        }
+
+        renderMarquee(selectedDailyWords, dateString);
     }
 
     function handleSearch(inputText) {
@@ -1924,6 +2859,17 @@
         }
 
         const tokens = rawInput.toLowerCase().split(/\s+/).filter(Boolean);
+
+        let expandedTargets = [];
+        tokens.forEach(token => {
+            SEMANTIC_SYNONYMS.forEach(syn => {
+                if (syn.triggers.some(t => token.includes(t) || t.includes(token))) {
+                    expandedTargets.push(...syn.targets);
+                }
+            });
+        });
+        expandedTargets = [...new Set(expandedTargets)];
+
         let scoredMatches = [];
 
         allSearchableWords.forEach(item => {
@@ -1941,6 +2887,12 @@
                 else if (fullContent.includes(tok)) score += 15;
             });
 
+            expandedTargets.forEach(tgt => {
+                if (jp.includes(tgt) || kanji.includes(tgt) || fullContent.includes(tgt)) {
+                    score += 30;
+                }
+            });
+
             if (score > 0) {
                 scoredMatches.push({ item, score });
             }
@@ -1949,7 +2901,7 @@
         scoredMatches.sort((a, b) => b.score - a.score);
 
         if (scoredMatches.length === 0) {
-            dropdown.innerHTML = `<div style="padding: 14px; font-size: 13px; color: #64748b; text-align: center;">查無符合「${rawInput}」的項目 🍃</div>`;
+            dropdown.innerHTML = `<div style="padding: 14px; font-size: 13px; color: #64748b; text-align: center;">查無符合「${rawInput}」的項目 🍃<br><span style="font-size:11px; color:#94a3b8;">可嘗試輸入近義詞或假名喔！</span></div>`;
             dropdown.style.display = 'block';
             return;
         }
@@ -1989,28 +2941,12 @@
         jumpToCategory(sheetKey, wordJp);
     }
 
-    function jumpToCategory(sheetKey, targetWordJp = null) {
-        playPageFlipSound();
-        setMode('review');
-        const select = document.getElementById('sheetSelect');
-        select.value = sheetKey;
-        document.getElementById('flashcard').classList.remove('is-flipped');
-        loadSheetData(sheetKey, targetWordJp);
-    }
-
-    function pickDailyFiveWords(dateString) {
-        let seed = getDailyRandomSeed();
-        const pool = allSearchableWords.filter(w => !w.isIntroCard);
-        const selectedDailyWords = [];
-
-        for (let i = 0; i < 5 && pool.length > 0; i++) {
-            const randIndex = Math.floor(pseudoRandom(seed + i * 17) * pool.length);
-            selectedDailyWords.push(pool[randIndex]);
-            pool.splice(randIndex, 1);
+    document.addEventListener('click', (e) => {
+        const searchBox = document.querySelector('.search-container');
+        if (searchBox && !searchBox.contains(e.target)) {
+            document.getElementById('searchResultsDropdown').style.display = 'none';
         }
-
-        renderMarquee(selectedDailyWords, dateString);
-    }
+    });
 
     function renderMarquee(items, dateString) {
         const marqueeEl = document.getElementById('marquee-content');
@@ -2019,7 +2955,11 @@
         const itemsHtml = items.map((item, idx) => {
             let display = item.jp;
             if (item.kanji && item.kanji !== item.jp) {
-                display = `${item.kanji} (${item.jp})`;
+                if (/[a-zA-Z]/.test(item.kanji)) {
+                    display = `${item.jp} (${item.kanji})`;
+                } else {
+                    display = `${item.kanji} (${item.jp})`;
+                }
             }
             const zhText = getWordZhText(item);
             const safeJp = item.jp.replace(/'/g, "\\'");
@@ -2029,336 +2969,356 @@
         marqueeEl.innerHTML = `${itemsHtml} &nbsp;&nbsp;&nbsp;&nbsp; ${itemsHtml}`;
     }
 
-    // --- 2. 測驗模式 ---
-    function checkQuizStartFlow() {
-        if (fullSourceList.length === 0) {
-            alert('⏳ 單字庫載入中，請稍候！');
-            setMode('review');
-            return;
-        }
+    function jumpToCategory(sheetKey, targetWordJp = null) {
+        playPageFlipSound();
+        setMode('review');
+        const select = document.getElementById('sheetSelect');
+        select.value = sheetKey;
+        document.getElementById('flashcard').classList.remove('is-flipped');
+        loadSheetData(sheetKey, targetWordJp);
+    }
 
-        const validQuizPool = fullSourceList.filter(w => !w.isIntroCard);
-        if (validQuizPool.length < 4) {
-            alert('這個分頁的單字少於 4 個，無法產生測驗喔！');
-            setMode('review');
-            return;
-        }
+    function loadSheetData(urlKey, targetWordJp = null) {
+        let sourceData = [];
 
-        const learnedKeys = getTodayLearnedWords();
-        const guideBox = document.getElementById('quiz-guide-box');
-        const mainBox = document.getElementById('quiz-main-container');
-
-        if (learnedKeys.length === 0) {
-            guideBox.style.display = 'flex';
-            mainBox.style.display = 'none';
+        if (urlKey === 'all') {
+            sourceData = sheetDataCache['all'] || allSearchableWords || [];
         } else {
-            guideBox.style.display = 'none';
-            mainBox.style.display = 'block';
-            startQuiz(false);
+            sourceData = sheetDataCache[urlKey] || [];
         }
-    }
 
-    function startWildQuiz() {
-        playClickSound();
-        document.getElementById('quiz-guide-box').style.display = 'none';
-        document.getElementById('quiz-main-container').style.display = 'block';
-        startQuiz(false, true);
-    }
+        if (sourceData.length === 0) {
+            document.getElementById('card-sub-front').textContent = '資料加速載入中...';
+            document.getElementById('card-main-front').textContent = '';
+            return;
+        }
 
-    function startQuiz(infiniteMode = false, forceWild = false) {
-        const pool = fullSourceList.filter(w => !w.isIntroCard);
-        if (pool.length < 4) return;
+        const introCard = sourceData.find(w => w.isIntroCard);
+        let normalWords = sourceData.filter(w => !w.isIntroCard);
+        normalWords.sort(() => Math.random() - 0.5);
+
+        fullSourceList = introCard ? [introCard, ...normalWords] : [...normalWords];
 
         const settings = getQuestSettings();
-        const targetCount = infiniteMode ? pool.length : settings.quizTarget;
+        const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
 
-        let selectedQuestions = [];
-
-        if (forceWild || infiniteMode) {
-            selectedQuestions = [...pool].sort(() => Math.random() - 0.5);
+        if (fullSourceList.length > targetLimit) {
+            currentList = fullSourceList.slice(0, targetLimit);
+            document.getElementById('btn-unlock-more-cards').style.display = 'block';
         } else {
-            const learnedKeys = getTodayLearnedWords();
-            const learnedObjs = pool.filter(item => learnedKeys.includes(item.jp));
-            const shuffledLearned = [...learnedObjs].sort(() => Math.random() - 0.5);
-
-            if (shuffledLearned.length >= targetCount) {
-                selectedQuestions = shuffledLearned.slice(0, targetCount);
-            } else {
-                selectedQuestions = [...shuffledLearned];
-                const remainCount = targetCount - selectedQuestions.length;
-                const poolWithoutLearned = pool.filter(item => !learnedKeys.includes(item.jp));
-                poolWithoutLearned.sort(() => Math.random() - 0.5);
-                selectedQuestions = selectedQuestions.concat(poolWithoutLearned.slice(0, remainCount));
-            }
+            currentList = [...fullSourceList];
+            document.getElementById('btn-unlock-more-cards').style.display = 'none';
         }
 
-        quizList = selectedQuestions.slice(0, targetCount);
-        quizIndex = 0;
-        document.getElementById('btn-restart-quiz-round').style.display = 'none';
-        document.getElementById('btn-infinite-quiz').style.display = 'none';
-        renderQuizQuestion();
-    }
-
-    function renderQuizQuestion() {
-        if (quizIndex >= quizList.length) {
-            document.getElementById('quiz-jp').textContent = '今日回合完成！🎉✨';
-            document.getElementById('quiz-type').textContent = 'STAGE CLEAR!';
-            document.getElementById('quiz-options').innerHTML = '';
-            document.getElementById('quiz-feedback').textContent = '已完成此輪練習！';
-            document.getElementById('quiz-feedback').className = 'quiz-feedback success';
-            document.getElementById('btn-submit-answer').style.display = 'none';
-            document.getElementById('btn-next-quiz').style.display = 'none';
-            document.getElementById('quiz-score').textContent = `全部完成 (${quizList.length} 題)`;
-            document.getElementById('btn-restart-quiz-round').style.display = 'block';
-            document.getElementById('btn-infinite-quiz').style.display = 'block';
-            return;
-        }
-
-        const currentWord = quizList[quizIndex];
-        currentCorrectAnswer = currentWord;
-        currentCorrectAnswer.hasQuizzedThisTime = false;
-        selectedOptionData = null; 
-        
-        const rawExample = getQuizExampleText(currentWord);
-        const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
-        const hasExample = exampleLine1 !== '';
-        
-        let questionType = Math.floor(Math.random() * (hasExample ? 3 : 2));
-        const typeSelect = document.getElementById('sheetSelect');
-        const defaultType = typeSelect.value === 'all' ? '綜合大亂鬥' : typeSelect.selectedOptions[0].text;
-        
-        let questionText = '';
-        let quizBadge = '';
-        
-        if (questionType === 0) {
-            quizBadge = '📖 讀音測意';
-            questionText = currentWord.jp; 
-        } else if (questionType === 1) {
-            quizBadge = '🔄 語意反查';
-            questionText = getQuizZhText(currentWord); 
+        if (targetWordJp) {
+            const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
+            currentIndex = (foundIndex !== -1) ? foundIndex : 0;
         } else {
-            quizBadge = '✍️ 克漏字';
-            let cloze = exampleLine1;
-            if (currentWord.kanji && currentWord.kanji.trim() !== '') {
-                cloze = cloze.split(currentWord.kanji).join('＿＿＿');
-            }
-            if (currentWord.jp && currentWord.jp.trim() !== '') {
-                cloze = cloze.split(currentWord.jp).join('＿＿＿');
-            }
-            questionText = cloze;
+            currentIndex = 0;
         }
-
-        currentWord.activeQuestionType = questionType;
-
-        document.getElementById('quiz-type').textContent = `${quizBadge} (${defaultType})`;
-        document.getElementById('quiz-jp').textContent = questionText;
-        document.getElementById('quiz-score').textContent = `STAGE ${quizIndex + 1} / ${quizList.length}`;
         
-        document.getElementById('quiz-feedback').textContent = '';
-        document.getElementById('quiz-feedback').className = 'quiz-feedback';
-        document.getElementById('btn-submit-answer').style.display = 'none'; 
-        document.getElementById('btn-next-quiz').style.display = 'none';
+        initMode(targetWordJp ? true : false);
+    }
 
-        const pool = fullSourceList.filter(w => !w.isIntroCard);
-        let wrongCandidates = pool.filter(word => {
-            if (word.jp === currentWord.jp) return false;
-            let textToShow = (questionType === 0) ? getQuizZhText(word) : word.jp;
-            return textToShow && textToShow.trim() !== '';
-        });
+    function unlockFullCards() {
+        playClickSound();
+        currentList = [...fullSourceList];
+        document.getElementById('btn-unlock-more-cards').style.display = 'none';
+        updateReviewUI();
+    }
+
+    function changeSheet() {
+        playClickSound();
+        const selected = document.getElementById('sheetSelect').value;
+        document.getElementById('flashcard').classList.remove('is-flipped');
+        loadSheetData(selected);
+    }
+
+    function setMode(mode) {
+        playClickSound();
+        currentMode = mode;
+        document.getElementById('mode-review').classList.toggle('active', mode === 'review');
+        document.getElementById('mode-quiz').classList.toggle('active', mode === 'quiz');
+        document.getElementById('mode-kana').classList.toggle('active', mode === 'kana');
+        document.getElementById('mode-stats').classList.toggle('active', mode === 'stats');
         
-        wrongCandidates.sort(() => Math.random() - 0.5);
-        let options = [currentWord].concat(wrongCandidates.slice(0, 3)); 
-        options.sort(() => Math.random() - 0.5); 
+        document.getElementById('review-section').style.display = (mode === 'review') ? 'block' : 'none';
+        document.getElementById('quiz-section').style.display = (mode === 'quiz') ? 'block' : 'none';
+        document.getElementById('kana-section').style.display = (mode === 'kana') ? 'block' : 'none';
+        document.getElementById('stats-section').style.display = (mode === 'stats') ? 'block' : 'none';
 
-        const optionsContainer = document.getElementById('quiz-options');
-        optionsContainer.innerHTML = '';
-        
-        options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'quiz-btn';
-            
-            let optMainText = '';
-            let optSubText = getQuizZhText(opt);
-            
-            if (questionType === 0) {
-                optMainText = getQuizZhText(opt); 
-                optSubText = `${opt.jp} (${getJapaneseText(opt)})`; 
-            } else if (questionType === 2) {
-                optMainText = opt.jp; 
-            } else {
-                const kanjiPart = opt.kanji && opt.kanji !== opt.jp ? ` (${opt.kanji})` : '';
-                optMainText = `${opt.jp}${kanjiPart}`;
+        if (mode === 'review') {
+            document.getElementById('review-section').style.display = 'block';
+            updateReviewUI();
+        } else if (mode === 'quiz') {
+            document.getElementById('quiz-section').style.display = 'block';
+            checkQuizStartFlow();
+        } else if (mode === 'kana') {
+            initKanaSection();
+        } else if (mode === 'stats') {
+            renderStatsDashboard();
+        }
+    }
+
+    function initMode(preserveIndex = false) {
+        if (currentMode === 'review') {
+            if (!preserveIndex) currentIndex = 0;
+            updateReviewUI();
+        } else if (currentMode === 'quiz') {
+            checkQuizStartFlow();
+        } else if (currentMode === 'kana') {
+            initKanaSection();
+        } else if (currentMode === 'stats') {
+            renderStatsDashboard();
+        }
+    }
+
+    // 🐣 五十音與手寫板核心模組
+    function initKanaSection() {
+        switchKanaGroup(currentKanaTab);
+        setKanaView(currentKanaView, false);
+        setupCanvasEvents();
+    }
+
+    function setKanaView(view, withSound = true) {
+        const normalizedView = (view === 'writing') ? 'writing' : 'grid';
+        currentKanaView = normalizedView;
+
+        if (withSound) playClickSound();
+
+        const gridView = document.getElementById('kana-grid-view');
+        const writingView = document.getElementById('kana-writing-view');
+        const gridBtn = document.getElementById('kana-view-grid-btn');
+        const writingBtn = document.getElementById('kana-view-writing-btn');
+
+        if (!gridView || !writingView || !gridBtn || !writingBtn) return;
+
+        const isGrid = normalizedView === 'grid';
+
+        gridView.hidden = !isGrid;
+        writingView.hidden = isGrid;
+
+        gridBtn.classList.toggle('active', isGrid);
+        writingBtn.classList.toggle('active', !isGrid);
+        gridBtn.setAttribute('aria-selected', isGrid ? 'true' : 'false');
+        writingBtn.setAttribute('aria-selected', !isGrid ? 'true' : 'false');
+
+        // Canvas 從 hidden 狀態切回可見時重新畫一次，避免部分瀏覽器顯示空白。
+        if (!isGrid && currentWritingList.length > 0) {
+            const item = currentWritingList[currentWritingIndex] || currentWritingList[0];
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(item, isKataMode);
+        }
+    }
+
+    function switchKanaGroup(tabKey) {
+        currentKanaTab = tabKey;
+        const allTabs = document.querySelectorAll('.btn-kana-tab');
+        allTabs.forEach(tab => tab.classList.remove('active'));
+
+        const targetBtn = Array.from(allTabs).find(b => b.getAttribute('onclick').includes(tabKey));
+        if (targetBtn) targetBtn.classList.add('active');
+
+        const gridContainer = document.getElementById('kana-grid-container');
+        gridContainer.innerHTML = '';
+
+        let list = KANA_DATA[tabKey] || KANA_DATA['seion-hira'];
+        if (tabKey === 'seion-kata') {
+            list = KANA_DATA['seion-hira']; // 片假名共用清音架構
+        }
+
+        // 過濾出可練習清單
+        currentWritingList = list.filter(Boolean);
+        currentWritingIndex = 0;
+
+        list.forEach((item, idx) => {
+            if (!item) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'kana-item kana-empty';
+                gridContainer.appendChild(emptyDiv);
+                return;
             }
-            
-            btn.innerHTML = `<span>[${index + 1}] ${optMainText}</span><span class="option-subtext">💡 意思：${optSubText}</span>`;
-            btn.onclick = () => selectOption(btn, opt);
-            optionsContainer.appendChild(btn);
-        });
-    }
 
-    function selectOption(clickedBtn, selectedWord) {
-        playClickSound();
-        const allBtns = document.querySelectorAll('.quiz-btn');
-        allBtns.forEach(btn => btn.classList.remove('selected'));
-        clickedBtn.classList.add('selected');
-        selectedOptionData = selectedWord;
-        document.getElementById('btn-submit-answer').style.display = 'block';
-    }
+            const isKataMode = (tabKey === 'seion-kata');
+            const mainChar = isKataMode ? item.kata : item.hira;
+            const subChar = isKataMode ? item.hira : item.kata;
 
-    function submitAnswer() {
-        if (!selectedOptionData) return;
-        const allBtns = document.querySelectorAll('.quiz-btn');
-        const questionType = currentCorrectAnswer.activeQuestionType;
+            const div = document.createElement('div');
+            div.className = `kana-item ${idx === 0 ? 'active' : ''}`;
+            div.onclick = () => selectKanaItem(item, div, isKataMode);
 
-        allBtns.forEach(btn => {
-            btn.disabled = true;
-            btn.classList.remove('selected');
-            const subtext = btn.querySelector('.option-subtext');
-            if (subtext) subtext.style.display = 'block';
+            div.innerHTML = `
+                <span class="kana-char">${mainChar}</span>
+                <span class="kana-romaji">${item.romaji}</span>
+            `;
+            gridContainer.appendChild(div);
         });
 
-        document.getElementById('btn-submit-answer').style.display = 'none';
-        const feedbackEl = document.getElementById('quiz-feedback');
-        const nextBtn = document.getElementById('btn-next-quiz');
-
-        let clickedBtn = null;
-        allBtns.forEach(btn => {
-            let checkText = (questionType === 0) ? getQuizZhText(selectedOptionData) : selectedOptionData.jp;
-            if (btn.textContent.includes(checkText)) clickedBtn = btn;
-        });
-
-        saveTodayQuestProgress('quiz');
-
-        if (selectedOptionData.jp === currentCorrectAnswer.jp) {
-            playSuccessSound();
-            if (clickedBtn) clickedBtn.classList.add('correct');
-            feedbackEl.textContent = '💖 答對了！+25 EXP';
-            feedbackEl.classList.add('success');
-            
-            if (!currentCorrectAnswer.hasQuizzedThisTime) {
-                saveProgress(currentCorrectAnswer.jp, 'quiz');
-                currentCorrectAnswer.hasQuizzedThisTime = true;
-            }
-            speakWordDirectly(null, currentCorrectAnswer.jp);
-        } else {
-            playWrongSound();
-            if (clickedBtn) clickedBtn.classList.add('wrong');
-            
-            let correctAnswerText = (questionType === 0) ? getQuizZhText(currentCorrectAnswer) : currentCorrectAnswer.jp;
-            feedbackEl.textContent = `💀 答錯囉！正解：${correctAnswerText}`;
-            feedbackEl.classList.add('error');
-            
-            allBtns.forEach(btn => {
-                if (btn.textContent.includes(currentCorrectAnswer.jp)) {
-                    btn.classList.add('correct');
-                }
-            });
-        }
-        nextBtn.style.display = 'block'; 
-    }
-
-    function nextQuiz() {
-        playClickSound();
-        quizIndex++;
-        renderQuizQuestion();
-    }
-
-    function checkSurpriseBossTrigger() {
-        const lastTrigger = localStorage.getItem('jp_surprise_last_date');
-        const today = getTodayKey();
-        if (!lastTrigger) {
-            localStorage.setItem('jp_surprise_last_date', today);
-            return;
-        }
-
-        const d1 = new Date(lastTrigger);
-        const d2 = new Date(today);
-        const diffDays = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
-        if (diffDays >= 3) {
-            setTimeout(() => { triggerSurpriseBossQuest(); }, 1200);
+        if (currentWritingList.length > 0) {
+            loadKanaToWritingBoard(currentWritingList[0], tabKey === 'seion-kata');
         }
     }
 
-    function triggerSurpriseBossQuest() {
-        if (allSearchableWords.length < 4) return;
-        const pool = allSearchableWords.filter(w => !w.isIntroCard);
-        currentBossWord = pool[Math.floor(Math.random() * pool.length)];
-
-        document.getElementById('boss-quest-badge').textContent = '⚔️ 文法魔王陷阱（句型助詞特訓）';
-        document.getElementById('boss-question-text').textContent = `【${currentBossWord.catName}】\n${currentBossWord.jp}`;
-
-        let wrongCandidates = pool.filter(w => w.jp !== currentBossWord.jp).sort(() => Math.random() - 0.5).slice(0, 3);
-        let options = [currentBossWord].concat(wrongCandidates).sort(() => Math.random() - 0.5);
-
-        const optionsContainer = document.getElementById('boss-quiz-options');
-        optionsContainer.innerHTML = '';
-        selectedBossOption = null;
-
-        options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'quiz-btn';
-            btn.innerHTML = `<span>[${idx + 1}] ${getQuizZhText(opt)}</span>`;
-            btn.onclick = () => selectBossOption(btn, opt);
-            optionsContainer.appendChild(btn);
-        });
-
-        document.getElementById('boss-quiz-feedback').textContent = '';
-        document.getElementById('boss-quiz-feedback').className = 'quiz-feedback';
-        document.getElementById('btn-boss-submit').style.display = 'none';
-        document.getElementById('btn-boss-close').style.display = 'none';
-        document.getElementById('btn-boss-flee').style.display = 'block';
-
-        playWrongSound();
-        document.getElementById('surpriseBossModal').style.display = 'flex';
-    }
-
-    function selectBossOption(btn, opt) {
+    function selectKanaItem(item, element, isKataMode) {
         playClickSound();
-        const allBtns = document.querySelectorAll('#boss-quiz-options .quiz-btn');
-        allBtns.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedBossOption = opt;
-        document.getElementById('btn-boss-submit').style.display = 'block';
+        const allItems = document.querySelectorAll('.kana-item');
+        allItems.forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        const foundIdx = currentWritingList.findIndex(k => k.hira === item.hira);
+        if (foundIdx !== -1) currentWritingIndex = foundIdx;
+
+        loadKanaToWritingBoard(item, isKataMode);
+        speakWordDirectly(null, item.hira);
     }
 
-    function submitBossAnswer() {
-        if (!selectedBossOption) return;
-        const allBtns = document.querySelectorAll('#boss-quiz-options .quiz-btn');
-        allBtns.forEach(b => {
-            b.disabled = true;
-            b.classList.remove('selected');
-        });
+    function loadKanaToWritingBoard(item, isKataMode) {
+        if (!item) return;
+        const char = isKataMode ? item.kata : item.hira;
+        document.getElementById('current-writing-label').textContent = `${char} (${item.romaji})`;
+        drawGhostKanaOnCanvas(char);
+    }
 
-        document.getElementById('btn-boss-submit').style.display = 'none';
-        document.getElementById('btn-boss-flee').style.display = 'none';
-        const feedbackEl = document.getElementById('boss-quiz-feedback');
+    function drawGhostKanaOnCanvas(char) {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (selectedBossOption.jp === currentBossWord.jp) {
-            playSuccessSound();
-            addEXP(200);
-            feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP！🔥';
-            feedbackEl.className = 'quiz-feedback success';
-            localStorage.setItem('jp_surprise_last_date', getTodayKey());
-        } else {
-            playWrongSound();
-            feedbackEl.textContent = `💀 挑戰失敗！正解是：${currentBossWord.jp} (${getQuizZhText(currentBossWord)})`;
-            feedbackEl.className = 'quiz-feedback error';
+        // 1. 繪製田字格輔助線
+        ctx.save();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.moveTo(0, canvas.height / 2);
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // 2. 繪製淺色假名輪廓導引字
+        ctx.save();
+        ctx.font = 'bold 150px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 10);
+        ctx.restore();
+    }
+
+    function clearStrokeCanvas() {
+        playClickSound();
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        if (item) {
+            const char = isKataMode ? item.kata : item.hira;
+            drawGhostKanaOnCanvas(char);
+        }
+    }
+
+    function nextWritingKana() {
+        playClickSound();
+        if (currentWritingIndex < currentWritingList.length - 1) {
+            currentWritingIndex++;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function prevWritingKana() {
+        playClickSound();
+        if (currentWritingIndex > 0) {
+            currentWritingIndex--;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function speakCurrentWritingKana() {
+        const item = currentWritingList[currentWritingIndex];
+        if (item) speakWordDirectly(null, item.hira);
+    }
+
+    function setupCanvasEvents() {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas || canvas.dataset.hasEvents) return;
+        canvas.dataset.hasEvents = 'true';
+
+        const ctx = canvas.getContext('2d');
+
+        function startDraw(x, y) {
+            isDrawing = true;
+            lastX = x;
+            lastY = y;
         }
 
-        document.getElementById('btn-boss-close').style.display = 'block';
+        function draw(x, y) {
+            if (!isDrawing) return;
+            ctx.save();
+            ctx.strokeStyle = '#ec4899';
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.restore();
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
+        });
+        window.addEventListener('mouseup', stopDraw);
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', stopDraw);
     }
 
-    function closeSurpriseModal() {
-        playClickSound();
-        document.getElementById('surpriseBossModal').style.display = 'none';
+    function getWordZhText(wordObj) {
+        if (!wordObj || !wordObj.rawHeaders) return '';
+        const idx = wordObj.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
+        if (idx !== -1 && wordObj.rawCols[idx]) return wordObj.rawCols[idx];
+        return wordObj.rawCols[4] || wordObj.rawCols[2] || '';
     }
 
-    function fleeSurpriseModal() {
-        playClickSound();
-        document.getElementById('surpriseBossModal').style.display = 'none';
-    }
-
-    // --- 3. 學習進度儀表板 ---
     function renderStatsDashboard() {
         renderQuestBoard();
         const gridContainer = document.getElementById('stats-category-grid');
@@ -2430,7 +3390,7 @@
                 const zhText = getWordZhText(item.wordObj);
                 let kanjiText = item.wordJp;
                 if (item.wordObj && item.wordObj.kanji && item.wordObj.kanji !== item.wordJp) {
-                    kanjiText = `${item.wordObj.kanji} (${item.wordJp})`;
+                    kanjiText = /[a-zA-Z]/.test(item.wordObj.kanji) ? `${item.wordJp} (${item.wordObj.kanji})` : `${item.wordObj.kanji} (${item.wordJp})`;
                 }
                 const safeWordJp = item.wordJp.replace(/'/g, "\\'");
 
@@ -2477,6 +3437,8 @@
             const arrow = groupEl.querySelector('.category-header span:last-child');
             if (arrow) arrow.textContent = '▲';
             groupEl.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert(`「${catName}」目前還沒有任何學習記錄喔！`);
         }
     }
 
@@ -2499,120 +3461,619 @@
         }
     }
 
-    // --- 4. Firebase 同步與帳號功能 ---
-    function toggleAuth() {
-        playClickSound();
-        if (!auth) return;
-        if (currentUser) {
-            auth.signOut();
+    function updateReviewUI() {
+        if (currentList.length === 0) return;
+        const current = currentList[currentIndex];
+        current.hasReadThisTime = false;
+        
+        const progress = getProgress(current.jp);
+        document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+        
+        const fixedCounter = document.getElementById('card-counter-fixed');
+        const hasIntro = currentList.some(w => w.isIntroCard);
+
+        if (current.isIntroCard) {
+            fixedCounter.textContent = '💡 觀念導讀';
+            fixedCounter.classList.add('intro-mode');
         } else {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(err => {
-                console.error(err);
-                alert('登入失敗，請確認是否已在 Firebase 授權 candlekang.github.io 網域！');
-            });
+            const actualIndex = hasIntro ? currentIndex : currentIndex + 1;
+            const actualTotal = hasIntro ? currentList.length - 1 : currentList.length;
+            fixedCounter.textContent = `${actualIndex} / ${actualTotal}`;
+            fixedCounter.classList.remove('intro-mode');
         }
-    }
 
-    function forceAppReload() {
-        playClickSound();
-        window.location.reload(true);
-    }
+        const badgeEl = document.getElementById('card-badge-front');
+        const mainTitleEl = document.getElementById('card-main-front');
+        const subTitleEl = document.getElementById('card-sub-front');
+        const meanBoxEl = document.getElementById('card-mean-front');
+        const ttsBtnEl = document.getElementById('btn-card-tts');
+        const backContainer = document.getElementById('card-back-content');
 
-    async function syncCloudData() {
-        if (!currentUser || !db) return;
-        try {
-            const docRef = db.collection('user_progress').doc(currentUser.uid);
-            const docSnap = await docRef.get();
+        // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等）
+        if (current.isIntroCard && current.isStructuredIntro) {
+            badgeEl.style.display = 'none';
+            mainTitleEl.textContent = current.introValues[0] || current.catName;
             
-            let localData = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_') || k.startsWith('jp_learned_') || k.startsWith('jp_surprise_')) {
-                    try {
-                        localData[k] = JSON.parse(localStorage.getItem(k));
-                    } catch(e) {
-                        localData[k] = localStorage.getItem(k);
-                    }
-                }
+            const subTitleVal = current.introValues[1] || '';
+            if (subTitleVal) {
+                subTitleEl.textContent = subTitleVal;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.style.display = 'none';
             }
 
-            if (docSnap.exists) {
-                const cloudData = docSnap.data().progress || {};
-                for (const [key, cVal] of Object.entries(cloudData)) {
-                    if (key.startsWith('jp_progress_')) {
-                        const lVal = localData[key] || { read: 0, quiz: 0 };
-                        localData[key] = {
-                            read: Math.max(lVal.read || 0, cVal.read || 0),
-                            quiz: Math.max(lVal.quiz || 0, cVal.quiz || 0)
-                        };
-                    } else if (key === 'jp_rpg_exp') {
-                        localData[key] = Math.max(localData[key] || 0, cVal || 0);
-                    } else if (key.startsWith('jp_quest_daily_')) {
-                        const lProg = localData[key] || { readCount: 0, quizCount: 0, rewardClaimed: false };
-                        localData[key] = {
-                            readCount: Math.max(lProg.readCount || 0, cVal.readCount || 0),
-                            quizCount: Math.max(lProg.quizCount || 0, cVal.quizCount || 0),
-                            rewardClaimed: lProg.rewardClaimed || cVal.rewardClaimed || false
-                        };
-                    } else {
-                        localData[key] = cVal;
-                    }
-                    localStorage.setItem(key, typeof localData[key] === 'object' ? JSON.stringify(localData[key]) : localData[key]);
-                }
+            const defAndFunc = current.introValues[2] || '';
+            if (defAndFunc) {
+                meanBoxEl.innerHTML = `<b>📖 核心觀念：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
+                meanBoxEl.style.display = 'block';
+            } else {
+                meanBoxEl.style.display = 'none';
             }
 
-            await docRef.set({ progress: localData, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-            renderQuestBoard();
-        } catch (e) {
-            console.error('雲端同步失敗:', e);
+            ttsBtnEl.style.display = 'none';
+
+            const col3Header = current.introHeaders[3] || '🔗 體系對照速查';
+            const col3Val = current.introValues[3] || '';
+            
+            const col4Header = current.introHeaders[4] || '💡 使用時機與語感';
+            const col4Val = current.introValues[4] || '';
+
+            const col5Header = current.introHeaders[5] || '👨‍👩‍👧‍👦 範例速查';
+            const col5Val = current.introValues[5] || '';
+            
+            const col6Val = current.introValues[6] || '';
+
+            let backHTML = `<div class="kanji-title">📖 ${current.catName}・修煉秘笈</div>`;
+
+            if (col3Val) {
+                backHTML += `
+                    <div class="grammar-rule-card">
+                        <div class="grammar-rule-title">⚡ ${col3Header}</div>
+                        <div class="grammar-rule-content">${col3Val}</div>
+                    </div>
+                `;
+            }
+
+            if (col4Val && !col4Val.includes('✅') && !col4Val.includes('❌')) {
+                backHTML += `
+                    <div class="notes-block" style="border-left: 4px solid #0284c7; background:#f0f9ff; border-color:#bae6fd;">
+                        <div class="notes-title" style="color:#0369a1;">💡 ${col4Header}</div>
+                        <div class="notes-content" style="color:#0c4a6e;">${col4Val}</div>
+                    </div>
+                `;
+            }
+
+            if (col5Val) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">🔢 ${col5Header}</div>
+                        <div class="notes-content">${col5Val}</div>
+                    </div>
+                `;
+            }
+
+            if (col6Val) {
+                const lines = col6Val.split('\n').filter(Boolean);
+                const jpLine = lines[0] || col6Val;
+                const zhLine = lines.slice(1).join('\n') || '';
+                const escapedJp = encodeURIComponent(jpLine);
+
+                backHTML += `
+                    <div class="example-block">
+                        <div class="example-jp-line">
+                            <span>💬 ${jpLine}</span>
+                            <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                        </div>
+                        ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
         }
-    }
 
-    // --- 5. 全局監聽與啟動 ---
-    document.addEventListener('click', (e) => {
-        const searchBox = document.querySelector('.search-container');
-        if (searchBox && !searchBox.contains(e.target)) {
-            const dropdown = document.getElementById('searchResultsDropdown');
-            if (dropdown) dropdown.style.display = 'none';
+        // 💡 2. 單列觀念導讀特卡（如形式名詞 A2 說明）
+        if (current.isIntroCard) {
+            badgeEl.style.display = 'none';
+            mainTitleEl.textContent = current.catName;
+            subTitleEl.textContent = '核心概念與用法特性';
+            subTitleEl.style.display = 'block';
+            meanBoxEl.style.display = 'none';
+            ttsBtnEl.style.display = 'none';
+
+            backContainer.innerHTML = `
+                <div class="kanji-title">📖 ${current.catName}・定義說明</div>
+                <div class="grammar-rule-card" style="border-color:#f59e0b; background:rgba(245, 158, 11, 0.12);">
+                    <div class="grammar-rule-title" style="color:#b45309;">💡 核心定義</div>
+                    <div class="grammar-rule-content" style="color:#78350f;">${current.introContent}</div>
+                </div>
+                <div class="notes-block">
+                    <div class="notes-title">🎯 修煉心法</div>
+                    <div class="notes-content">掌握該詞類的特性與語境位置，翻閱後續單字卡時請重點觀察接續形態與例句結構！</div>
+                </div>
+                <div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>
+            `;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
         }
-    });
 
-    window.addEventListener('load', () => {
-        try {
-            if (typeof firebase !== 'undefined') {
-                auth = firebase.auth();
-                db = firebase.firestore();
+        // 💡 3. 形式名詞（sheet2）專屬版型
+        if (current.catKey === 'sheet2') {
+            badgeEl.style.display = 'inline-block';
+            badgeEl.textContent = '🧩 形式名詞';
+            mainTitleEl.textContent = current.jp;
+            
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                subTitleEl.textContent = `漢字：${current.kanji}`;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.style.display = 'none';
+            }
 
-                auth.onAuthStateChanged(async (user) => {
-                    const userInfoEl = document.getElementById('user-info');
-                    const authBtnText = document.getElementById('btn-auth-text');
-                    
-                    if (user) {
-                        currentUser = user;
-                        const photo = user.photoURL ? `<img src="${user.photoURL}" class="user-avatar">` : '<span class="user-status-dot online"></span>';
-                        if(userInfoEl) userInfoEl.innerHTML = `${photo} <span>${user.displayName || '使用者'} (已同步)</span>`;
-                        if(authBtnText) authBtnText.textContent = '登出';
-                        await syncCloudData();
-                    } else {
-                        currentUser = null;
-                        if(userInfoEl) userInfoEl.innerHTML = `<span class="user-status-dot"></span> <span>訪客模式（點右側登入同步 ➔）</span>`;
-                        if(authBtnText) authBtnText.textContent = 'Google 登入同步';
-                    }
+            const meaning = getWordZhText(current);
+            if (meaning) {
+                meanBoxEl.textContent = `💡 意思：${meaning}`;
+                meanBoxEl.style.display = 'block';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
 
-                    updateHUDLevel();
-                    renderQuestBoard();
-                    if (currentMode === 'review') updateReviewUI();
-                    if (currentMode === 'stats') renderStatsDashboard();
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let usageVal = '';
+            let noteVal = '';
+            let exampleVal = '';
+
+            for (let i = 0; i < current.rawHeaders.length; i++) {
+                const h = current.rawHeaders[i] || '';
+                const v = current.rawCols[i] || '';
+                if (h.includes('用法')) usageVal = v;
+                if (h.includes('備註') || h.includes('備注')) noteVal = v;
+                if (h.includes('例句')) exampleVal = v;
+            }
+
+            let backHTML = `<div class="kanji-title">${current.jp}</div>`;
+
+            if (usageVal) {
+                backHTML += `
+                    <div class="grammar-rule-card">
+                        <div class="grammar-rule-title">⚡ 用法與句型規則</div>
+                        <div class="grammar-rule-content">${usageVal}</div>
+                    </div>
+                `;
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">📝 備註與解析</div>
+                        <div class="notes-content">${noteVal}</div>
+                    </div>
+                `;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split('\n\n').filter(Boolean);
+                const listToRender = exBlocks.length > 1 ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').filter(Boolean);
+                    const jpLine = lines[0] || exText;
+                    const zhLine = lines.slice(1).join('\n') || '';
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                        </div>
+                    `;
                 });
             }
-        } catch(e) {
-            console.warn("Firebase 離線模式啟動");
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
         }
 
-        initKanaSection();
-        preloadAllCategories();
-    });
+        // 💡 4. 一般分類標準版型
+        badgeEl.style.display = 'inline-block';
+        badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
+        meanBoxEl.style.display = 'none';
+        ttsBtnEl.style.display = 'inline-flex';
+
+        let fullBackTitle = current.jp;
+
+        if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+            const isEnglishForeign = /[a-zA-Z]/.test(current.kanji);
+            if (isEnglishForeign) {
+                mainTitleEl.textContent = current.jp;
+                subTitleEl.textContent = current.kanji;
+                fullBackTitle = `${current.jp} (${current.kanji})`;
+            } else {
+                mainTitleEl.textContent = current.kanji;
+                subTitleEl.textContent = current.jp;
+                fullBackTitle = `${current.kanji} (${current.jp})`;
+            }
+            mainTitleEl.style.display = 'block';
+            subTitleEl.style.display = 'block';
+        } else {
+            mainTitleEl.textContent = current.jp;
+            subTitleEl.textContent = '';
+            subTitleEl.style.display = 'none';
+            fullBackTitle = current.jp;
+        }
+
+        let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+        if (current.type) {
+            backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
+        }
+
+        for (let i = 2; i < current.rawHeaders.length; i++) {
+            const h = current.rawHeaders[i] ? current.rawHeaders[i].trim() : '';
+            const val = current.rawCols[i] ? current.rawCols[i].trim() : '';
+            if (!val || (i === 3 && val === current.type)) continue;
+
+            if (h.includes('例句')) {
+                const lines = val.split('\n').filter(Boolean);
+                const jpLine = lines[0] || val;
+                const zhLine = lines.slice(1).join('\n') || '';
+                const escapedJp = encodeURIComponent(jpLine);
+
+                backHTML += `
+                    <div class="example-block">
+                        <div class="example-jp-line">
+                            <span>💬 ${jpLine}</span>
+                            <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                        </div>
+                        ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                    </div>
+                `;
+            } else {
+                backHTML += `
+                    <div class="detail-section">
+                        <span class="section-title">💡 ${h}：</span>
+                        <span class="section-text">${val}</span>
+                    </div>
+                `;
+            }
+        }
+
+        backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+        backContainer.innerHTML = backHTML;
+        document.getElementById('flashcard').classList.remove('is-flipped');
+    }
+
+    function flipCard() { 
+        playPageFlipSound();
+        const flashcard = document.getElementById('flashcard');
+        const isFlipped = flashcard.classList.contains('is-flipped');
+        
+        if (!isFlipped) {
+            const current = currentList[currentIndex];
+            if (!current.hasReadThisTime && !current.isIntroCard) {
+                saveProgress(current.jp, 'read');
+                current.hasReadThisTime = true;
+                const progress = getProgress(current.jp);
+                document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+            }
+        }
+        flashcard.classList.toggle('is-flipped'); 
+    }
+    
+    function nextCard(event) { 
+        if (event) event.stopPropagation();
+        playPageFlipSound(); 
+        if (currentIndex < currentList.length - 1) { 
+            currentIndex++; 
+            updateReviewUI(); 
+        } 
+    }
+
+    function prevCard(event) { 
+        if (event) event.stopPropagation();
+        playPageFlipSound(); 
+        if (currentIndex > 0) { 
+            currentIndex--; 
+            updateReviewUI(); 
+        } 
+    }
+
+    function getJapaneseText(word) {
+        if (word.kanji && /[a-zA-Z]/.test(word.kanji)) return word.jp;
+        return word.kanji || word.jp;
+    }
+
+    function getQuizZhText(word) {
+        const idx = word.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
+        if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
+        return word.rawCols[4] || word.rawCols[2] || '';
+    }
+
+    function getQuizExampleText(word) {
+        const idx = word.rawHeaders.findIndex(h => h.includes('例句'));
+        if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
+        return word.rawCols[6] || word.rawCols[5] || '';
+    }
+
+    function checkQuizStartFlow() {
+        if (fullSourceList.length === 0) {
+            alert('⏳ 單字庫正在全力加速傳送中！請稍微等我一下下嘛～( ＞＜ )✨');
+            setMode('review');
+            return;
+        }
+
+        const validQuizPool = fullSourceList.filter(w => !w.isIntroCard);
+        if (validQuizPool.length < 4) {
+            alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
+            setMode('review');
+            return;
+        }
+
+        const learnedKeys = getTodayLearnedWords();
+        const guideBox = document.getElementById('quiz-guide-box');
+        const mainBox = document.getElementById('quiz-main-container');
+
+        if (learnedKeys.length === 0) {
+            guideBox.style.display = 'flex';
+            mainBox.style.display = 'none';
+        } else {
+            guideBox.style.display = 'none';
+            mainBox.style.display = 'block';
+            startQuiz(false);
+        }
+    }
+
+    function startWildQuiz() {
+        playClickSound();
+        document.getElementById('quiz-guide-box').style.display = 'none';
+        document.getElementById('quiz-main-container').style.display = 'block';
+        startQuiz(false, true);
+    }
+
+    function startQuiz(infiniteMode = false, forceWild = false) {
+        const pool = fullSourceList.filter(w => !w.isIntroCard);
+        if (pool.length < 4) {
+            alert('⏳ 單字庫正在全力加速傳送中！請稍微等我一下下嘛～( ＞＜ )✨');
+            setMode('review');
+            return;
+        }
+
+        const settings = getQuestSettings();
+        const targetCount = infiniteMode ? pool.length : settings.quizTarget;
+
+        let selectedQuestions = [];
+
+        if (forceWild || infiniteMode) {
+            selectedQuestions = [...pool].sort(() => Math.random() - 0.5);
+        } else {
+            const learnedKeys = getTodayLearnedWords();
+            const learnedObjs = pool.filter(item => learnedKeys.includes(item.jp));
+            
+            const shuffledLearned = [...learnedObjs].sort(() => Math.random() - 0.5);
+
+            if (shuffledLearned.length >= targetCount) {
+                selectedQuestions = shuffledLearned.slice(0, targetCount);
+            } else {
+                selectedQuestions = [...shuffledLearned];
+                const remainCount = targetCount - selectedQuestions.length;
+                const poolWithoutLearned = pool.filter(item => !learnedKeys.includes(item.jp));
+                poolWithoutLearned.sort(() => Math.random() - 0.5);
+                selectedQuestions = selectedQuestions.concat(poolWithoutLearned.slice(0, remainCount));
+            }
+        }
+
+        quizList = selectedQuestions.slice(0, targetCount);
+        quizIndex = 0;
+        document.getElementById('btn-restart-quiz-round').style.display = 'none';
+        document.getElementById('btn-infinite-quiz').style.display = 'none';
+        renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+        if (quizIndex >= quizList.length) {
+            document.getElementById('quiz-jp').textContent = '今日回合完成！🎉✨';
+            document.getElementById('quiz-type').textContent = 'STAGE CLEAR!';
+            document.getElementById('quiz-options').innerHTML = '';
+            document.getElementById('quiz-feedback').textContent = '已完成此輪練習！';
+            document.getElementById('quiz-feedback').className = 'quiz-feedback success';
+            document.getElementById('btn-submit-answer').style.display = 'none';
+            document.getElementById('btn-next-quiz').style.display = 'none';
+            document.getElementById('quiz-score').textContent = `全部完成 (${quizList.length} 題)`;
+            document.getElementById('btn-restart-quiz-round').style.display = 'block';
+            document.getElementById('btn-infinite-quiz').style.display = 'block';
+            return;
+        }
+
+        const currentWord = quizList[quizIndex];
+        currentCorrectAnswer = currentWord;
+        currentCorrectAnswer.hasQuizzedThisTime = false;
+        selectedOptionData = null; 
+        
+        const rawExample = getQuizExampleText(currentWord);
+        const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
+        const hasExample = exampleLine1 !== '';
+        
+        let questionType = Math.floor(Math.random() * (hasExample ? 3 : 2));
+        
+        const typeSelect = document.getElementById('sheetSelect');
+        const defaultType = typeSelect.value === 'all' ? '綜合大亂鬥' : typeSelect.selectedOptions[0].text;
+        
+        let questionText = '';
+        let quizBadge = '';
+        
+        if (questionType === 0) {
+            quizBadge = '📖 讀音測意';
+            questionText = currentWord.jp; 
+        } else if (questionType === 1) {
+            quizBadge = '🔄 語意反查';
+            questionText = getQuizZhText(currentWord); 
+        } else {
+            quizBadge = '✍️ 克漏字';
+            let cloze = exampleLine1;
+            if (currentWord.kanji && currentWord.kanji.trim() !== '') {
+                cloze = cloze.split(currentWord.kanji).join('＿＿＿');
+            }
+            if (currentWord.jp && currentWord.jp.trim() !== '') {
+                cloze = cloze.split(currentWord.jp).join('＿＿＿');
+            }
+            questionText = cloze;
+        }
+
+        currentWord.activeQuestionType = questionType;
+
+        document.getElementById('quiz-type').textContent = `${quizBadge} (${defaultType})`;
+        document.getElementById('quiz-jp').textContent = questionText;
+        document.getElementById('quiz-score').textContent = `STAGE ${quizIndex + 1} / ${quizList.length}`;
+        
+        document.getElementById('quiz-feedback').textContent = '';
+        document.getElementById('quiz-feedback').className = 'quiz-feedback';
+        document.getElementById('btn-submit-answer').style.display = 'none'; 
+        document.getElementById('btn-next-quiz').style.display = 'none';
+
+        const pool = fullSourceList.filter(w => !w.isIntroCard);
+        let wrongCandidates = pool.filter(word => {
+            if (word.jp === currentWord.jp) return false;
+            
+            let textToShow;
+            if (questionType === 0) {
+                textToShow = getQuizZhText(word);
+            } else if (questionType === 2) {
+                textToShow = word.jp; 
+            } else {
+                textToShow = word.kanji && word.kanji !== word.jp ? `${word.jp} (${word.kanji})` : word.jp;
+            }
+            return textToShow && textToShow.trim() !== '';
+        });
+        
+        wrongCandidates.sort(() => Math.random() - 0.5);
+        let options = [currentWord].concat(wrongCandidates.slice(0, 3)); 
+        options.sort(() => Math.random() - 0.5); 
+
+        const optionsContainer = document.getElementById('quiz-options');
+        optionsContainer.innerHTML = '';
+        
+        options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-btn';
+            
+            let optMainText = '';
+            let optSubText = getQuizZhText(opt);
+            
+            if (questionType === 0) {
+                optMainText = getQuizZhText(opt); 
+                optSubText = `${opt.jp} (${getJapaneseText(opt)})`; 
+            } else if (questionType === 2) {
+                optMainText = opt.jp; 
+            } else {
+                const kanjiPart = opt.kanji && opt.kanji !== opt.jp ? ` (${opt.kanji})` : '';
+                optMainText = `${opt.jp}${kanjiPart}`;
+            }
+            
+            btn.innerHTML = `<span>[${index + 1}] ${optMainText}</span><span class="option-subtext">💡 意思：${optSubText}</span>`;
+            
+            btn.onclick = () => selectOption(btn, opt);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(clickedBtn, selectedWord) {
+        playClickSound();
+        const allBtns = document.querySelectorAll('.quiz-btn');
+        allBtns.forEach(btn => btn.classList.remove('selected'));
+        
+        clickedBtn.classList.add('selected');
+        selectedOptionData = selectedWord;
+        
+        document.getElementById('btn-submit-answer').style.display = 'block';
+    }
+
+    function submitAnswer() {
+        if (!selectedOptionData) return;
+        
+        const allBtns = document.querySelectorAll('.quiz-btn');
+        const questionType = currentCorrectAnswer.activeQuestionType;
+
+        allBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.classList.remove('selected');
+            const subtext = btn.querySelector('.option-subtext');
+            if (subtext) subtext.style.display = 'block';
+        });
+
+        document.getElementById('btn-submit-answer').style.display = 'none';
+        const feedbackEl = document.getElementById('quiz-feedback');
+        const nextBtn = document.getElementById('btn-next-quiz');
+
+        let clickedBtn = null;
+        allBtns.forEach(btn => {
+            let checkText = '';
+            if (questionType === 0) {
+                checkText = getQuizZhText(selectedOptionData);
+            } else if (questionType === 2) {
+                checkText = selectedOptionData.jp;
+            } else {
+                checkText = selectedOptionData.jp;
+            }
+
+            if (btn.textContent.includes(checkText)) {
+                clickedBtn = btn;
+            }
+        });
+
+        saveTodayQuestProgress('quiz');
+
+        if (selectedOptionData.jp === currentCorrectAnswer.jp) {
+            playSuccessSound();
+            if (clickedBtn) clickedBtn.classList.add('correct');
+            feedbackEl.textContent = '💖 答對了！+25 EXP';
+            feedbackEl.classList.add('success');
+            
+            if (!currentCorrectAnswer.hasQuizzedThisTime) {
+                saveProgress(currentCorrectAnswer.jp, 'quiz');
+                currentCorrectAnswer.hasQuizzedThisTime = true;
+            }
+            
+            speakWordDirectly(null, currentCorrectAnswer.jp);
+        } else {
+            playWrongSound();
+            if (clickedBtn) clickedBtn.classList.add('wrong');
+            
+            let correctAnswerText;
+            if (questionType === 0) {
+                correctAnswerText = getQuizZhText(currentCorrectAnswer);
+            } else if (questionType === 2) {
+                correctAnswerText = currentCorrectAnswer.jp;
+            } else {
+                correctAnswerText = `${currentCorrectAnswer.jp} (${getJapaneseText(currentCorrectAnswer)})`;
+            }
+            
+            feedbackEl.textContent = `💀 答錯囉！正解：${correctAnswerText}`;
+            feedbackEl.classList.add('error');
+            
+            allBtns.forEach(btn => {
+                if (btn.textContent.includes(currentCorrectAnswer.jp)) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+        nextBtn.style.display = 'block'; 
+    }
+
+    function nextQuiz() {
+        playClickSound();
+        quizIndex++;
+        renderQuizQuestion();
+    }
+
+    preloadAllCategories();
 </script>
 
 </body>
