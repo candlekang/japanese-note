@@ -934,41 +934,6 @@
             display: none;
             margin-bottom: 20px;
         }
-        .kana-main-toggle {
-            display: flex;
-            gap: 6px;
-            background: #0f172a;
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 14px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .btn-kana-view {
-            flex: 1;
-            background: transparent;
-            color: #94a3b8;
-            border: none;
-            padding: 9px 6px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            font-family: 'DotGothic16', sans-serif;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-kana-view.active {
-            background: var(--primary-dark);
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
-        }
-        .kana-subview {
-            width: 100%;
-        }
-        .kana-subview[hidden] {
-            display: none !important;
-        }
-
         .kana-nav-tabs {
             display: flex;
             gap: 6px;
@@ -1017,6 +982,30 @@
             border-color: var(--primary-dark);
             transform: scale(1.05);
         }
+        .kana-item.exp-earned {
+            position: relative;
+            background: rgba(34, 197, 94, 0.13);
+            border: 2px solid #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12), 0 0 12px rgba(34, 197, 94, 0.22);
+        }
+        .kana-item.exp-earned::after {
+            content: "✓";
+            position: absolute;
+            top: -6px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #22c55e;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 900;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.22);
+        }
         .kana-char {
             font-size: 22px;
             font-weight: 800;
@@ -1035,6 +1024,24 @@
         }
 
         /* 手寫練習板專區 */
+        .btn-back-kana-grid {
+            width: auto;
+            background: transparent;
+            color: var(--primary-dark);
+            border: 1px solid #bae6fd;
+            padding: 8px 12px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 800;
+            font-family: 'DotGothic16', sans-serif;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        .btn-back-kana-grid:hover {
+            background: #f0f9ff;
+            border-color: var(--primary-dark);
+        }
+
         .writing-board-card {
             background: #0f172a;
             border: 2px solid #38bdf8;
@@ -1064,8 +1071,9 @@
         }
         .canvas-container {
             position: relative;
-            width: 220px;
-            height: 220px;
+            width: 280px;
+            height: 280px;
+            max-width: 100%;
             background: #ffffff;
             border-radius: 12px;
             border: 2px solid #cbd5e1;
@@ -1073,13 +1081,51 @@
             touch-action: none;
             overflow: hidden;
         }
+        #guideCanvas,
         #strokeCanvas {
             position: absolute;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
+        }
+        #guideCanvas {
+            z-index: 5;
+            pointer-events: none;
+        }
+        #strokeCanvas {
             z-index: 10;
             cursor: crosshair;
+        }
+
+        /* 9.3：桌機版筆型游標，筆頭水平朝右；hotspot 精準落在筆尖 */
+        @media (hover: hover) and (pointer: fine) {
+            #strokeCanvas {
+                cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%0A%20%20%3Cg%3E%0A%20%20%20%20%3Crect%20x%3D%223%22%20y%3D%2212%22%20width%3D%2220%22%20height%3D%228%22%20rx%3D%223%22%20fill%3D%22%23ec4899%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%221.5%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%223%22%20y%3D%2212%22%20width%3D%225%22%20height%3D%228%22%20rx%3D%222%22%20fill%3D%22%23f8fafc%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%221.5%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M23%2012%20L30%2016%20L23%2020%20Z%22%20fill%3D%22%23fde68a%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%221.5%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2229.2%22%20cy%3D%2216%22%20r%3D%221.1%22%20fill%3D%22%230f172a%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E") 30 16, crosshair;
+            }
+        }
+
+        .writing-score-box {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(56, 189, 248, 0.10);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: center;
+            font-family: 'DotGothic16', sans-serif;
+            display: none;
+        }
+        .writing-score-main {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fde047;
+            margin-bottom: 4px;
+        }
+        .writing-score-note {
+            font-size: 11px;
+            color: #cbd5e1;
+            line-height: 1.5;
         }
         .writing-controls {
             display: flex;
@@ -1542,18 +1588,8 @@
 
     <!-- 3. 🐣 菜雞互啄（五十音圖鑑與筆順練習） -->
     <div id="kana-section">
-        <!-- 菜雞互啄內部功能切換 -->
-        <div class="kana-main-toggle" role="tablist" aria-label="菜雞互啄功能切換">
-            <button id="kana-view-grid-btn" class="btn-kana-view active" type="button"
-                    role="tab" aria-selected="true" aria-controls="kana-grid-view"
-                    onclick="setKanaView('grid')">📊 五十音總表</button>
-            <button id="kana-view-writing-btn" class="btn-kana-view" type="button"
-                    role="tab" aria-selected="false" aria-controls="kana-writing-view"
-                    onclick="setKanaView('writing')">✍️ 筆順手寫板</button>
-        </div>
-
         <!-- 視圖 A：五十音總表 -->
-        <div id="kana-grid-view" class="kana-subview" role="tabpanel" aria-labelledby="kana-view-grid-btn">
+        <div id="kana-grid-view" class="kana-subview">
             <div class="kana-nav-tabs">
                 <button class="btn-kana-tab active" onclick="switchKanaGroup('seion-hira')">あ 平假名</button>
                 <button class="btn-kana-tab" onclick="switchKanaGroup('seion-kata')">ア 片假名</button>
@@ -1563,13 +1599,16 @@
 
             <div class="kana-grid" id="kana-grid-container"></div>
             <div style="font-size:11px; color:#64748b; text-align:center; margin-top:8px;">
-                💡 點擊假名可聽發音並設定練習字，再切到「筆順手寫板」開始臨摹。
+                💡 點擊任一假名即可直接進入手寫練習；想回來選其他音，按上方「← 五十音總表」。
             </div>
         </div>
 
         <!-- 視圖 B：筆順手寫板 -->
-        <div id="kana-writing-view" class="kana-subview" role="tabpanel"
-             aria-labelledby="kana-view-writing-btn" hidden>
+        <div id="kana-writing-view" class="kana-subview" hidden>
+            <button type="button"
+                    class="btn-back-kana-grid"
+                    onclick="returnToKanaGrid()">← 五十音總表</button>
+
             <div class="writing-board-card">
                 <div class="writing-header">
                     <span class="writing-title">✍️ 筆順手寫板：<span id="current-writing-label" style="color:#38bdf8;">あ (a)</span></span>
@@ -1577,7 +1616,8 @@
                 </div>
 
                 <div class="canvas-container">
-                    <canvas id="strokeCanvas" width="220" height="220"></canvas>
+                    <canvas id="guideCanvas" width="280" height="280"></canvas>
+                    <canvas id="strokeCanvas" width="280" height="280"></canvas>
                 </div>
 
                 <div class="writing-controls">
@@ -1585,8 +1625,18 @@
                     <button class="btn-writing-action" style="background:#ec4899; color:#ffffff;" onclick="clearStrokeCanvas()">🧹 清除重寫</button>
                     <button class="btn-writing-action" style="background:#0284c7; color:#ffffff;" onclick="nextWritingKana()">下一個 ▶</button>
                 </div>
+
+                <button class="btn-writing-action"
+                        style="width:100%; background:#22c55e; color:#ffffff; padding:11px 12px;"
+                        onclick="gradeCurrentWriting()">✅ 完成填寫・立即打分</button>
+
+                <div id="writing-score-box" class="writing-score-box" aria-live="polite">
+                    <div id="writing-score-main" class="writing-score-main">0 分</div>
+                    <div id="writing-score-note" class="writing-score-note"></div>
+                </div>
+
                 <div style="font-size:11px; color:#94a3b8;">
-                    💡 淺色字形是臨摹導引，可直接用手指或滑鼠練習。
+                    💡 淺色字形是臨摹導引；60 分以上可獲得 EXP。分數評估「描寫位置與字形接近度」，不是正式筆順判定。
                 </div>
             </div>
         </div>
@@ -2135,8 +2185,11 @@
 
     let currentKanaTab = 'seion-hira';
     let currentKanaView = 'grid';
+    const WRITING_PASS_SCORE = 60;
+    const WRITING_PASS_EXP = 20;
     let currentWritingList = [];
     let currentWritingIndex = 0;
+    let writingRewardedThisSession = new Set();
     let isDrawing = false;
     let lastX = 0, lastY = 0;
 
@@ -3054,6 +3107,7 @@
             document.getElementById('quiz-section').style.display = 'block';
             checkQuizStartFlow();
         } else if (mode === 'kana') {
+            currentKanaView = 'grid';
             initKanaSection();
         } else if (mode === 'stats') {
             renderStatsDashboard();
@@ -3067,6 +3121,7 @@
         } else if (currentMode === 'quiz') {
             checkQuizStartFlow();
         } else if (currentMode === 'kana') {
+            currentKanaView = 'grid';
             initKanaSection();
         } else if (currentMode === 'stats') {
             renderStatsDashboard();
@@ -3088,20 +3143,11 @@
 
         const gridView = document.getElementById('kana-grid-view');
         const writingView = document.getElementById('kana-writing-view');
-        const gridBtn = document.getElementById('kana-view-grid-btn');
-        const writingBtn = document.getElementById('kana-view-writing-btn');
-
-        if (!gridView || !writingView || !gridBtn || !writingBtn) return;
+        if (!gridView || !writingView) return;
 
         const isGrid = normalizedView === 'grid';
-
         gridView.hidden = !isGrid;
         writingView.hidden = isGrid;
-
-        gridBtn.classList.toggle('active', isGrid);
-        writingBtn.classList.toggle('active', !isGrid);
-        gridBtn.setAttribute('aria-selected', isGrid ? 'true' : 'false');
-        writingBtn.setAttribute('aria-selected', !isGrid ? 'true' : 'false');
 
         // Canvas 從 hidden 狀態切回可見時重新畫一次，避免部分瀏覽器顯示空白。
         if (!isGrid && currentWritingList.length > 0) {
@@ -3109,6 +3155,12 @@
             const isKataMode = (currentKanaTab === 'seion-kata');
             loadKanaToWritingBoard(item, isKataMode);
         }
+    }
+
+    function returnToKanaGrid() {
+        playClickSound();
+        setKanaView('grid', false);
+        updateKanaRewardBadges();
     }
 
     function switchKanaGroup(tabKey) {
@@ -3142,9 +3194,11 @@
             const isKataMode = (tabKey === 'seion-kata');
             const mainChar = isKataMode ? item.kata : item.hira;
             const subChar = isKataMode ? item.hira : item.kata;
+            const rewardKey = `${tabKey}:${mainChar}`;
 
             const div = document.createElement('div');
-            div.className = `kana-item ${idx === 0 ? 'active' : ''}`;
+            div.className = `kana-item ${idx === 0 ? 'active' : ''} ${writingRewardedThisSession.has(rewardKey) ? 'exp-earned' : ''}`.trim();
+            div.dataset.rewardKey = rewardKey;
             div.onclick = () => selectKanaItem(item, div, isKataMode);
 
             div.innerHTML = `
@@ -3168,8 +3222,9 @@
         const foundIdx = currentWritingList.findIndex(k => k.hira === item.hira);
         if (foundIdx !== -1) currentWritingIndex = foundIdx;
 
+        // 點五十音總表：直接進入該音的手寫板，不自動發音。
         loadKanaToWritingBoard(item, isKataMode);
-        speakWordDirectly(null, item.hira);
+        setKanaView('writing', false);
     }
 
     function loadKanaToWritingBoard(item, isKataMode) {
@@ -3180,42 +3235,208 @@
     }
 
     function drawGhostKanaOnCanvas(char) {
-        const canvas = document.getElementById('strokeCanvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const guideCanvas = document.getElementById('guideCanvas');
+        const strokeCanvas = document.getElementById('strokeCanvas');
+        if (!guideCanvas || !strokeCanvas) return;
 
-        // 1. 繪製田字格輔助線
+        const ctx = guideCanvas.getContext('2d');
+        ctx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
+
+        // 1. 田字格輔助線
         ctx.save();
         ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
 
         ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, 0);
-        ctx.lineTo(canvas.width / 2, canvas.height);
-        ctx.moveTo(0, canvas.height / 2);
-        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.moveTo(guideCanvas.width / 2, 0);
+        ctx.lineTo(guideCanvas.width / 2, guideCanvas.height);
+        ctx.moveTo(0, guideCanvas.height / 2);
+        ctx.lineTo(guideCanvas.width, guideCanvas.height / 2);
         ctx.stroke();
         ctx.restore();
 
-        // 2. 繪製淺色假名輪廓導引字
+        // 2. 淺色假名導引字
         ctx.save();
-        ctx.font = 'bold 150px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+        const ghostFontSize = char.length > 1 ? 132 : 190;
+        ctx.font = `bold ${ghostFontSize}px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif`;
         ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 10);
+        ctx.fillText(char, guideCanvas.width / 2, guideCanvas.height / 2 + 12);
         ctx.restore();
+
+        // 換字時清除上層使用者筆跡與舊分數
+        const strokeCtx = strokeCanvas.getContext('2d');
+        strokeCtx.clearRect(0, 0, strokeCanvas.width, strokeCanvas.height);
+        resetWritingScore();
     }
 
     function clearStrokeCanvas() {
         playClickSound();
-        const isKataMode = (currentKanaTab === 'seion-kata');
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas) return;
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        resetWritingScore();
+    }
+
+    function resetWritingScore() {
+        const box = document.getElementById('writing-score-box');
+        const main = document.getElementById('writing-score-main');
+        const note = document.getElementById('writing-score-note');
+        if (box) box.style.display = 'none';
+        if (main) main.textContent = '0 分';
+        if (note) note.textContent = '';
+    }
+
+    function gradeCurrentWriting() {
+        playClickSound();
+
+        const strokeCanvas = document.getElementById('strokeCanvas');
+        const box = document.getElementById('writing-score-box');
+        const main = document.getElementById('writing-score-main');
+        const note = document.getElementById('writing-score-note');
+
+        if (!strokeCanvas || !box || !main || !note) return;
+
         const item = currentWritingList[currentWritingIndex];
-        if (item) {
-            const char = isKataMode ? item.kata : item.hira;
-            drawGhostKanaOnCanvas(char);
+        if (!item) return;
+
+        const userCtx = strokeCanvas.getContext('2d');
+        const userData = userCtx.getImageData(0, 0, strokeCanvas.width, strokeCanvas.height);
+
+        // 先確認是否真的有寫
+        let inkPixels = 0;
+        for (let i = 3; i < userData.data.length; i += 4) {
+            if (userData.data[i] > 20) inkPixels++;
+        }
+
+        if (inkPixels < 35) {
+            box.style.display = 'block';
+            main.textContent = '尚未完成';
+            note.textContent = '先在手寫板上描寫假名，再按「完成填寫・立即打分」。';
+            return;
+        }
+
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const char = isKataMode ? item.kata : item.hira;
+
+        // 建立純字形遮罩，不包含田字格
+        const maskCanvas = document.createElement('canvas');
+        maskCanvas.width = strokeCanvas.width;
+        maskCanvas.height = strokeCanvas.height;
+        const maskCtx = maskCanvas.getContext('2d');
+
+        const maskFontSize = char.length > 1 ? 132 : 190;
+        maskCtx.font = `bold ${maskFontSize}px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif`;
+        maskCtx.fillStyle = '#000000';
+        maskCtx.textAlign = 'center';
+        maskCtx.textBaseline = 'middle';
+        maskCtx.fillText(char, maskCanvas.width / 2, maskCanvas.height / 2 + 12);
+
+        const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+
+        const w = strokeCanvas.width;
+        const h = strokeCanvas.height;
+        const tolerance = 9;
+
+        function maskNear(x, y) {
+            for (let dy = -tolerance; dy <= tolerance; dy += 3) {
+                const yy = y + dy;
+                if (yy < 0 || yy >= h) continue;
+                for (let dx = -tolerance; dx <= tolerance; dx += 3) {
+                    const xx = x + dx;
+                    if (xx < 0 || xx >= w) continue;
+                    const idx = (yy * w + xx) * 4 + 3;
+                    if (maskData.data[idx] > 40) return true;
+                }
+            }
+            return false;
+        }
+
+        let matchedInk = 0;
+        let minX = w, minY = h, maxX = 0, maxY = 0;
+
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                const alpha = userData.data[(y * w + x) * 4 + 3];
+                if (alpha > 20) {
+                    if (maskNear(x, y)) matchedInk++;
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+
+        const precision = matchedInk / Math.max(inkPixels, 1);
+
+        // 比較使用者筆跡與目標字形的外框大小，避免亂塗整個畫布也拿高分
+        let maskMinX = w, maskMinY = h, maskMaxX = 0, maskMaxY = 0, maskCount = 0;
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                const alpha = maskData.data[(y * w + x) * 4 + 3];
+                if (alpha > 40) {
+                    maskCount++;
+                    if (x < maskMinX) maskMinX = x;
+                    if (x > maskMaxX) maskMaxX = x;
+                    if (y < maskMinY) maskMinY = y;
+                    if (y > maskMaxY) maskMaxY = y;
+                }
+            }
+        }
+
+        const userW = Math.max(maxX - minX, 1);
+        const userH = Math.max(maxY - minY, 1);
+        const maskW = Math.max(maskMaxX - maskMinX, 1);
+        const maskH = Math.max(maskMaxY - maskMinY, 1);
+
+        const sizeSimilarity = Math.max(
+            0,
+            1 - (Math.abs(userW - maskW) / maskW + Math.abs(userH - maskH) / maskH) / 2
+        );
+
+        const userCx = (minX + maxX) / 2;
+        const userCy = (minY + maxY) / 2;
+        const maskCx = (maskMinX + maskMaxX) / 2;
+        const maskCy = (maskMinY + maskMaxY) / 2;
+        const centerDistance = Math.hypot(userCx - maskCx, userCy - maskCy);
+        const centerSimilarity = Math.max(0, 1 - centerDistance / 80);
+
+        let score = Math.round((precision * 0.65 + sizeSimilarity * 0.20 + centerSimilarity * 0.15) * 100);
+        score = Math.max(0, Math.min(100, score));
+
+        let comment = '';
+        if (score >= 90) comment = '🌟 超漂亮！位置、大小和字形都很接近範本。';
+        else if (score >= 80) comment = '🎉 很不錯！再注意轉折和收筆會更漂亮。';
+        else if (score >= 65) comment = '👍 有抓到字形，再沿著淺色輪廓多練一次。';
+        else if (score >= 45) comment = '🌱 已經有基礎，注意字的大小與中心位置。';
+        else comment = '💪 再試一次！建議慢慢沿著淺色字形描寫。';
+
+        const rewardKey = `${currentKanaTab}:${char}`;
+
+        if (score >= WRITING_PASS_SCORE) {
+            playSuccessSound();
+
+            let rewardText = '';
+            if (!writingRewardedThisSession.has(rewardKey)) {
+                addEXP(WRITING_PASS_EXP);
+                writingRewardedThisSession.add(rewardKey);
+                updateKanaRewardBadges();
+                rewardText = `　🎁 達成 ${WRITING_PASS_SCORE} 分以上，獲得 +${WRITING_PASS_EXP} EXP！`;
+            } else {
+                rewardText = `　✅ 已達標！本次練習此假名的 EXP 已領取。`;
+            }
+
+            box.style.display = 'block';
+            main.textContent = `${score} 分・PASS`;
+            note.textContent = `${comment}${rewardText}　※ 此分數為臨摹相似度，不代表正式筆順正誤。`;
+        } else {
+            playWrongSound();
+            box.style.display = 'block';
+            main.textContent = `${score} 分・再挑戰`;
+            note.textContent = `${comment}　未達 ${WRITING_PASS_SCORE} 分，再練一次就能挑戰 EXP！　※ 此分數為臨摹相似度，不代表正式筆順正誤。`;
         }
     }
 
@@ -3310,6 +3531,13 @@
         }, { passive: false });
 
         canvas.addEventListener('touchend', stopDraw);
+    }
+
+    function updateKanaRewardBadges() {
+        document.querySelectorAll('.kana-item[data-reward-key]').forEach(el => {
+            const key = el.dataset.rewardKey;
+            el.classList.toggle('exp-earned', writingRewardedThisSession.has(key));
+        });
     }
 
     function getWordZhText(wordObj) {
