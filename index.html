@@ -538,6 +538,57 @@
             box-sizing: border-box;
         }
 
+        /* 9.7：名詞分頁專屬字卡 */
+        .noun-priority-badge {
+            background: rgba(245, 158, 11, 0.12) !important;
+            border-color: rgba(245, 158, 11, 0.38) !important;
+            color: #a16207 !important;
+            letter-spacing: 0.2px;
+        }
+        .noun-front-meaning {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em;
+            width: 92%;
+            text-align: center;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #38bdf8;
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.55;
+            padding: 9px 12px;
+            border-radius: 10px;
+            margin: 2px auto 12px auto;
+            box-sizing: border-box;
+        }
+        .noun-back-meaning {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid #0284c7;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .noun-back-meaning-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0369a1;
+            margin-bottom: 4px;
+        }
+        .noun-back-meaning-text {
+            font-size: 14px;
+            color: #0f172a;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
         .kanji-title {
             font-size: 22px; font-weight: 800; color: var(--text-main);
             text-align: center; width: 100%; margin-bottom: 14px; 
@@ -3783,9 +3834,11 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
+        badgeEl.classList.remove('noun-priority-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
+        meanBoxEl.className = 'front-mean-box';
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
 
@@ -3900,7 +3953,137 @@
             return;
         }
 
-        // 💡 3. 形式名詞（sheet2）專屬版型
+        // 💡 3. 名詞（sheet1）專屬版型：正面直接看意思，背面看完整學習資訊
+        if (current.catKey === 'sheet1') {
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('noun-priority-badge');
+            badgeEl.textContent = current.level || '☆ 待評';
+
+            const meaning = getWordZhText(current);
+
+            // 正面：漢字優先，假名放副標；外來語則保留日文為主標
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                const isEnglishForeign = /[a-zA-Z]/.test(current.kanji);
+                if (isEnglishForeign) {
+                    mainTitleEl.textContent = current.jp;
+                    subTitleEl.textContent = current.kanji;
+                } else {
+                    mainTitleEl.textContent = current.kanji;
+                    subTitleEl.textContent = current.jp;
+                }
+                subTitleEl.style.display = 'block';
+            } else {
+                mainTitleEl.textContent = current.jp;
+                subTitleEl.textContent = '';
+                subTitleEl.style.display = 'none';
+            }
+            mainTitleEl.style.display = 'block';
+
+            // 正面意思：只顯示最多兩行，避免資訊過量
+            if (meaning) {
+                meanBoxEl.className = 'noun-front-meaning';
+                meanBoxEl.textContent = `💡 ${meaning}`;
+                meanBoxEl.style.display = '-webkit-box';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            // 依欄位名稱抓資料，避免未來名詞頁欄位內容變動時完全依賴固定位置
+            const getColByHeader = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const typeVal = current.type || getColByHeader(['類型']);
+            const collocationVal = getColByHeader(['最常搭配', '搭配']);
+            const exampleVal = getColByHeader(['例句']);
+            const antonymVal = getColByHeader(['反義詞']);
+            const noteVal = getColByHeader(['備註', '備注']);
+
+            let fullBackTitle = current.jp;
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                const isEnglishForeign = /[a-zA-Z]/.test(current.kanji);
+                fullBackTitle = isEnglishForeign
+                    ? `${current.jp} (${current.kanji})`
+                    : `${current.kanji} (${current.jp})`;
+            }
+
+            let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+
+            if (typeVal) {
+                backHTML += `<div class="section-type-badge">🗂️ ${typeVal}</div>`;
+            }
+
+            if (meaning) {
+                backHTML += `
+                    <div class="noun-back-meaning">
+                        <div class="noun-back-meaning-title">💡 意思</div>
+                        <div class="noun-back-meaning-text">${meaning}</div>
+                    </div>
+                `;
+            }
+
+            if (collocationVal) {
+                backHTML += `
+                    <div class="grammar-rule-card" style="border-color:#c4b5fd; background:#f5f3ff;">
+                        <div class="grammar-rule-title" style="color:#6d28d9;">🔗 最常搭配</div>
+                        <div class="grammar-rule-content" style="color:#4c1d95;">${collocationVal}</div>
+                    </div>
+                `;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split('\n\n').filter(Boolean);
+                const listToRender = exBlocks.length > 1 ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').filter(Boolean);
+                    const jpLine = lines[0] || exText;
+                    const zhLine = lines.slice(1).join('\n') || '';
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            if (antonymVal) {
+                backHTML += `
+                    <div class="notes-block" style="background:#fff7ed; border-color:#fed7aa;">
+                        <div class="notes-title" style="color:#c2410c;">↔️ 反義詞</div>
+                        <div class="notes-content" style="color:#7c2d12;">${antonymVal}</div>
+                    </div>
+                `;
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">📝 備註</div>
+                        <div class="notes-content">${noteVal}</div>
+                    </div>
+                `;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 4. 形式名詞（sheet2）專屬版型
         if (current.catKey === 'sheet2') {
             badgeEl.style.display = 'inline-block';
             badgeEl.textContent = '🧩 形式名詞';
@@ -3983,7 +4166,7 @@
             return;
         }
 
-        // 💡 4. 一般分類標準版型
+        // 💡 5. 一般分類標準版型
         badgeEl.style.display = 'inline-block';
         badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
         meanBoxEl.style.display = 'none';
