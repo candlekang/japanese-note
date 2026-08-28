@@ -1470,7 +1470,7 @@
             <option value="sheet25">つけます的擴充包</option>
         </select>
 
-        <!-- 💡 4 個核心模式按鈕 -->
+        <!-- 💡 4 個核心模式按鈕（包含 🐣 菜雞互啄） -->
         <div class="button-group">
             <button id="mode-review" class="active" onclick="setMode('review')">📖 翻卡複習</button>
             <button id="mode-quiz" onclick="setMode('quiz')">🏆 選擇測驗</button>
@@ -1539,7 +1539,7 @@
         </div>
     </div>
 
-    <!-- 3. 🐣 菜雞互啄專區 -->
+    <!-- 3. 🐣 菜雞互啄專區（純淨無雜點臨摹手寫板） -->
     <div id="kana-section">
         <div class="kana-main-toggle">
             <button class="btn-sub-view active" id="btn-view-grid" onclick="setKanaSubView('grid')">📊 五十音總表</button>
@@ -1890,9 +1890,7 @@
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
-            if (ctx.state === 'suspended') {
-                ctx.resume();
-            }
+            if (ctx.state === 'suspended') ctx.resume();
 
             const now = ctx.currentTime;
             const duration = 0.08;
@@ -2088,6 +2086,7 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
+    // 🐣 五十音資料庫（宣告一次，安全無誤）
     const KANA_DATA = {
         'seion-hira': [
             { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
@@ -2098,7 +2097,7 @@
             { hira: 'は', kata: 'ハ', romaji: 'ha' }, { hira: 'ひ', kata: 'ヒ', romaji: 'hi' }, { hira: 'ふ', kata: 'フ', romaji: 'fu' }, { hira: 'へ', kata: 'ヘ', romaji: 'he' }, { hira: 'ほ', kata: 'ホ', romaji: 'ho' },
             { hira: 'ま', kata: 'マ', romaji: 'ma' }, { hira: 'み', kata: 'ミ', romaji: 'mi' }, { hira: 'む', kata: 'ム', romaji: 'mu' }, { hira: 'め', kata: 'メ', romaji: 'me' }, { hira: 'も', kata: 'モ', romaji: 'mo' },
             { hira: 'や', kata: 'ヤ', romaji: 'ya' }, null, { hira: 'ゆ', kata: 'ユ', romaji: 'yu' }, null, { hira: 'よ', kata: 'ヨ', romaji: 'yo' },
-            { hira: 'ら', kata: 'ラ', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
+            { hira: 'ら', kata: '拉', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
             { hira: 'わ', kata: 'ワ', romaji: 'wa' }, null, null, null, { hira: 'を', kata: 'ヲ', romaji: 'o/wo' },
             { hira: 'ん', kata: 'ン', romaji: 'n' }, null, null, null, null
         ],
@@ -2148,919 +2147,343 @@
     let globalWordDataMap = {};
     allSearchableWords = [];
 
-    function getTotalEXP() {
-        const exp = localStorage.getItem('jp_rpg_exp');
-        return exp ? parseInt(exp, 10) : 0;
+    // 🐣 菜雞互啄專區模組
+    function initKanaSection() {
+        switchKanaGroup(currentKanaTab);
+        setupCanvasEvents();
     }
 
-    function addEXP(points) {
-        let currentExp = getTotalEXP() + points;
-        localStorage.setItem('jp_rpg_exp', currentExp);
-
-        if (currentUser) {
-            db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_rpg_exp: currentExp } }, { merge: true });
-        }
-        updateHUDLevel();
-    }
-
-    function getLevelAndTitle(exp, totalWords) {
-        const maxExpCap = Math.max(totalWords * 35, 1000);
-        const progressRatio = Math.min(exp / maxExpCap, 1.0);
-
-        let currentRank = RANK_TIERS_CONFIG[0];
-        let nextRank = null;
-
-        for (let i = RANK_TIERS_CONFIG.length - 1; i >= 0; i--) {
-            if (progressRatio >= RANK_TIERS_CONFIG[i].threshold) {
-                currentRank = RANK_TIERS_CONFIG[i];
-                nextRank = RANK_TIERS_CONFIG[i + 1] || null;
-                break;
-            }
-        }
-
-        let nextExpReq = 0;
-        let expToNext = 0;
-        if (nextRank) {
-            nextExpReq = Math.ceil(nextRank.threshold * maxExpCap);
-            expToNext = Math.max(nextExpReq - exp, 0);
-        }
-
-        return {
-            title: currentRank.title,
-            ratioPercent: Math.floor(progressRatio * 100),
-            currentExp: exp,
-            maxExp: maxExpCap,
-            nextRank: nextRank,
-            expToNext: expToNext,
-            totalWords: totalWords
-        };
-    }
-
-    function updateHUDLevel() {
-        const totalWords = allSearchableWords.length || 1000;
-        const info = getLevelAndTitle(getTotalEXP(), totalWords);
-
-        const titleEl = document.getElementById('hud-rpg-title');
-        const fillEl = document.getElementById('hud-rpg-exp-fill');
-        const textEl = document.getElementById('hud-rpg-exp-text');
-
-        if (titleEl) titleEl.textContent = info.title;
-        if (fillEl) fillEl.style.width = `${info.ratioPercent}%`;
-        if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
-    }
-
-    function openRankGuideModal() {
+    function setKanaSubView(viewKey) {
         playClickSound();
-        const totalWords = allSearchableWords.length || 1000;
-        const info = getLevelAndTitle(getTotalEXP(), totalWords);
+        const btnGrid = document.getElementById('btn-view-grid');
+        const btnWriting = document.getElementById('btn-view-writing');
+        const viewGrid = document.getElementById('kana-grid-subview');
+        const viewWriting = document.getElementById('kana-writing-subview');
 
-        document.getElementById('modal-my-rank-title').textContent = `${info.title} (${info.ratioPercent}%)`;
-        document.getElementById('modal-sync-rate-text').textContent = `${info.ratioPercent}%`;
-
-        const hintEl = document.getElementById('modal-my-rank-hint');
-        if (info.nextRank) {
-            hintEl.textContent = `⚡ 距離下一位階【${info.nextRank.title}】還差 ${info.expToNext} EXP！`;
+        if (viewKey === 'grid') {
+            btnGrid.classList.add('active');
+            btnWriting.classList.remove('active');
+            viewGrid.style.display = 'block';
+            viewWriting.style.display = 'none';
         } else {
-            hintEl.textContent = `👾 恭喜登頂！你已達成【日文大魔王】的最高境界！🔥`;
+            btnWriting.classList.add('active');
+            btnGrid.classList.remove('active');
+            viewWriting.style.display = 'block';
+            viewGrid.style.display = 'none';
+            setupCanvasEvents();
+            redrawCurrentKanaBoard();
+        }
+    }
+
+    function switchKanaGroup(tabKey) {
+        currentKanaTab = tabKey;
+        const allTabs = document.querySelectorAll('.btn-kana-tab');
+        allTabs.forEach(tab => tab.classList.remove('active'));
+
+        const targetBtn = Array.from(allTabs).find(b => b.getAttribute('onclick').includes(tabKey));
+        if (targetBtn) targetBtn.classList.add('active');
+
+        const gridContainer = document.getElementById('kana-grid-container');
+        if (!gridContainer) return;
+        gridContainer.innerHTML = '';
+
+        let list = KANA_DATA[tabKey] || KANA_DATA['seion-hira'];
+        if (tabKey === 'seion-kata') {
+            list = KANA_DATA['seion-hira'];
         }
 
-        const tierListEl = document.getElementById('modal-rank-tier-list');
-        tierListEl.innerHTML = '';
+        currentWritingList = list.filter(Boolean);
+        currentWritingIndex = 0;
 
-        RANK_TIERS_CONFIG.forEach(tier => {
-            const reqExp = Math.ceil(tier.threshold * info.maxExp);
-            const isCurrent = (tier.title === info.title);
-            const isUnlocked = (info.currentExp >= reqExp);
+        list.forEach((item, idx) => {
+            if (!item) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'kana-item kana-empty';
+                gridContainer.appendChild(emptyDiv);
+                return;
+            }
 
-            let statusClass = isCurrent ? 'current' : (isUnlocked ? 'unlocked' : 'locked');
-            let badgeHtml = isCurrent ? `<span class="tier-badge-current">▶ 目前位置</span>` : (isUnlocked ? `<span style="color:#22c55e; font-size:11px; font-weight:bold;">✅ 已達成</span>` : `<span style="color:#64748b; font-size:11px;">🔒 ${Math.floor(tier.threshold * 100)}% 同步</span>`);
+            const isKataMode = (tabKey === 'seion-kata');
+            const mainChar = isKataMode ? item.kata : item.hira;
 
-            tierListEl.innerHTML += `
-                <div class="rank-tier-item ${statusClass}">
-                    <div>
-                        <div class="tier-name">${tier.title}</div>
-                        <div class="tier-req">${tier.desc}</div>
-                    </div>
-                    <div>${badgeHtml}</div>
-                </div>
+            const div = document.createElement('div');
+            div.className = `kana-item ${idx === 0 ? 'active' : ''}`;
+            div.onclick = () => {
+                selectKanaItem(item, div, isKataMode);
+                setKanaSubView('writing');
+            };
+
+            div.innerHTML = `
+                <span class="kana-char">${mainChar}</span>
+                <span class="kana-romaji">${item.romaji}</span>
             `;
+            gridContainer.appendChild(div);
         });
 
-        document.getElementById('rankGuideModal').style.display = 'flex';
-    }
-
-    function closeRankGuideModal(e) {
-        if (e && e.target !== document.getElementById('rankGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
-        playClickSound();
-        document.getElementById('rankGuideModal').style.display = 'none';
-    }
-
-    function getTodayKey() {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    }
-
-    function getTodayLearnedWords() {
-        const today = getTodayKey();
-        const data = localStorage.getItem(`jp_learned_${today}`);
-        return data ? JSON.parse(data) : [];
-    }
-
-    function recordTodayLearnedWord(wordJp) {
-        const today = getTodayKey();
-        let list = getTodayLearnedWords();
-        if (!list.includes(wordJp)) {
-            list.push(wordJp);
-            localStorage.setItem(`jp_learned_${today}`, JSON.stringify(list));
-            if (currentUser) {
-                const obj = {};
-                obj[`progress.jp_learned_${today}`] = list;
-                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
-            }
+        if (currentWritingList.length > 0) {
+            loadKanaToWritingBoard(currentWritingList[0], tabKey === 'seion-kata');
         }
     }
 
-    function getQuestSettings() {
-        const data = localStorage.getItem('jp_quest_settings');
-        return data ? JSON.parse(data) : { readTarget: 20, quizTarget: 10 };
-    }
-
-    function getTodayQuestProgress() {
-        const today = getTodayKey();
-        const data = localStorage.getItem(`jp_quest_daily_${today}`);
-        return data ? JSON.parse(data) : { readCount: 0, quizCount: 0, rewardClaimed: false };
-    }
-
-    function saveTodayQuestProgress(type) {
-        const today = getTodayKey();
-        const prog = getTodayQuestProgress();
-        const settings = getQuestSettings();
-
-        if (type === 'read') prog.readCount++;
-        if (type === 'quiz') prog.quizCount++;
-
-        if (!prog.rewardClaimed && prog.readCount >= settings.readTarget && prog.quizCount >= settings.quizTarget) {
-            prog.rewardClaimed = true;
-            addEXP(100);
-            playSuccessSound();
-            
-            let msg = '🎉 恭喜達成今日所有修煉委託！額外獲得 +100 EXP 🌟';
-            if (!currentUser) {
-                msg += '\n\n💡 溫馨提醒：登入 Google 帳號可永久保存你的等級與修煉進度喔！';
-            }
-            alert(msg);
-        }
-
-        localStorage.setItem(`jp_quest_daily_${today}`, JSON.stringify(prog));
-
-        if (currentUser) {
-            const obj = {};
-            obj[`progress.jp_quest_daily_${today}`] = prog;
-            db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
-        }
-
-        renderQuestBoard();
-    }
-
-    function openQuestSettings() {
+    function selectKanaItem(item, element, isKataMode) {
         playClickSound();
-        const current = getQuestSettings();
-        document.getElementById('input-read-target').value = current.readTarget;
-        document.getElementById('input-quiz-target').value = current.quizTarget;
-        document.getElementById('questSettingsModal').style.display = 'flex';
+        const allItems = document.querySelectorAll('.kana-item');
+        allItems.forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        const foundIdx = currentWritingList.findIndex(k => k.hira === item.hira);
+        if (foundIdx !== -1) currentWritingIndex = foundIdx;
+
+        loadKanaToWritingBoard(item, isKataMode);
+        speakWordDirectly(null, item.hira);
     }
 
-    function closeQuestSettingsModal(e) {
-        if (e && e.target !== document.getElementById('questSettingsModal') && !e.target.classList.contains('btn-modal-close')) return;
-        playClickSound();
-        document.getElementById('questSettingsModal').style.display = 'none';
-    }
+    function loadKanaToWritingBoard(item, isKataMode) {
+        if (!item) return;
+        const char = isKataMode ? item.kata : item.hira;
+        document.getElementById('current-writing-label').textContent = `${char} (${item.romaji})`;
+        document.getElementById('writing-grade-feedback').textContent = '';
+        hasDrawnOnCanvas = false;
 
-    function stepQuestInput(inputId, delta) {
-        playClickSound();
-        const input = document.getElementById(inputId);
-        let val = (parseInt(input.value, 10) || 5) + delta;
-        if (val < 1) val = 1;
-        input.value = val;
-    }
+        const wrapper = document.getElementById('canvas-wrapper');
+        const canvas = document.getElementById('strokeCanvas');
+        const isWide = (char.length > 1);
 
-    function setQuestInputValue(inputId, value) {
-        playClickSound();
-        document.getElementById(inputId).value = value;
-    }
-
-    function saveQuestSettingsFromModal() {
-        playClickSound();
-        const readVal = parseInt(document.getElementById('input-read-target').value, 10) || 20;
-        const quizVal = parseInt(document.getElementById('input-quiz-target').value, 10) || 10;
-
-        const targetObj = {
-            readTarget: Math.max(readVal, 1),
-            quizTarget: Math.max(quizVal, 1)
-        };
-        localStorage.setItem('jp_quest_settings', JSON.stringify(targetObj));
-
-        if (currentUser) {
-            db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_quest_settings: targetObj } }, { merge: true });
-        }
-        
-        document.getElementById('questSettingsModal').style.display = 'none';
-        renderQuestBoard();
-        loadSheetData(document.getElementById('sheetSelect').value);
-    }
-
-    function renderQuestBoard() {
-        const settings = getQuestSettings();
-        const todayProg = getTodayQuestProgress();
-        const dateEl = document.getElementById('quest-date-indicator');
-        if (dateEl) dateEl.textContent = `(${getTodayKey()})`;
-
-        const readPercent = Math.min(Math.floor((todayProg.readCount / settings.readTarget) * 100), 100);
-        const quizPercent = Math.min(Math.floor((todayProg.quizCount / settings.quizTarget) * 100), 100);
-
-        const readTextEl = document.getElementById('quest-read-text');
-        const readBarEl = document.getElementById('quest-read-bar');
-        if (readTextEl) readTextEl.textContent = `${todayProg.readCount} / ${settings.readTarget} (${readPercent}%) ${readPercent >= 100 ? '✅' : ''}`;
-        if (readBarEl) readBarEl.style.width = `${readPercent}%`;
-
-        const quizTextEl = document.getElementById('quest-quiz-text');
-        const quizBarEl = document.getElementById('quest-quiz-bar');
-        if (quizTextEl) quizTextEl.textContent = `${todayProg.quizCount} / ${settings.quizTarget} (${quizPercent}%) ${quizPercent >= 100 ? '✅' : ''}`;
-        if (quizBarEl) quizBarEl.style.width = `${quizPercent}%`;
-    }
-
-    function getProgress(wordJp) {
-        const key = `jp_progress_${wordJp}`;
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : { read: 0, quiz: 0 };
-    }
-    
-    function saveProgress(wordJp, type) {
-        const key = `jp_progress_${wordJp}`;
-        const progress = getProgress(wordJp);
-        const isFirstRead = (type === 'read' && progress.read === 0);
-
-        if (type === 'read') {
-            progress.read++;
-            recordTodayLearnedWord(wordJp);
-        }
-        if (type === 'quiz') progress.quiz++;
-        localStorage.setItem(key, JSON.stringify(progress));
-
-        if (isFirstRead) addEXP(10); 
-        if (type === 'quiz') addEXP(25);
-
-        saveTodayQuestProgress(type);
-
-        if (currentUser) {
-            const updateObj = {};
-            updateObj[`progress.${key}`] = progress;
-            db.collection('user_progress').doc(currentUser.uid).update(updateObj).catch(() => {
-                const fullObj = {};
-                fullObj[key] = progress;
-                db.collection('user_progress').doc(currentUser.uid).set({ progress: fullObj }, { merge: true });
-            });
-        }
-    }
-
-    function cleanTextForSpeech(text) {
-        if (!text) return '';
-        return text.replace(/[（\(][^）\)]*[）\)]/g, '').replace(/〜/g, '');
-    }
-
-    let globalTTSAudio = new Audio();
-
-    function speakWordDirectly(event, wordText) {
-        if (event) event.stopPropagation();
-        if (!wordText) return;
-        
-        playClickSound();
-
-        let text = cleanTextForSpeech(wordText).trim();
-        if (!text) return;
-
-        try {
-            globalTTSAudio.pause();
-            globalTTSAudio.currentTime = 0;
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        } catch(e) {}
-
-        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`;
-
-        globalTTSAudio.src = ttsUrl;
-        const playPromise = globalTTSAudio.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'ja-JP';
-                    utterance.rate = 0.95;
-                    window.speechSynthesis.speak(utterance);
-                }
-            });
-        }
-    }
-
-    function speakFrontCard(event) {
-        if (event) event.stopPropagation();
-        if (currentList.length === 0) return;
-        const current = currentList[currentIndex];
-        speakWordDirectly(event, current.jp);
-    }
-
-    function speakJP(event, elementId) {
-        if (event) event.stopPropagation();
-        let text = document.getElementById(elementId).textContent;
-        if (!text || text.includes('載入中') || text.includes('測驗完成') || text.includes('＿')) return;
-        speakWordDirectly(event, text);
-    }
-
-    function speakExampleJP(event, rawText) {
-        if (event) event.stopPropagation();
-        if (!rawText) return;
-        const firstLine = rawText.split('\n')[0] || rawText;
-        speakWordDirectly(event, firstLine);
-    }
-
-    function speakQuizPrompt(event) {
-        if (event) event.stopPropagation();
-        if (!currentCorrectAnswer) return;
-
-        playClickSound();
-        const questionType = currentCorrectAnswer.activeQuestionType;
-        if (questionType === 1) {
-            speakWordDirectly(event, currentCorrectAnswer.jp);
+        if (isWide) {
+            wrapper.classList.add('wide-mode');
+            canvas.width = 320;
+            canvas.height = 240;
         } else {
-            speakJP(event, 'quiz-jp');
-        }
-    }
-
-    function parseCSVText(text) {
-        let result = [];
-        let row = [];
-        let current = '';
-        let insideQuote = false;
-
-        for (let i = 0; i < text.length; i++) {
-            let char = text[i];
-            let nextChar = text[i + 1];
-
-            if (char === '"') {
-                if (insideQuote && nextChar === '"') {
-                    current += '"';
-                    i++; 
-                } else {
-                    insideQuote = !insideQuote;
-                }
-            } else if (char === ',' && !insideQuote) {
-                row.push(current.trim());
-                current = '';
-            } else if ((char === '\n' || char === '\r') && !insideQuote) {
-                if (char === '\r' && nextChar === '\n') i++; 
-                row.push(current.trim());
-                result.push(row);
-                row = [];
-                current = '';
-            } else {
-                current += char;
-            }
-        }
-        if (current !== '' || row.length > 0) {
-            row.push(current.trim());
-            result.push(row);
-        }
-        return result;
-    }
-
-    function isValidWord(item) {
-        if (!item.jp || item.jp.trim() === '') return false;
-        if (item.isIntroCard) return true;
-        if (item.jp.length > 30) return false;
-        return true;
-    }
-
-    function getDailyRandomSeed() {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = now.getMonth() + 1;
-        const d = now.getDate();
-        return y * 10000 + m * 100 + d;
-    }
-
-    function pseudoRandom(seed) {
-        const x = Math.sin(seed++) * 10000;
-        return x - Math.floor(x);
-    }
-
-    async function preloadAllCategories() {
-        const selectElement = document.getElementById('sheetSelect');
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const date = String(now.getDate()).padStart(2, '0');
-        const dateString = `${year}/${month}/${date}`;
-
-        const dateTagEl = document.getElementById('marquee-date-tag');
-        if (dateTagEl) {
-            dateTagEl.textContent = `📢 今日必學・${dateString}`;
+            wrapper.classList.remove('wide-mode');
+            canvas.width = 240;
+            canvas.height = 240;
         }
 
-        allSearchableWords = [];
-        sheetDataCache = {};
-
-        let hasLoadedFirstBatch = false;
-
-        const promises = Object.entries(SHEETS_CONFIG).map(async ([sheetKey, url]) => {
-            const optElement = Array.from(selectElement.options).find(o => o.value === sheetKey);
-            const catName = optElement ? optElement.text : sheetKey;
-
-            try {
-                const res = await fetch(url);
-                const text = await res.text();
-                const parsedData = parseCSVText(text);
-
-                if (parsedData.length >= 2) {
-                    const headers = parsedData[0];
-                    const sheetWords = [];
-
-                    const row2 = parsedData[1] || [];
-                    const row3 = parsedData[2] || [];
-                    
-                    const isDualRowIntro = row2.length > 0 && row2.some(c => c.includes('定義與功能') || c.includes('我是誰？') || c.includes('平假名') || c.includes('核心定義'));
-                    const isSingleRowIntro = !isDualRowIntro && row2.length > 0 && row2[0] && (row2[0].includes('特色') || row2[0].includes('定義') || row2[0].includes('文法中') || row2[0].includes('像中文的') || row2[0].includes('計數系統'));
-
-                    let dataStartIndex = 1;
-
-                    if (isDualRowIntro && row3.length > 0) {
-                        const introItem = {
-                            jp: row3[0] || catName,
-                            kanji: '',
-                            level: '觀念導讀',
-                            type: catName,
-                            rawCols: row3,
-                            rawHeaders: row2,
-                            catKey: sheetKey,
-                            catName: catName,
-                            isIntroCard: true,
-                            isStructuredIntro: true,
-                            introHeaders: row2,
-                            introValues: row3
-                        };
-                        sheetWords.push(introItem);
-                        dataStartIndex = 3;
-                    } else if (isSingleRowIntro) {
-                        const introItem = {
-                            jp: `📖 ${catName}・核心觀念`,
-                            kanji: '',
-                            level: '觀念導讀',
-                            type: catName,
-                            rawCols: row2,
-                            rawHeaders: headers,
-                            catKey: sheetKey,
-                            catName: catName,
-                            isIntroCard: true,
-                            introContent: row2[0]
-                        };
-                        sheetWords.push(introItem);
-                        dataStartIndex = 2;
-                    }
-
-                    const dataRows = parsedData.slice(dataStartIndex);
-
-                    dataRows.forEach(cols => {
-                        const wordTitle = cols[0] || '';
-                        if (wordTitle && wordTitle.trim() !== '') {
-                            const item = {
-                                jp: wordTitle,
-                                kanji: cols[1] || '',
-                                level: cols[2] || '',
-                                type: cols[3] || '',
-                                rawCols: cols,
-                                rawHeaders: headers,
-                                catKey: sheetKey,
-                                catName: catName
-                            };
-                            if (isValidWord(item)) {
-                                globalWordCategoryMap[item.jp] = catName;
-                                globalWordDataMap[item.jp] = item;
-                                sheetWords.push(item);
-                                allSearchableWords.push(item);
-                            }
-                        }
-                    });
-
-                    sheetDataCache[sheetKey] = sheetWords;
-
-                    if (!hasLoadedFirstBatch && sheetWords.length > 0) {
-                        hasLoadedFirstBatch = true;
-                        loadSheetData(document.getElementById('sheetSelect').value);
-                    }
-                }
-            } catch (err) {}
-        });
-
-        await Promise.all(promises);
-
-        sheetDataCache['all'] = [...allSearchableWords];
-        pickDailyFiveWords(dateString);
-        updateHUDLevel();
-
-        loadSheetData(document.getElementById('sheetSelect').value);
-        checkSurpriseBossTrigger();
+        drawGhostKanaOnCanvas(char);
     }
 
-    function checkSurpriseBossTrigger() {
-        const lastTrigger = localStorage.getItem('jp_surprise_last_date');
-        const today = getTodayKey();
-        
-        if (!lastTrigger) {
-            localStorage.setItem('jp_surprise_last_date', today);
+    function redrawCurrentKanaBoard() {
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        if (item) loadKanaToWritingBoard(item, isKataMode);
+    }
+
+    function drawGhostKanaOnCanvas(char) {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. 田字格輔助線
+        ctx.save();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+
+        if (char.length > 1) {
+            const halfW = canvas.width / 2;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(halfW, 0); ctx.lineTo(halfW, canvas.height);
+            ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        } else {
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        // 2. 淺藍色標準底字
+        ctx.save();
+        if (char.length > 1) {
+            ctx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
+            ctx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
+        } else {
+            ctx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        }
+        ctx.restore();
+    }
+
+    function clearStrokeCanvas() {
+        playClickSound();
+        document.getElementById('writing-grade-feedback').textContent = '';
+        hasDrawnOnCanvas = false;
+        redrawCurrentKanaBoard();
+    }
+
+    function checkWritingGrade() {
+        const feedbackEl = document.getElementById('writing-grade-feedback');
+        const canvas = document.getElementById('strokeCanvas');
+        if (!hasDrawnOnCanvas || !canvas) {
+            feedbackEl.textContent = '🐣 還沒有動筆臨摹喔！請在白板上臨摹寫一次！';
+            feedbackEl.style.color = '#f59e0b';
+            playWrongSound();
             return;
         }
 
-        const d1 = new Date(lastTrigger);
-        const d2 = new Date(today);
-        const diffDays = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        const char = isKataMode ? item.kata : item.hira;
 
-        if (diffDays >= 3) {
-            setTimeout(() => {
-                triggerSurpriseBossQuest();
-            }, 1200);
-        }
-    }
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = canvas.width;
+        offCanvas.height = canvas.height;
+        const offCtx = offCanvas.getContext('2d');
 
-    function triggerSurpriseBossQuest() {
-        if (allSearchableWords.length < 4) return;
-
-        let weakCandidates = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (k.startsWith('jp_progress_')) {
-                const w = k.replace('jp_progress_', '');
-                const p = JSON.parse(localStorage.getItem(k));
-                if (p.read > 0 && p.quiz === 0 && globalWordDataMap[w] && !globalWordDataMap[w].isIntroCard) {
-                    weakCandidates.push(globalWordDataMap[w]);
-                }
-            }
-        }
-
-        const grammarTrapKeys = ['sheet2', 'sheet3', 'sheet10', 'sheet11', 'sheet13', 'sheet15', 'sheet17', 'sheet19', 'sheet21', 'sheet22'];
-        let grammarCandidates = allSearchableWords.filter(item => grammarTrapKeys.includes(item.catKey) && !item.isIntroCard);
-
-        let isWeakness = false;
-        if (weakCandidates.length > 0 && Math.random() > 0.4) {
-            currentBossWord = weakCandidates[Math.floor(Math.random() * weakCandidates.length)];
-            isWeakness = true;
-        } else if (grammarCandidates.length > 0) {
-            currentBossWord = grammarCandidates[Math.floor(Math.random() * grammarCandidates.length)];
-            isWeakness = false;
+        offCtx.save();
+        if (char.length > 1) {
+            offCtx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillStyle = '#000000';
+            offCtx.textAlign = 'center';
+            offCtx.textBaseline = 'middle';
+            offCtx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
+            offCtx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
         } else {
-            const pool = allSearchableWords.filter(w => !w.isIntroCard);
-            currentBossWord = pool[Math.floor(Math.random() * pool.length)];
+            offCtx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillStyle = '#000000';
+            offCtx.textAlign = 'center';
+            offCtx.textBaseline = 'middle';
+            offCtx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        }
+        offCtx.restore();
+
+        const refData = offCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+        const userCtx = canvas.getContext('2d');
+        const userData = userCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        let refPixelCount = 0;
+        let matchedPixelCount = 0;
+        let userStrokeCount = 0;
+
+        for (let i = 0; i < refData.length; i += 4) {
+            const isRef = refData[i + 3] > 100;
+            const isUserStroke = (userData[i] > 180 && userData[i + 1] < 120 && userData[i + 3] > 150);
+
+            if (isRef) refPixelCount++;
+            if (isUserStroke) userStrokeCount++;
+            if (isRef && isUserStroke) matchedPixelCount++;
         }
 
-        document.getElementById('boss-quest-badge').textContent = isWeakness ? '🎯 弱點狙擊（遺忘盲區狙擊）' : '⚔️ 文法魔王陷阱（句型助詞特訓）';
+        const coverageRatio = refPixelCount > 0 ? (matchedPixelCount / refPixelCount) : 0;
+        const accuracyRatio = userStrokeCount > 0 ? (matchedPixelCount / userStrokeCount) : 0;
 
-        const rawExample = getQuizExampleText(currentBossWord);
-        const exampleLine1 = (rawExample.split('\n')[0] || rawExample).trim();
-        let questionText = '';
-
-        if (exampleLine1 !== '') {
-            let cloze = exampleLine1;
-            if (currentBossWord.kanji && currentBossWord.kanji.trim() !== '') {
-                cloze = cloze.split(currentBossWord.kanji).join('＿＿＿');
-            }
-            if (currentBossWord.jp && currentBossWord.jp.trim() !== '') {
-                cloze = cloze.split(currentBossWord.jp).join('＿＿＿');
-            }
-            questionText = `【${currentBossWord.catName}】\n${cloze}`;
-        } else {
-            questionText = `【${currentBossWord.catName}】\n${currentBossWord.jp}`;
-        }
-
-        document.getElementById('boss-question-text').textContent = questionText;
-
-        let wrongCandidates = allSearchableWords.filter(w => w.jp !== currentBossWord.jp && !w.isIntroCard).sort(() => Math.random() - 0.5).slice(0, 3);
-        let options = [currentBossWord].concat(wrongCandidates).sort(() => Math.random() - 0.5);
-
-        const optionsContainer = document.getElementById('boss-quiz-options');
-        optionsContainer.innerHTML = '';
-        selectedBossOption = null;
-
-        options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'quiz-btn';
-            const optText = (exampleLine1 !== '') ? opt.jp : getQuizZhText(opt);
-            btn.innerHTML = `<span>[${idx + 1}] ${optText}</span>`;
-            btn.onclick = () => selectBossOption(btn, opt);
-            optionsContainer.appendChild(btn);
-        });
-
-        document.getElementById('boss-quiz-feedback').textContent = '';
-        document.getElementById('boss-quiz-feedback').className = 'quiz-feedback';
-        document.getElementById('btn-boss-submit').style.display = 'none';
-        document.getElementById('btn-boss-close').style.display = 'none';
-        document.getElementById('btn-boss-flee').style.display = 'block';
-
-        playWrongSound();
-        document.getElementById('surpriseBossModal').style.display = 'flex';
-    }
-
-    function selectBossOption(btn, opt) {
-        playClickSound();
-        const allBtns = document.querySelectorAll('.quiz-btn');
-        allBtns.forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedBossOption = opt;
-        document.getElementById('btn-boss-submit').style.display = 'block';
-    }
-
-    function submitBossAnswer() {
-        if (!selectedBossOption) return;
-        const allBtns = document.querySelectorAll('.quiz-btn');
-        allBtns.forEach(b => {
-            b.disabled = true;
-            b.classList.remove('selected');
-        });
-
-        document.getElementById('btn-boss-submit').style.display = 'none';
-        document.getElementById('btn-boss-flee').style.display = 'none';
-        const feedbackEl = document.getElementById('boss-quiz-feedback');
-
-        if (selectedBossOption.jp === currentBossWord.jp) {
+        if (coverageRatio >= 0.40 && accuracyRatio >= 0.25) {
             playSuccessSound();
-            addEXP(200);
-            feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
-            feedbackEl.className = 'quiz-feedback success';
-            localStorage.setItem('jp_surprise_last_date', getTodayKey());
-            if (currentUser) {
-                const obj = {};
-                obj['progress.jp_surprise_last_date'] = getTodayKey();
-                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
-            }
+            addEXP(5);
+            feedbackEl.textContent = `🎉 完美達成！臨摹契合度 ${Math.floor(coverageRatio * 100)}%！(+5 EXP)`;
+            feedbackEl.style.color = '#22c55e';
         } else {
             playWrongSound();
-            feedbackEl.textContent = `💀 挑戰失敗！正解是：${currentBossWord.jp} (${getQuizZhText(currentBossWord)})`;
-            feedbackEl.className = 'quiz-feedback error';
+            feedbackEl.textContent = `💀 筆劃偏離過多（契合度 ${Math.floor(coverageRatio * 100)}%）！請對齊字形重新練習喔～`;
+            feedbackEl.style.color = '#ef4444';
+        }
+    }
+
+    function nextWritingKana() {
+        playClickSound();
+        if (currentWritingIndex < currentWritingList.length - 1) {
+            currentWritingIndex++;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function prevWritingKana() {
+        playClickSound();
+        if (currentWritingIndex > 0) {
+            currentWritingIndex--;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function speakCurrentWritingKana() {
+        const item = currentWritingList[currentWritingIndex];
+        if (item) speakWordDirectly(null, item.hira);
+    }
+
+    function setupCanvasEvents() {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas || canvas.dataset.hasEvents) return;
+        canvas.dataset.hasEvents = 'true';
+
+        const ctx = canvas.getContext('2d');
+
+        function startDraw(x, y) {
+            isDrawing = true;
+            hasDrawnOnCanvas = true;
+            lastX = x;
+            lastY = y;
         }
 
-        allBtns.forEach(b => {
-            if (b.textContent.includes(currentBossWord.jp) || b.textContent.includes(getQuizZhText(currentBossWord))) {
-                b.classList.add('correct');
-            }
+        function draw(x, y) {
+            if (!isDrawing) return;
+            ctx.save();
+            ctx.strokeStyle = '#ec4899';
+            ctx.lineWidth = 12;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.restore();
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
         });
-
-        document.getElementById('btn-boss-close').style.display = 'block';
-    }
-
-    function closeSurpriseModal() {
-        playClickSound();
-        document.getElementById('surpriseBossModal').style.display = 'none';
-    }
-
-    function fleeSurpriseModal() {
-        playClickSound();
-        document.getElementById('surpriseBossModal').style.display = 'none';
-    }
-
-    function pickDailyFiveWords(dateString) {
-        let seed = getDailyRandomSeed();
-        const pool = allSearchableWords.filter(w => !w.isIntroCard);
-        const selectedDailyWords = [];
-
-        for (let i = 0; i < 5 && pool.length > 0; i++) {
-            const randIndex = Math.floor(pseudoRandom(seed + i * 17) * pool.length);
-            selectedDailyWords.push(pool[randIndex]);
-            pool.splice(randIndex, 1);
-        }
-
-        renderMarquee(selectedDailyWords, dateString);
-    }
-
-    function handleSearch(inputText) {
-        const dropdown = document.getElementById('searchResultsDropdown');
-        const rawInput = inputText.trim();
-
-        if (!rawInput) {
-            dropdown.style.display = 'none';
-            dropdown.innerHTML = '';
-            return;
-        }
-
-        const tokens = rawInput.toLowerCase().split(/\s+/).filter(Boolean);
-
-        let expandedTargets = [];
-        tokens.forEach(token => {
-            SEMANTIC_SYNONYMS.forEach(syn => {
-                if (syn.triggers.some(t => token.includes(t) || t.includes(token))) {
-                    expandedTargets.push(...syn.targets);
-                }
-            });
+        canvas.addEventListener('mousemove', (e) => {
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
         });
-        expandedTargets = [...new Set(expandedTargets)];
+        window.addEventListener('mouseup', stopDraw);
 
-        let scoredMatches = [];
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
+        }, { passive: false });
 
-        allSearchableWords.forEach(item => {
-            if (item.isIntroCard) return;
-            let score = 0;
-            const jp = item.jp.toLowerCase();
-            const kanji = (item.kanji || '').toLowerCase();
-            const zh = getWordZhText(item).toLowerCase();
-            const fullContent = (item.rawCols || []).join(' ').toLowerCase();
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
+        }, { passive: false });
 
-            tokens.forEach(tok => {
-                if (jp === tok || kanji === tok) score += 100;
-                else if (jp.includes(tok) || kanji.includes(tok)) score += 50;
-                if (zh.includes(tok)) score += 40;
-                else if (fullContent.includes(tok)) score += 15;
-            });
-
-            expandedTargets.forEach(tgt => {
-                if (jp.includes(tgt) || kanji.includes(tgt) || fullContent.includes(tgt)) {
-                    score += 30;
-                }
-            });
-
-            if (score > 0) {
-                scoredMatches.push({ item, score });
-            }
-        });
-
-        scoredMatches.sort((a, b) => b.score - a.score);
-
-        if (scoredMatches.length === 0) {
-            dropdown.innerHTML = `<div style="padding: 14px; font-size: 13px; color: #64748b; text-align: center;">查無符合「${rawInput}」的項目 🍃<br><span style="font-size:11px; color:#94a3b8;">可嘗試輸入近義詞或假名喔！</span></div>`;
-            dropdown.style.display = 'block';
-            return;
-        }
-
-        const resultsHtml = scoredMatches.slice(0, 15).map(({ item }) => {
-            const zhText = getWordZhText(item);
-            let mainDisplay = item.jp;
-            if (item.kanji && item.kanji !== item.jp) {
-                if (/[a-zA-Z]/.test(item.kanji)) {
-                    mainDisplay = `${item.jp} (${item.kanji})`;
-                } else {
-                    mainDisplay = `${item.kanji} (${item.jp})`;
-                }
-            }
-            const safeJp = item.jp.replace(/'/g, "\\'");
-
-            return `
-                <div class="search-result-item" onclick="selectSearchResult('${item.catKey}', '${safeJp}')">
-                    <div style="overflow:hidden; text-overflow:ellipsis;">
-                        <div class="search-result-word">${mainDisplay}</div>
-                        <div class="search-result-sub">${zhText}</div>
-                    </div>
-                    <span class="search-result-cat">${item.catName}</span>
-                </div>
-            `;
-        }).join('');
-
-        dropdown.innerHTML = resultsHtml;
-        dropdown.style.display = 'block';
-    }
-
-    function selectSearchResult(sheetKey, wordJp) {
-        playClickSound();
-        const dropdown = document.getElementById('searchResultsDropdown');
-        dropdown.style.display = 'none';
-        document.getElementById('searchInput').value = '';
-        jumpToCategory(sheetKey, wordJp);
-    }
-
-    document.addEventListener('click', (e) => {
-        const searchBox = document.querySelector('.search-container');
-        if (searchBox && !searchBox.contains(e.target)) {
-            document.getElementById('searchResultsDropdown').style.display = 'none';
-        }
-    });
-
-    function renderMarquee(items, dateString) {
-        const marqueeEl = document.getElementById('marquee-content');
-        if (!marqueeEl) return;
-
-        const itemsHtml = items.map((item, idx) => {
-            let display = item.jp;
-            if (item.kanji && item.kanji !== item.jp) {
-                if (/[a-zA-Z]/.test(item.kanji)) {
-                    display = `${item.jp} (${item.kanji})`;
-                } else {
-                    display = `${item.kanji} (${item.jp})`;
-                }
-            }
-            const zhText = getWordZhText(item);
-            const safeJp = item.jp.replace(/'/g, "\\'");
-            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}', '${safeJp}')">✨ [${idx + 1}/5・${item.catName}] ${display}：${zhText}</span>`;
-        }).join('');
-
-        marqueeEl.innerHTML = `${itemsHtml} &nbsp;&nbsp;&nbsp;&nbsp; ${itemsHtml}`;
-    }
-
-    function jumpToCategory(sheetKey, targetWordJp = null) {
-        playPageFlipSound();
-        setMode('review');
-        const select = document.getElementById('sheetSelect');
-        select.value = sheetKey;
-        document.getElementById('flashcard').classList.remove('is-flipped');
-        loadSheetData(sheetKey, targetWordJp);
-    }
-
-    function loadSheetData(urlKey, targetWordJp = null) {
-        let sourceData = [];
-
-        if (urlKey === 'all') {
-            sourceData = sheetDataCache['all'] || allSearchableWords || [];
-        } else {
-            sourceData = sheetDataCache[urlKey] || [];
-        }
-
-        if (sourceData.length === 0) {
-            document.getElementById('card-sub-front').textContent = '資料加速載入中...';
-            document.getElementById('card-main-front').textContent = '';
-            return;
-        }
-
-        const introCard = sourceData.find(w => w.isIntroCard);
-        let normalWords = sourceData.filter(w => !w.isIntroCard);
-        normalWords.sort(() => Math.random() - 0.5);
-
-        fullSourceList = introCard ? [introCard, ...normalWords] : [...normalWords];
-
-        const settings = getQuestSettings();
-        const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
-
-        if (fullSourceList.length > targetLimit) {
-            currentList = fullSourceList.slice(0, targetLimit);
-            document.getElementById('btn-unlock-more-cards').style.display = 'block';
-        } else {
-            currentList = [...fullSourceList];
-            document.getElementById('btn-unlock-more-cards').style.display = 'none';
-        }
-
-        if (targetWordJp) {
-            const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
-            currentIndex = (foundIndex !== -1) ? foundIndex : 0;
-        } else {
-            currentIndex = 0;
-        }
-        
-        initMode(targetWordJp ? true : false);
-    }
-
-    function unlockFullCards() {
-        playClickSound();
-        currentList = [...fullSourceList];
-        document.getElementById('btn-unlock-more-cards').style.display = 'none';
-        updateReviewUI();
-    }
-
-    function changeSheet() {
-        playClickSound();
-        const selected = document.getElementById('sheetSelect').value;
-        document.getElementById('flashcard').classList.remove('is-flipped');
-        loadSheetData(selected);
-    }
-
-    function setMode(mode) {
-        playClickSound();
-        currentMode = mode;
-        document.getElementById('mode-review').classList.toggle('active', mode === 'review');
-        document.getElementById('mode-quiz').classList.toggle('active', mode === 'quiz');
-        document.getElementById('mode-kana').classList.toggle('active', mode === 'kana');
-        document.getElementById('mode-stats').classList.toggle('active', mode === 'stats');
-        
-        document.getElementById('review-section').style.display = (mode === 'review') ? 'block' : 'none';
-        document.getElementById('quiz-section').style.display = (mode === 'quiz') ? 'block' : 'none';
-        document.getElementById('kana-section').style.display = (mode === 'kana') ? 'block' : 'none';
-        document.getElementById('stats-section').style.display = (mode === 'stats') ? 'block' : 'none';
-
-        if (mode === 'review') {
-            document.getElementById('review-section').style.display = 'block';
-            updateReviewUI();
-        } else if (mode === 'quiz') {
-            document.getElementById('quiz-section').style.display = 'block';
-            checkQuizStartFlow();
-        } else if (mode === 'kana') {
-            initKanaSection();
-        } else if (mode === 'stats') {
-            renderStatsDashboard();
-        }
-    }
-
-    function initMode(preserveIndex = false) {
-        if (currentMode === 'review') {
-            if (!preserveIndex) currentIndex = 0;
-            updateReviewUI();
-        } else if (currentMode === 'quiz') {
-            checkQuizStartFlow();
-        } else if (currentMode === 'kana') {
-            initKanaSection();
-        } else if (currentMode === 'stats') {
-            renderStatsDashboard();
-        }
+        canvas.addEventListener('touchend', stopDraw);
     }
 
     function getWordZhText(wordObj) {
