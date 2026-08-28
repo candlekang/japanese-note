@@ -2204,8 +2204,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.9.3';
-    const APP_UPDATE_NOTE = '修正數詞例句朗讀｜範例速查與一般例句都可直接播放日文';
+    const APP_VERSION = 'v9.9.4';
+    const APP_UPDATE_NOTE = '數詞一般字卡獨立版型｜A4 起依 A1:G1 欄位顯示並修正例句朗讀';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4919,7 +4919,133 @@
             return;
         }
 
-        // 💡 5. 一般分類標準版型
+
+        // 💡 5. 數詞（sheet3）專屬一般字卡
+        // 導讀卡固定由 A2:G3 組成；A4 起的資料一律依 A1:G1 正式欄位名稱顯示
+        if (current.catKey === 'sheet3') {
+            badgeEl.style.display = 'inline-block';
+            badgeEl.textContent = '🔢 數詞';
+
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                mainTitleEl.textContent = current.kanji;
+                subTitleEl.textContent = current.jp;
+                subTitleEl.style.display = 'block';
+            } else {
+                mainTitleEl.textContent = current.jp;
+                subTitleEl.textContent = '';
+                subTitleEl.style.display = 'none';
+            }
+            mainTitleEl.style.display = 'block';
+
+            const getCounterCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const meaningVal = getCounterCol(['意思', '中文']);
+            const exampleVal = getCounterCol(['例句寶寶', '例句']);
+            const collocationVal = getCounterCol(['常見搭配', '搭配']);
+            const noteVal = getCounterCol(['備註', '備注']);
+            const explainVal = getCounterCol(['註解', '注解']);
+
+            if (meaningVal) {
+                meanBoxEl.textContent = `💡 ${meaningVal}`;
+                meanBoxEl.style.display = 'block';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let fullBackTitle = current.jp;
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                fullBackTitle = `${current.kanji}（${current.jp}）`;
+            }
+
+            let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+
+            const counterSpecialReading = getCounterSpecialReading(current);
+            if (counterSpecialReading) {
+                backHTML += `
+                    <div class="counter-reading-alert">
+                        <div class="counter-reading-alert-title">⚠️ 特殊讀音／音變</div>
+                        <div class="counter-reading-alert-text">${counterSpecialReading}</div>
+                    </div>
+                `;
+            }
+
+            if (meaningVal) {
+                backHTML += `
+                    <div class="detail-section">
+                        <span class="section-title">💡 意思：</span>
+                        <span class="section-text">${meaningVal}</span>
+                    </div>
+                `;
+            }
+
+            if (exampleVal) {
+                // 試算表「例句寶寶」通常為：
+                // 第 1 行日文、第 2 行中文。若有多組，以空白行分隔。
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button type="button" class="btn-tts-small"
+                                    onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            if (collocationVal) {
+                backHTML += `
+                    <div class="grammar-rule-card" style="border-color:#c4b5fd; background:#f5f3ff;">
+                        <div class="grammar-rule-title" style="color:#6d28d9;">🔗 常見搭配</div>
+                        <div class="grammar-rule-content" style="color:#4c1d95;">${collocationVal.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">📝 備註</div>
+                        <div class="notes-content">${noteVal.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+
+            if (explainVal) {
+                backHTML += `
+                    <div class="notes-block" style="background:#f8fafc;">
+                        <div class="notes-title">📌 註解</div>
+                        <div class="notes-content">${explainVal.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 6. 一般分類標準版型
+
         badgeEl.style.display = 'inline-block';
         badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
         meanBoxEl.style.display = 'none';
