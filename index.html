@@ -1753,277 +1753,1358 @@
 </div>
 
 <script>
-    // --- 7. 資料抓取、預載與卡片初始化 ---
-    async function preloadAllCategories() {
-        const selectElement = document.getElementById('sheetSelect');
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const date = String(now.getDate()).padStart(2, '0');
-        const dateString = `${year}/${month}/${date}`;
+    // --- 1. 全域變數宣告 ---
+    let sheetDataCache = {}; 
+    let fullSourceList = [];
+    let currentList = [];
+    let currentIndex = 0;
+    let currentMode = 'review';
+    let quizList = [];
+    let quizIndex = 0;
+    let currentCorrectAnswer = null;
+    let selectedOptionData = null;
+    let currentBossWord = null;
+    let selectedBossOption = null;
 
-        const dateTagEl = document.getElementById('marquee-date-tag');
-        if (dateTagEl) {
-            dateTagEl.textContent = `📢 今日必學・${dateString}`;
+    let globalWordCategoryMap = {};
+    let globalWordDataMap = {};
+    let allSearchableWords = [];
+
+    let currentKanaTab = 'seion-hira';
+    let currentWritingList = [];
+    let currentWritingIndex = 0;
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+    let hasDrawnOnCanvas = false;
+    let globalTTSAudio = new Audio();
+
+    let auth = null;
+    let db = null;
+    let currentUser = null;
+
+    // --- 2. 核心字典與常數 ---
+    const RANK_TIERS_CONFIG = [
+        { threshold: 0.00, title: "Lv.1 日文小白ㄔ 🐣", desc: "剛踏入日語修煉之門 (0% 起)" },
+        { threshold: 0.05, title: "Lv.2 日文小菜鳥 🐤", desc: "熟悉基本問候與簡單名詞 (5% 達成)" },
+        { threshold: 0.15, title: "Lv.3 日文初心者 🌿", desc: "掌握基礎五十音與日常詞彙 (15% 達成)" },
+        { threshold: 0.30, title: "Lv.4 單字小行家 ⚔️", desc: "具備核心基礎單字量 (30% 達成)" },
+        { threshold: 0.50, title: "Lv.5 文法修行僧 🛡️", desc: "突破動詞變化與句型難關 (50% 達成)" },
+        { threshold: 0.70, title: "Lv.6 假名魔法使 🧙‍♀️", desc: "掌握進階文法與細膩語感 (70% 達成)" },
+        { threshold: 0.85, title: "Lv.7 日語狂戰士 🐉", desc: "全方位制霸日語詞彙庫 (85% 達成)" },
+        { threshold: 0.95, title: "Lv.8 準・魔王領主 👑", desc: "即將登頂的頂級強者 (95% 達成)" },
+        { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
+    ];
+
+    const SHEETS_CONFIG = {
+        sheet1: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=938197036&single=true&output=csv',
+        sheet2: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1844228081&single=true&output=csv',
+        sheet3: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1130260118&single=true&output=csv',
+        sheet4: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=20080234&single=true&output=csv',
+        sheet5: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=591299877&single=true&output=csv',
+        sheet6: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1833922770&single=true&output=csv',
+        sheet7: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1447704017&single=true&output=csv',
+        sheet8: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=124325165&single=true&output=csv',
+        sheet9: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1679842630&single=true&output=csv',
+        sheet10: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1897403022&single=true&output=csv',
+        sheet11: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1587333217&single=true&output=csv',
+        sheet12: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1490497949&single=true&output=csv',
+        sheet13: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1342438350&single=true&output=csv',
+        sheet14: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=373655117&single=true&output=csv',
+        sheet15: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1550390723&single=true&output=csv',
+        sheet16: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1982280953&single=true&output=csv',
+        sheet17: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=369240348&single=true&output=csv',
+        sheet18: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1114398002&single=true&output=csv',
+        sheet19: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=1377172328&single=true&output=csv',
+        sheet20: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=826241804&single=true&output=csv',
+        sheet21: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=141438539&single=true&output=csv',
+        sheet22: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=584642201&single=true&output=csv',
+        sheet24: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=942908072&single=true&output=csv',
+        sheet25: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSgyG9Xklm79rvumT7CuueE952MHxngTgSq3kKF-zNdotON4WNXtcuOGSpoY9levw/pub?gid=219719106&single=true&output=csv'
+    };
+
+    const KANA_DATA = {
+        'seion-hira': [
+            { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
+            { hira: 'か', kata: 'カ', romaji: 'ka' }, { hira: 'き', kata: 'キ', romaji: 'ki' }, { hira: 'く', kata: 'ク', romaji: 'ku' }, { hira: 'け', kata: 'ケ', romaji: 'ke' }, { hira: 'こ', kata: 'コ', romaji: 'ko' },
+            { hira: 'さ', kata: 'サ', romaji: 'sa' }, { hira: 'し', kata: 'シ', romaji: 'shi' }, { hira: 'す', kata: 'ス', romaji: 'su' }, { hira: 'せ', kata: 'セ', romaji: 'se' }, { hira: 'そ', kata: 'ソ', romaji: 'so' },
+            { hira: 'た', kata: 'タ', romaji: 'ta' }, { hira: 'ち', kata: 'チ', romaji: 'chi' }, { hira: 'つ', kata: 'ツ', romaji: 'tsu' }, { hira: 'て', kata: 'テ', romaji: 'te' }, { hira: 'と', kata: 'ト', romaji: 'to' },
+            { hira: 'な', kata: 'ナ', romaji: 'na' }, { hira: 'に', kata: 'ニ', romaji: 'ni' }, { hira: 'ぬ', kata: 'ヌ', romaji: 'nu' }, { hira: 'ね', kata: 'ネ', romaji: 'ne' }, { hira: 'の', kata: 'ノ', romaji: 'no' },
+            { hira: 'は', kata: 'ハ', romaji: 'ha' }, { hira: 'ひ', kata: 'ヒ', romaji: 'hi' }, { hira: 'ふ', kata: 'フ', romaji: 'fu' }, { hira: 'へ', kata: 'ヘ', romaji: 'he' }, { hira: 'ほ', kata: 'ホ', romaji: 'ho' },
+            { hira: 'ま', kata: 'マ', romaji: 'ma' }, { hira: 'み', kata: 'ミ', romaji: 'mi' }, { hira: 'む', kata: 'ム', romaji: 'mu' }, { hira: 'め', kata: 'メ', romaji: 'me' }, { hira: 'も', kata: 'モ', romaji: 'mo' },
+            { hira: 'や', kata: 'ヤ', romaji: 'ya' }, null, { hira: 'ゆ', kata: 'ユ', romaji: 'yu' }, null, { hira: 'よ', kata: 'ヨ', romaji: 'yo' },
+            { hira: 'ら', kata: 'ラ', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
+            { hira: 'わ', kata: 'ワ', romaji: 'wa' }, null, null, null, { hira: 'を', kata: 'ヲ', romaji: 'o/wo' },
+            { hira: 'ん', kata: 'ン', romaji: 'n' }, null, null, null, null
+        ],
+        'dakuon': [
+            { hira: 'が', kata: 'ガ', romaji: 'ga' }, { hira: 'ぎ', kata: 'ギ', romaji: 'gi' }, { hira: 'ぐ', kata: 'グ', romaji: 'gu' }, { hira: 'げ', kata: 'ゲ', romaji: 'ge' }, { hira: 'ご', kata: 'ゴ', romaji: 'go' },
+            { hira: 'ざ', kata: 'ザ', romaji: 'za' }, { hira: 'じ', kata: 'ジ', romaji: 'ji' }, { hira: 'ず', kata: 'ズ', romaji: 'zu' }, { hira: 'ぜ', kata: 'ゼ', romaji: 'ze' }, { hira: 'ぞ', kata: 'ゾ', romaji: 'zo' },
+            { hira: 'だ', kata: 'ダ', romaji: 'da' }, { hira: 'ぢ', kata: 'ヂ', romaji: 'ji' }, { hira: 'づ', kata: 'ヅ', romaji: 'zu' }, { hira: 'で', kata: 'デ', romaji: 'de' }, { hira: 'ど', kata: 'ド', romaji: 'do' },
+            { hira: 'ば', kata: 'バ', romaji: 'ba' }, { hira: 'び', kata: 'ビ', romaji: 'bi' }, { hira: 'ぶ', kata: 'ブ', romaji: 'bu' }, { hira: 'べ', kata: 'ベ', romaji: 'be' }, { hira: 'ぼ', kata: '波', romaji: 'bo' },
+            { hira: 'ぱ', kata: 'パ', romaji: 'pa' }, { hira: 'ぴ', kata: 'ピ', romaji: 'pi' }, { hira: 'ぷ', kata: 'プ', romaji: 'pu' }, { hira: 'ぺ', kata: 'ペ', romaji: 'pe' }, { hira: 'ぽ', kata: 'ポ', romaji: 'po' }
+        ],
+        'youon': [
+            { hira: 'きゃ', kata: 'キャ', romaji: 'kya' }, { hira: 'きゅ', kata: 'キュ', romaji: 'kyu' }, { hira: 'きょ', kata: 'キョ', romaji: 'kyo' },
+            { hira: 'しゃ', kata: 'シャ', romaji: 'sha' }, { hira: 'しゅ', kata: 'シュ', romaji: 'shu' }, { hira: 'しょ', kata: 'ショ', romaji: 'sho' },
+            { hira: 'ちゃ', kata: 'チャ', romaji: 'cha' }, { hira: 'ちゅ', kata: 'チュ', romaji: 'chu' }, { hira: 'ちょ', kata: 'チョ', romaji: 'cho' },
+            { hira: 'にゃ', kata: 'ニャ', romaji: 'nya' }, { hira: 'にゅ', kata: 'ニュ', romaji: 'nyu' }, { hira: 'にょ', kata: 'ニョ', romaji: 'nyo' },
+            { hira: 'ひゃ', kata: 'ヒャ', romaji: 'hya' }, { hira: 'ひゅ', kata: 'ヒュ', romaji: 'hyu' }, { hira: 'ひょ', kata: 'ヒョ', romaji: 'hyo' },
+            { hira: 'みゃ', kata: 'ミャ', romaji: 'mya' }, { hira: 'みゅ', kata: 'ミュ', romaji: 'myu' }, { hira: 'みょ', kata: 'ミョ', romaji: 'myo' },
+            { hira: 'りゃ', kata: 'リャ', romaji: 'rya' }, { hira: 'りゅ', kata: 'リュ', romaji: 'ryu' }, { hira: 'りょ', kata: 'リョ', romaji: 'ryo' },
+            { hira: 'ぎゃ', kata: 'ギャ', romaji: 'gya' }, { hira: 'ぎゅ', kata: 'ギュ', romaji: 'gyu' }, { hira: 'ぎょ', kata: 'ギョ', romaji: 'gyo' },
+            { hira: 'じゃ', kata: 'ジャ', romaji: 'ja' }, { hira: 'じゅ', kata: 'ジュ', romaji: 'ju' }, { hira: 'じょ', kata: 'ジョ', romaji: 'jo' },
+            { hira: 'びゃ', kata: 'ビャ', romaji: 'bya' }, { hira: 'びゅ', kata: 'ビュ', romaji: 'byu' }, { hira: 'びょ', kata: 'ビョ', romaji: 'byo' },
+            { hira: 'ぴゃ', kata: 'ピャ', romaji: 'pya' }, { hira: 'ぴゅ', kata: 'ピュ', romaji: 'pyu' }, { hira: 'ぴょ', kata: 'ピョ', romaji: 'pyo' }
+        ]
+    };
+
+    // --- 3. 音效與 TTS 模組 ---
+    let audioCtx = null;
+    function getAudioContext() {
+        if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) audioCtx = new AudioContextClass();
         }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+    }
 
-        allSearchableWords = [];
-        sheetDataCache = {};
+    function unlockAudioOnMobile() {
+        const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') ctx.resume();
+        try {
+            const dummyAudio = new Audio();
+            dummyAudio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
+            dummyAudio.play().catch(() => {});
+        } catch(e) {}
+        document.removeEventListener('touchstart', unlockAudioOnMobile);
+        document.removeEventListener('click', unlockAudioOnMobile);
+    }
+    document.addEventListener('touchstart', unlockAudioOnMobile, { passive: true });
+    document.addEventListener('click', unlockAudioOnMobile, { passive: true });
 
-        const promises = Object.entries(SHEETS_CONFIG).map(async ([sheetKey, url]) => {
-            const optElement = Array.from(selectElement.options).find(o => o.value === sheetKey);
-            const catName = optElement ? optElement.text : sheetKey;
+    function playPageFlipSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const duration = 0.08;
+            const bufferSize = Math.floor(ctx.sampleRate * duration);
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            let lastOut = 0.0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                data[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = data[i];
+                data[i] *= 3.5;
+            }
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1400, now);
+            filter.frequency.exponentialRampToValueAtTime(700, now + duration);
+            filter.Q.setValueAtTime(1.8, now);
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.01, now);
+            gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+            noise.start(now);
+            noise.stop(now + duration);
+        } catch (e) {}
+    }
 
-            try {
-                const res = await fetch(url);
-                const text = await res.text();
-                const parsedData = parseCSVText(text);
+    function playClickSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const bufferSize = ctx.sampleRate * 0.005; 
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(2500, now);
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.025, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.005);
+            noise.connect(filter);
+            filter.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+            const osc = ctx.createOscillator();
+            const oscGain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1400, now);
+            osc.frequency.exponentialRampToValueAtTime(300, now + 0.012);
+            oscGain.gain.setValueAtTime(0.035, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+            osc.connect(oscGain);
+            oscGain.connect(ctx.destination);
+            noise.start(now);
+            osc.start(now);
+            osc.stop(now + 0.12);
+        } catch(e) {}
+    }
 
-                if (parsedData.length >= 2) {
-                    const headers = parsedData[0];
-                    const sheetWords = [];
+    function playSuccessSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, now);
+            gain1.gain.setValueAtTime(0.08, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.12);
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(659.25, now + 0.09);
+            gain2.gain.setValueAtTime(0.1, now + 0.09);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.09);
+            osc2.stop(now + 0.28);
+        } catch(e) {}
+    }
 
-                    const row2 = parsedData[1] || [];
-                    const row3 = parsedData[2] || [];
-                    
-                    const isDualRowIntro = row2.length > 0 && row2.some(c => c.includes('定義與功能') || c.includes('我是誰？') || c.includes('平假名') || c.includes('核心定義'));
-                    const isSingleRowIntro = !isDualRowIntro && row2.length > 0 && row2[0] && (row2[0].includes('特色') || row2[0].includes('定義') || row2[0].includes('文法中') || row2[0].includes('像中文的') || row2[0].includes('計數系統'));
+    function playWrongSound() {
+        try {
+            const ctx = getAudioContext();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'triangle';
+            osc1.frequency.setValueAtTime(349.23, now);
+            gain1.gain.setValueAtTime(0.08, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.12);
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(277.18, now + 0.1);
+            gain2.gain.setValueAtTime(0.09, now + 0.1);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.1);
+            osc2.stop(now + 0.28);
+        } catch(e) {}
+    }
 
-                    let dataStartIndex = 1;
+    function cleanTextForSpeech(text) {
+        if (!text) return '';
+        return text.replace(/[（\(][^）\)]*[）\)]/g, '').replace(/〜/g, '');
+    }
 
-                    if (isDualRowIntro && row3.length > 0) {
-                        const introItem = {
-                            jp: row3[0] || catName,
-                            kanji: '',
-                            level: '觀念導讀',
-                            type: catName,
-                            rawCols: row3,
-                            rawHeaders: row2,
-                            catKey: sheetKey,
-                            catName: catName,
-                            isIntroCard: true,
-                            isStructuredIntro: true,
-                            introHeaders: row2,
-                            introValues: row3
-                        };
-                        sheetWords.push(introItem);
-                        dataStartIndex = 3;
-                    } else if (isSingleRowIntro) {
-                        const introItem = {
-                            jp: `📖 ${catName}・核心觀念`,
-                            kanji: '',
-                            level: '觀念導讀',
-                            type: catName,
-                            rawCols: row2,
-                            rawHeaders: headers,
-                            catKey: sheetKey,
-                            catName: catName,
-                            isIntroCard: true,
-                            introContent: row2[0]
-                        };
-                        sheetWords.push(introItem);
-                        dataStartIndex = 2;
-                    }
-
-                    const dataRows = parsedData.slice(dataStartIndex);
-
-                    dataRows.forEach(cols => {
-                        const wordTitle = cols[0] || '';
-                        if (wordTitle && wordTitle.trim() !== '') {
-                            const item = {
-                                jp: wordTitle,
-                                kanji: cols[1] || '',
-                                level: cols[2] || '',
-                                type: cols[3] || '',
-                                rawCols: cols,
-                                rawHeaders: headers,
-                                catKey: sheetKey,
-                                catName: catName
-                            };
-                            if (isValidWord(item)) {
-                                globalWordCategoryMap[item.jp] = catName;
-                                globalWordDataMap[item.jp] = item;
-                                sheetWords.push(item);
-                                allSearchableWords.push(item);
-                            }
-                        }
-                    });
-
-                    sheetDataCache[sheetKey] = sheetWords;
+    function speakWordDirectly(event, wordText) {
+        if (event) event.stopPropagation();
+        if (!wordText) return;
+        playClickSound();
+        let text = cleanTextForSpeech(wordText).trim();
+        if (!text) return;
+        try {
+            globalTTSAudio.pause();
+            globalTTSAudio.currentTime = 0;
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        } catch(e) {}
+        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`;
+        globalTTSAudio.src = ttsUrl;
+        const playPromise = globalTTSAudio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'ja-JP';
+                    utterance.rate = 0.95;
+                    window.speechSynthesis.speak(utterance);
                 }
-            } catch (err) {}
-        });
-
-        await Promise.all(promises);
-
-        sheetDataCache['all'] = [...allSearchableWords];
-        pickDailyFiveWords(dateString);
-        updateHUDLevel();
-
-        // 💡 關鍵修復：下載完成後立即載入選定的分類並渲染正面卡片！
-        loadSheetData(document.getElementById('sheetSelect').value);
-        checkSurpriseBossTrigger();
-    }
-
-    function loadSheetData(urlKey, targetWordJp = null) {
-        let sourceData = [];
-
-        if (urlKey === 'all') {
-            sourceData = sheetDataCache['all'] || allSearchableWords || [];
-        } else {
-            sourceData = sheetDataCache[urlKey] || [];
-        }
-
-        if (sourceData.length === 0) {
-            document.getElementById('card-sub-front').textContent = '資料載入中...';
-            document.getElementById('card-main-front').textContent = '';
-            return;
-        }
-
-        const introCard = sourceData.find(w => w.isIntroCard);
-        let normalWords = sourceData.filter(w => !w.isIntroCard);
-        normalWords.sort(() => Math.random() - 0.5);
-
-        fullSourceList = introCard ? [introCard, ...normalWords] : [...normalWords];
-
-        const settings = getQuestSettings();
-        const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
-
-        if (fullSourceList.length > targetLimit) {
-            currentList = fullSourceList.slice(0, targetLimit);
-            document.getElementById('btn-unlock-more-cards').style.display = 'block';
-        } else {
-            currentList = [...fullSourceList];
-            document.getElementById('btn-unlock-more-cards').style.display = 'none';
-        }
-
-        if (targetWordJp) {
-            const foundIndex = currentList.findIndex(item => item.jp === targetWordJp);
-            currentIndex = (foundIndex !== -1) ? foundIndex : 0;
-        } else {
-            currentIndex = 0;
-        }
-        
-        initMode(targetWordJp ? true : false);
-    }
-
-    function handleSearch(inputText) {
-        const dropdown = document.getElementById('searchResultsDropdown');
-        const rawInput = inputText.trim();
-
-        if (!rawInput) {
-            dropdown.style.display = 'none';
-            dropdown.innerHTML = '';
-            return;
-        }
-
-        const tokens = rawInput.toLowerCase().split(/\s+/).filter(Boolean);
-        let scoredMatches = [];
-
-        allSearchableWords.forEach(item => {
-            if (item.isIntroCard) return;
-            let score = 0;
-            const jp = item.jp.toLowerCase();
-            const kanji = (item.kanji || '').toLowerCase();
-            const zh = getWordZhText(item).toLowerCase();
-            const fullContent = (item.rawCols || []).join(' ').toLowerCase();
-
-            tokens.forEach(tok => {
-                if (jp === tok || kanji === tok) score += 100;
-                else if (jp.includes(tok) || kanji.includes(tok)) score += 50;
-                if (zh.includes(tok)) score += 40;
-                else if (fullContent.includes(tok)) score += 15;
             });
-
-            if (score > 0) {
-                scoredMatches.push({ item, score });
-            }
-        });
-
-        scoredMatches.sort((a, b) => b.score - a.score);
-
-        if (scoredMatches.length === 0) {
-            dropdown.innerHTML = `<div style="padding: 14px; font-size: 13px; color: #64748b; text-align: center;">查無符合「${rawInput}」的項目 🍃</div>`;
-            dropdown.style.display = 'block';
-            return;
         }
+    }
 
-        const resultsHtml = scoredMatches.slice(0, 15).map(({ item }) => {
-            const zhText = getWordZhText(item);
-            let mainDisplay = item.jp;
-            if (item.kanji && item.kanji !== item.jp) {
-                if (/[a-zA-Z]/.test(item.kanji)) {
-                    mainDisplay = `${item.jp} (${item.kanji})`;
-                } else {
-                    mainDisplay = `${item.kanji} (${item.jp})`;
-                }
+    function speakFrontCard(event) {
+        if (event) event.stopPropagation();
+        if (currentList.length === 0) return;
+        const current = currentList[currentIndex];
+        speakWordDirectly(event, current.jp);
+    }
+
+    function speakJP(event, elementId) {
+        if (event) event.stopPropagation();
+        let text = document.getElementById(elementId).textContent;
+        if (!text || text.includes('載入中') || text.includes('測驗完成') || text.includes('＿')) return;
+        speakWordDirectly(event, text);
+    }
+
+    function speakExampleJP(event, rawText) {
+        if (event) event.stopPropagation();
+        if (!rawText) return;
+        const firstLine = rawText.split('\n')[0] || rawText;
+        speakWordDirectly(event, firstLine);
+    }
+
+    function speakQuizPrompt(event) {
+        if (event) event.stopPropagation();
+        if (!currentCorrectAnswer) return;
+        playClickSound();
+        const questionType = currentCorrectAnswer.activeQuestionType;
+        if (questionType === 1) {
+            speakWordDirectly(event, currentCorrectAnswer.jp);
+        } else {
+            speakJP(event, 'quiz-jp');
+        }
+    }
+
+    function speakCurrentWritingKana() {
+        const item = currentWritingList[currentWritingIndex];
+        if (item) speakWordDirectly(null, item.hira);
+    }
+
+    // --- 4. 經驗值與任務輔助函式 ---
+    function getTotalEXP() {
+        const exp = localStorage.getItem('jp_rpg_exp');
+        return exp ? parseInt(exp, 10) : 0;
+    }
+
+    function addEXP(points) {
+        let currentExp = getTotalEXP() + points;
+        localStorage.setItem('jp_rpg_exp', currentExp);
+        if (currentUser && db) {
+            db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_rpg_exp: currentExp } }, { merge: true });
+        }
+        updateHUDLevel();
+    }
+
+    function getLevelAndTitle(exp, totalWords) {
+        const maxExpCap = Math.max(totalWords * 35, 1000);
+        const progressRatio = Math.min(exp / maxExpCap, 1.0);
+        let currentRank = RANK_TIERS_CONFIG[0];
+        let nextRank = null;
+        for (let i = RANK_TIERS_CONFIG.length - 1; i >= 0; i--) {
+            if (progressRatio >= RANK_TIERS_CONFIG[i].threshold) {
+                currentRank = RANK_TIERS_CONFIG[i];
+                nextRank = RANK_TIERS_CONFIG[i + 1] || null;
+                break;
             }
-            const safeJp = item.jp.replace(/'/g, "\\'");
+        }
+        let nextExpReq = 0;
+        let expToNext = 0;
+        if (nextRank) {
+            nextExpReq = Math.ceil(nextRank.threshold * maxExpCap);
+            expToNext = Math.max(nextExpReq - exp, 0);
+        }
+        return {
+            title: currentRank.title,
+            ratioPercent: Math.floor(progressRatio * 100),
+            currentExp: exp,
+            maxExp: maxExpCap,
+            nextRank: nextRank,
+            expToNext: expToNext,
+            totalWords: totalWords
+        };
+    }
 
-            return `
-                <div class="search-result-item" onclick="selectSearchResult('${item.catKey}', '${safeJp}')">
-                    <div style="overflow:hidden; text-overflow:ellipsis;">
-                        <div class="search-result-word">${mainDisplay}</div>
-                        <div class="search-result-sub">${zhText}</div>
+    function updateHUDLevel() {
+        const totalWords = allSearchableWords.length || 1000;
+        const info = getLevelAndTitle(getTotalEXP(), totalWords);
+        const titleEl = document.getElementById('hud-rpg-title');
+        const fillEl = document.getElementById('hud-rpg-exp-fill');
+        const textEl = document.getElementById('hud-rpg-exp-text');
+        if (titleEl) titleEl.textContent = info.title;
+        if (fillEl) fillEl.style.width = `${info.ratioPercent}%`;
+        if (textEl) textEl.textContent = `${info.currentExp} EXP (${info.ratioPercent}%)`;
+    }
+
+    function openRankGuideModal() {
+        playClickSound();
+        const totalWords = allSearchableWords.length || 1000;
+        const info = getLevelAndTitle(getTotalEXP(), totalWords);
+        document.getElementById('modal-my-rank-title').textContent = `${info.title} (${info.ratioPercent}%)`;
+        document.getElementById('modal-sync-rate-text').textContent = `${info.ratioPercent}%`;
+        const hintEl = document.getElementById('modal-my-rank-hint');
+        if (info.nextRank) {
+            hintEl.textContent = `⚡ 距離下一位階【${info.nextRank.title}】還差 ${info.expToNext} EXP！`;
+        } else {
+            hintEl.textContent = `👾 恭喜登頂！你已達成【日文大魔王】的最高境界！🔥`;
+        }
+        const tierListEl = document.getElementById('modal-rank-tier-list');
+        tierListEl.innerHTML = '';
+        RANK_TIERS_CONFIG.forEach(tier => {
+            const reqExp = Math.ceil(tier.threshold * info.maxExp);
+            const isCurrent = (tier.title === info.title);
+            const isUnlocked = (info.currentExp >= reqExp);
+            let statusClass = isCurrent ? 'current' : (isUnlocked ? 'unlocked' : 'locked');
+            let badgeHtml = isCurrent ? `<span class="tier-badge-current">▶ 目前位置</span>` : (isUnlocked ? `<span style="color:#22c55e; font-size:11px; font-weight:bold;">✅ 已達成</span>` : `<span style="color:#64748b; font-size:11px;">🔒 ${Math.floor(tier.threshold * 100)}% 同步</span>`);
+            tierListEl.innerHTML += `
+                <div class="rank-tier-item ${statusClass}">
+                    <div>
+                        <div class="tier-name">${tier.title}</div>
+                        <div class="tier-req">${tier.desc}</div>
                     </div>
-                    <span class="search-result-cat">${item.catName}</span>
+                    <div>${badgeHtml}</div>
                 </div>
             `;
-        }).join('');
-
-        dropdown.innerHTML = resultsHtml;
-        dropdown.style.display = 'block';
+        });
+        document.getElementById('rankGuideModal').style.display = 'flex';
     }
 
-    function selectSearchResult(sheetKey, wordJp) {
+    function closeRankGuideModal(e) {
+        if (e && e.target !== document.getElementById('rankGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
         playClickSound();
-        const dropdown = document.getElementById('searchResultsDropdown');
-        dropdown.style.display = 'none';
-        document.getElementById('searchInput').value = '';
-        jumpToCategory(sheetKey, wordJp);
+        document.getElementById('rankGuideModal').style.display = 'none';
     }
 
-    function jumpToCategory(sheetKey, targetWordJp = null) {
+    function getTodayKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getTodayLearnedWords() {
+        const today = getTodayKey();
+        const data = localStorage.getItem(`jp_learned_${today}`);
+        return data ? JSON.parse(data) : [];
+    }
+
+    function recordTodayLearnedWord(wordJp) {
+        const today = getTodayKey();
+        let list = getTodayLearnedWords();
+        if (!list.includes(wordJp)) {
+            list.push(wordJp);
+            localStorage.setItem(`jp_learned_${today}`, JSON.stringify(list));
+            if (currentUser && db) {
+                const obj = {};
+                obj[`progress.jp_learned_${today}`] = list;
+                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+            }
+        }
+    }
+
+    function getQuestSettings() {
+        const data = localStorage.getItem('jp_quest_settings');
+        return data ? JSON.parse(data) : { readTarget: 20, quizTarget: 10 };
+    }
+
+    function getTodayQuestProgress() {
+        const today = getTodayKey();
+        const data = localStorage.getItem(`jp_quest_daily_${today}`);
+        return data ? JSON.parse(data) : { readCount: 0, quizCount: 0, rewardClaimed: false };
+    }
+
+    function saveTodayQuestProgress(type) {
+        const today = getTodayKey();
+        const prog = getTodayQuestProgress();
+        const settings = getQuestSettings();
+        if (type === 'read') prog.readCount++;
+        if (type === 'quiz') prog.quizCount++;
+        if (!prog.rewardClaimed && prog.readCount >= settings.readTarget && prog.quizCount >= settings.quizTarget) {
+            prog.rewardClaimed = true;
+            addEXP(100);
+            playSuccessSound();
+            alert('🎉 恭喜達成今日所有修煉委託！獲得 +100 EXP 🌟');
+        }
+        localStorage.setItem(`jp_quest_daily_${today}`, JSON.stringify(prog));
+        if (currentUser && db) {
+            const obj = {};
+            obj[`progress.jp_quest_daily_${today}`] = prog;
+            db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+        }
+        renderQuestBoard();
+    }
+
+    function openQuestSettings() {
+        playClickSound();
+        const current = getQuestSettings();
+        document.getElementById('input-read-target').value = current.readTarget;
+        document.getElementById('input-quiz-target').value = current.quizTarget;
+        document.getElementById('questSettingsModal').style.display = 'flex';
+    }
+
+    function closeQuestSettingsModal(e) {
+        if (e && e.target !== document.getElementById('questSettingsModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('questSettingsModal').style.display = 'none';
+    }
+
+    function stepQuestInput(inputId, delta) {
+        playClickSound();
+        const input = document.getElementById(inputId);
+        let val = (parseInt(input.value, 10) || 5) + delta;
+        if (val < 1) val = 1;
+        input.value = val;
+    }
+
+    function setQuestInputValue(inputId, value) {
+        playClickSound();
+        document.getElementById(inputId).value = value;
+    }
+
+    function saveQuestSettingsFromModal() {
+        playClickSound();
+        const readVal = parseInt(document.getElementById('input-read-target').value, 10) || 20;
+        const quizVal = parseInt(document.getElementById('input-quiz-target').value, 10) || 10;
+        const targetObj = {
+            readTarget: Math.max(readVal, 1),
+            quizTarget: Math.max(quizVal, 1)
+        };
+        localStorage.setItem('jp_quest_settings', JSON.stringify(targetObj));
+        if (currentUser && db) {
+            db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_quest_settings: targetObj } }, { merge: true });
+        }
+        document.getElementById('questSettingsModal').style.display = 'none';
+        renderQuestBoard();
+        loadSheetData(document.getElementById('sheetSelect').value);
+    }
+
+    function renderQuestBoard() {
+        const settings = getQuestSettings();
+        const todayProg = getTodayQuestProgress();
+        const dateEl = document.getElementById('quest-date-indicator');
+        if (dateEl) dateEl.textContent = `(${getTodayKey()})`;
+        const readPercent = Math.min(Math.floor((todayProg.readCount / settings.readTarget) * 100), 100);
+        const quizPercent = Math.min(Math.floor((todayProg.quizCount / settings.quizTarget) * 100), 100);
+        const readTextEl = document.getElementById('quest-read-text');
+        const readBarEl = document.getElementById('quest-read-bar');
+        if (readTextEl) readTextEl.textContent = `${todayProg.readCount} / ${settings.readTarget} (${readPercent}%) ${readPercent >= 100 ? '✅' : ''}`;
+        if (readBarEl) readBarEl.style.width = `${readPercent}%`;
+        const quizTextEl = document.getElementById('quest-quiz-text');
+        const quizBarEl = document.getElementById('quest-quiz-bar');
+        if (quizTextEl) quizTextEl.textContent = `${todayProg.quizCount} / ${settings.quizTarget} (${quizPercent}%) ${quizPercent >= 100 ? '✅' : ''}`;
+        if (quizBarEl) quizBarEl.style.width = `${quizPercent}%`;
+    }
+
+    function getProgress(wordJp) {
+        const key = `jp_progress_${wordJp}`;
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : { read: 0, quiz: 0 };
+    }
+    
+    function saveProgress(wordJp, type) {
+        const key = `jp_progress_${wordJp}`;
+        const progress = getProgress(wordJp);
+        const isFirstRead = (type === 'read' && progress.read === 0);
+        if (type === 'read') {
+            progress.read++;
+            recordTodayLearnedWord(wordJp);
+        }
+        if (type === 'quiz') progress.quiz++;
+        localStorage.setItem(key, JSON.stringify(progress));
+        if (isFirstRead) addEXP(10); 
+        if (type === 'quiz') addEXP(25);
+        saveTodayQuestProgress(type);
+        if (currentUser && db) {
+            const updateObj = {};
+            updateObj[`progress.${key}`] = progress;
+            db.collection('user_progress').doc(currentUser.uid).update(updateObj).catch(() => {
+                const fullObj = {};
+                fullObj[key] = progress;
+                db.collection('user_progress').doc(currentUser.uid).set({ progress: fullObj }, { merge: true });
+            });
+        }
+    }
+
+    function getJapaneseText(word) {
+        if (word.kanji && /[a-zA-Z]/.test(word.kanji)) return word.jp;
+        return word.kanji || word.jp;
+    }
+
+    function getQuizZhText(word) {
+        const idx = word.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
+        if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
+        return word.rawCols[4] || word.rawCols[2] || '';
+    }
+
+    function getQuizExampleText(word) {
+        const idx = word.rawHeaders.findIndex(h => h.includes('例句'));
+        if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
+        return word.rawCols[6] || word.rawCols[5] || '';
+    }
+
+    function getWordZhText(wordObj) {
+        if (!wordObj || !wordObj.rawHeaders) return '';
+        const idx = wordObj.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
+        if (idx !== -1 && wordObj.rawCols[idx]) return wordObj.rawCols[idx];
+        return wordObj.rawCols[4] || wordObj.rawCols[2] || '';
+    }
+
+    function parseCSVText(text) {
+        let result = [];
+        let row = [];
+        let current = '';
+        let insideQuote = false;
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            let nextChar = text[i + 1];
+            if (char === '"') {
+                if (insideQuote && nextChar === '"') {
+                    current += '"';
+                    i++; 
+                } else {
+                    insideQuote = !insideQuote;
+                }
+            } else if (char === ',' && !insideQuote) {
+                row.push(current.trim());
+                current = '';
+            } else if ((char === '\n' || char === '\r') && !insideQuote) {
+                if (char === '\r' && nextChar === '\n') i++; 
+                row.push(current.trim());
+                result.push(row);
+                row = [];
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        if (current !== '' || row.length > 0) {
+            row.push(current.trim());
+            result.push(row);
+        }
+        return result;
+    }
+
+    function isValidWord(item) {
+        if (!item.jp || item.jp.trim() === '') return false;
+        if (item.isIntroCard) return true;
+        if (item.jp.length > 30) return false;
+        return true;
+    }
+
+    function getDailyRandomSeed() {
+        const now = new Date();
+        return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+    }
+
+    function pseudoRandom(seed) {
+        const x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    // --- 5. 核心模式切換與翻卡 ---
+    function setMode(mode) {
+        playClickSound();
+        currentMode = mode;
+        document.getElementById('mode-review').classList.toggle('active', mode === 'review');
+        document.getElementById('mode-quiz').classList.toggle('active', mode === 'quiz');
+        document.getElementById('mode-kana').classList.toggle('active', mode === 'kana');
+        document.getElementById('mode-stats').classList.toggle('active', mode === 'stats');
+        
+        document.getElementById('review-section').style.display = (mode === 'review') ? 'block' : 'none';
+        document.getElementById('quiz-section').style.display = (mode === 'quiz') ? 'block' : 'none';
+        document.getElementById('kana-section').style.display = (mode === 'kana') ? 'block' : 'none';
+        document.getElementById('stats-section').style.display = (mode === 'stats') ? 'block' : 'none';
+
+        if (mode === 'review') {
+            updateReviewUI();
+        } else if (mode === 'quiz') {
+            checkQuizStartFlow();
+        } else if (mode === 'kana') {
+            initKanaSection();
+        } else if (mode === 'stats') {
+            renderStatsDashboard();
+        }
+    }
+
+    function initMode(preserveIndex = false) {
+        if (currentMode === 'review') {
+            if (!preserveIndex) currentIndex = 0;
+            updateReviewUI();
+        } else if (currentMode === 'quiz') {
+            checkQuizStartFlow();
+        } else if (currentMode === 'kana') {
+            initKanaSection();
+        } else if (currentMode === 'stats') {
+            renderStatsDashboard();
+        }
+    }
+
+    function changeSheet() {
+        playClickSound();
+        const selected = document.getElementById('sheetSelect').value;
+        const fc = document.getElementById('flashcard');
+        if (fc) fc.classList.remove('is-flipped');
+        loadSheetData(selected);
+    }
+
+    function flipCard() { 
         playPageFlipSound();
-        setMode('review');
-        const select = document.getElementById('sheetSelect');
-        select.value = sheetKey;
-        document.getElementById('flashcard').classList.remove('is-flipped');
-        loadSheetData(sheetKey, targetWordJp);
+        const flashcard = document.getElementById('flashcard');
+        if (!flashcard) return;
+        const isFlipped = flashcard.classList.contains('is-flipped');
+        
+        if (!isFlipped && currentList.length > 0) {
+            const current = currentList[currentIndex];
+            if (!current.hasReadThisTime && !current.isIntroCard) {
+                saveProgress(current.jp, 'read');
+                current.hasReadThisTime = true;
+                const progress = getProgress(current.jp);
+                document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+            }
+        }
+        flashcard.classList.toggle('is-flipped'); 
+    }
+    
+    function nextCard(event) { 
+        if (event) event.stopPropagation();
+        playPageFlipSound(); 
+        if (currentIndex < currentList.length - 1) { 
+            currentIndex++; 
+            updateReviewUI(); 
+        } 
     }
 
-    function pickDailyFiveWords(dateString) {
-        let seed = getDailyRandomSeed();
-        const pool = allSearchableWords.filter(w => !w.isIntroCard);
-        const selectedDailyWords = [];
+    function prevCard(event) { 
+        if (event) event.stopPropagation();
+        playPageFlipSound(); 
+        if (currentIndex > 0) { 
+            currentIndex--; 
+            updateReviewUI(); 
+        } 
+    }
 
-        for (let i = 0; i < 5 && pool.length > 0; i++) {
-            const randIndex = Math.floor(pseudoRandom(seed + i * 17) * pool.length);
-            selectedDailyWords.push(pool[randIndex]);
-            pool.splice(randIndex, 1);
+    function unlockFullCards() {
+        playClickSound();
+        currentList = [...fullSourceList];
+        document.getElementById('btn-unlock-more-cards').style.display = 'none';
+        updateReviewUI();
+    }
+
+    function updateReviewUI() {
+        if (!currentList || currentList.length === 0) return;
+        const current = currentList[currentIndex];
+        if (!current) return;
+        current.hasReadThisTime = false;
+        
+        const progress = getProgress(current.jp);
+        document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+        
+        const fixedCounter = document.getElementById('card-counter-fixed');
+        const hasIntro = currentList.some(w => w.isIntroCard);
+
+        if (current.isIntroCard) {
+            fixedCounter.textContent = '💡 觀念導讀';
+            fixedCounter.classList.add('intro-mode');
+        } else {
+            const actualIndex = hasIntro ? currentIndex : currentIndex + 1;
+            const actualTotal = hasIntro ? currentList.length - 1 : currentList.length;
+            fixedCounter.textContent = `${actualIndex} / ${actualTotal}`;
+            fixedCounter.classList.remove('intro-mode');
         }
 
-        renderMarquee(selectedDailyWords, dateString);
-    }
+        const badgeEl = document.getElementById('card-badge-front');
+        const mainTitleEl = document.getElementById('card-main-front');
+        const subTitleEl = document.getElementById('card-sub-front');
+        const meanBoxEl = document.getElementById('card-mean-front');
+        const ttsBtnEl = document.getElementById('btn-card-tts');
+        const backContainer = document.getElementById('card-back-content');
 
-    function renderMarquee(items, dateString) {
-        const marqueeEl = document.getElementById('marquee-content');
-        if (!marqueeEl) return;
-
-        const itemsHtml = items.map((item, idx) => {
-            let display = item.jp;
-            if (item.kanji && item.kanji !== item.jp) {
-                display = `${item.kanji} (${item.jp})`;
+        if (current.isIntroCard && current.isStructuredIntro) {
+            badgeEl.style.display = 'none';
+            mainTitleEl.textContent = current.introValues[0] || current.catName;
+            
+            const subTitleVal = current.introValues[1] || '';
+            if (subTitleVal) {
+                subTitleEl.textContent = subTitleVal;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.style.display = 'none';
             }
-            const zhText = getWordZhText(item);
-            const safeJp = item.jp.replace(/'/g, "\\'");
-            return `<span class="marquee-item" onclick="jumpToCategory('${item.catKey}', '${safeJp}')">✨ [${idx + 1}/5・${item.catName}] ${display}：${zhText}</span>`;
-        }).join('');
 
-        marqueeEl.innerHTML = `${itemsHtml} &nbsp;&nbsp;&nbsp;&nbsp; ${itemsHtml}`;
+            const defAndFunc = current.introValues[2] || '';
+            if (defAndFunc) {
+                meanBoxEl.innerHTML = `<b>📖 核心觀念：</b><br>${defAndFunc.replace(/\n/g, '<br>')}`;
+                meanBoxEl.style.display = 'block';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'none';
+
+            const col3Header = current.introHeaders[3] || '🔗 體系對照速查';
+            const col3Val = current.introValues[3] || '';
+            const col4Header = current.introHeaders[4] || '💡 使用時機與語感';
+            const col4Val = current.introValues[4] || '';
+            const col5Header = current.introHeaders[5] || '👨‍👩‍👧‍👦 範例速查';
+            const col5Val = current.introValues[5] || '';
+            const col6Val = current.introValues[6] || '';
+
+            let backHTML = `<div class="kanji-title">📖 ${current.catName}・修煉秘笈</div>`;
+
+            if (col3Val) {
+                backHTML += `
+                    <div class="grammar-rule-card">
+                        <div class="grammar-rule-title">⚡ ${col3Header}</div>
+                        <div class="grammar-rule-content">${col3Val}</div>
+                    </div>
+                `;
+            }
+
+            if (col4Val && !col4Val.includes('✅') && !col4Val.includes('❌')) {
+                backHTML += `
+                    <div class="notes-block" style="border-left: 4px solid #0284c7; background:#f0f9ff; border-color:#bae6fd;">
+                        <div class="notes-title" style="color:#0369a1;">💡 ${col4Header}</div>
+                        <div class="notes-content" style="color:#0c4a6e;">${col4Val}</div>
+                    </div>
+                `;
+            }
+
+            if (col5Val) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">🔢 ${col5Header}</div>
+                        <div class="notes-content">${col5Val}</div>
+                    </div>
+                `;
+            }
+
+            if (col6Val) {
+                const lines = col6Val.split('\n').filter(Boolean);
+                const jpLine = lines[0] || col6Val;
+                const zhLine = lines.slice(1).join('\n') || '';
+                const escapedJp = encodeURIComponent(jpLine);
+                backHTML += `
+                    <div class="example-block">
+                        <div class="example-jp-line">
+                            <span>💬 ${jpLine}</span>
+                            <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                        </div>
+                        ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        if (current.isIntroCard) {
+            badgeEl.style.display = 'none';
+            mainTitleEl.textContent = current.catName;
+            subTitleEl.textContent = '核心概念與用法特性';
+            subTitleEl.style.display = 'block';
+            meanBoxEl.style.display = 'none';
+            ttsBtnEl.style.display = 'none';
+
+            backContainer.innerHTML = `
+                <div class="kanji-title">📖 ${current.catName}・定義說明</div>
+                <div class="grammar-rule-card" style="border-color:#f59e0b; background:rgba(245, 158, 11, 0.12);">
+                    <div class="grammar-rule-title" style="color:#b45309;">💡 核心定義</div>
+                    <div class="grammar-rule-content" style="color:#78350f;">${current.introContent}</div>
+                </div>
+                <div class="notes-block">
+                    <div class="notes-title">🎯 修煉心法</div>
+                    <div class="notes-content">掌握該詞類的特性與語境位置，翻閱後續單字卡時請重點觀察接續形態與例句結構！</div>
+                </div>
+                <div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>
+            `;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        if (current.catKey === 'sheet2') {
+            badgeEl.style.display = 'inline-block';
+            badgeEl.textContent = '🧩 形式名詞';
+            mainTitleEl.textContent = current.jp;
+            
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                subTitleEl.textContent = `漢字：${current.kanji}`;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.style.display = 'none';
+            }
+
+            const meaning = getWordZhText(current);
+            if (meaning) {
+                meanBoxEl.textContent = `💡 意思：${meaning}`;
+                meanBoxEl.style.display = 'block';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let usageVal = '';
+            let noteVal = '';
+            let exampleVal = '';
+
+            for (let i = 0; i < current.rawHeaders.length; i++) {
+                const h = current.rawHeaders[i] || '';
+                const v = current.rawCols[i] || '';
+                if (h.includes('用法')) usageVal = v;
+                if (h.includes('備註') || h.includes('備注')) noteVal = v;
+                if (h.includes('例句')) exampleVal = v;
+            }
+
+            let backHTML = `<div class="kanji-title">${current.jp}</div>`;
+
+            if (usageVal) {
+                backHTML += `
+                    <div class="grammar-rule-card">
+                        <div class="grammar-rule-title">⚡ 用法與句型規則</div>
+                        <div class="grammar-rule-content">${usageVal}</div>
+                    </div>
+                `;
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">📝 備註與解析</div>
+                        <div class="notes-content">${noteVal}</div>
+                    </div>
+                `;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split('\n\n').filter(Boolean);
+                const listToRender = exBlocks.length > 1 ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').filter(Boolean);
+                    const jpLine = lines[0] || exText;
+                    const zhLine = lines.slice(1).join('\n') || '';
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        badgeEl.style.display = 'inline-block';
+        badgeEl.textContent = current.level ? `⭐ ${current.level}` : '⭐ 單字';
+        meanBoxEl.style.display = 'none';
+        ttsBtnEl.style.display = 'inline-flex';
+
+        let fullBackTitle = current.jp;
+
+        if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+            const isEnglishForeign = /[a-zA-Z]/.test(current.kanji);
+            if (isEnglishForeign) {
+                mainTitleEl.textContent = current.jp;
+                subTitleEl.textContent = current.kanji;
+                fullBackTitle = `${current.jp} (${current.kanji})`;
+            } else {
+                mainTitleEl.textContent = current.kanji;
+                subTitleEl.textContent = current.jp;
+                fullBackTitle = `${current.kanji} (${current.jp})`;
+            }
+            mainTitleEl.style.display = 'block';
+            subTitleEl.style.display = 'block';
+        } else {
+            mainTitleEl.textContent = current.jp;
+            subTitleEl.textContent = '';
+            subTitleEl.style.display = 'none';
+            fullBackTitle = current.jp;
+        }
+
+        let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+        if (current.type) {
+            backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
+        }
+
+        for (let i = 2; i < current.rawHeaders.length; i++) {
+            const h = current.rawHeaders[i] ? current.rawHeaders[i].trim() : '';
+            const val = current.rawCols[i] ? current.rawCols[i].trim() : '';
+            if (!val || (i === 3 && val === current.type)) continue;
+
+            if (h.includes('例句')) {
+                const lines = val.split('\n').filter(Boolean);
+                const jpLine = lines[0] || val;
+                const zhLine = lines.slice(1).join('\n') || '';
+                const escapedJp = encodeURIComponent(jpLine);
+
+                backHTML += `
+                    <div class="example-block">
+                        <div class="example-jp-line">
+                            <span>💬 ${jpLine}</span>
+                            <button class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                        </div>
+                        ${zhLine ? `<div class="example-zh-line">📖 ${zhLine}</div>` : ''}
+                    </div>
+                `;
+            } else {
+                backHTML += `
+                    <div class="detail-section">
+                        <span class="section-title">💡 ${h}：</span>
+                        <span class="section-text">${val}</span>
+                    </div>
+                `;
+            }
+        }
+
+        backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+        backContainer.innerHTML = backHTML;
+        document.getElementById('flashcard').classList.remove('is-flipped');
     }
 
-    // --- 8. 測驗與突發事件模組 ---
+    // --- 6. 菜雞互啄專區 ---
+    function initKanaSection() {
+        switchKanaGroup(currentKanaTab);
+        setupCanvasEvents();
+    }
+
+    function setKanaSubView(viewKey) {
+        playClickSound();
+        const btnGrid = document.getElementById('btn-view-grid');
+        const btnWriting = document.getElementById('btn-view-writing');
+        const viewGrid = document.getElementById('kana-grid-subview');
+        const viewWriting = document.getElementById('kana-writing-subview');
+
+        if (viewKey === 'grid') {
+            btnGrid.classList.add('active');
+            btnWriting.classList.remove('active');
+            viewGrid.style.display = 'block';
+            viewWriting.style.display = 'none';
+        } else {
+            btnWriting.classList.add('active');
+            btnGrid.classList.remove('active');
+            viewWriting.style.display = 'block';
+            viewGrid.style.display = 'none';
+            setupCanvasEvents();
+            redrawCurrentKanaBoard();
+        }
+    }
+
+    function switchKanaGroup(tabKey) {
+        currentKanaTab = tabKey;
+        const allTabs = document.querySelectorAll('.btn-kana-tab');
+        allTabs.forEach(tab => tab.classList.remove('active'));
+
+        const targetBtn = Array.from(allTabs).find(b => b.getAttribute('onclick').includes(tabKey));
+        if (targetBtn) targetBtn.classList.add('active');
+
+        const gridContainer = document.getElementById('kana-grid-container');
+        if (!gridContainer) return;
+        gridContainer.innerHTML = '';
+
+        let list = KANA_DATA[tabKey] || KANA_DATA['seion-hira'];
+        if (tabKey === 'seion-kata') {
+            list = KANA_DATA['seion-hira'];
+        }
+
+        currentWritingList = list.filter(Boolean);
+        currentWritingIndex = 0;
+
+        list.forEach((item, idx) => {
+            if (!item) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'kana-item kana-empty';
+                gridContainer.appendChild(emptyDiv);
+                return;
+            }
+
+            const isKataMode = (tabKey === 'seion-kata');
+            const mainChar = isKataMode ? item.kata : item.hira;
+
+            const div = document.createElement('div');
+            div.className = `kana-item ${idx === 0 ? 'active' : ''}`;
+            div.onclick = () => {
+                selectKanaItem(item, div, isKataMode);
+                setKanaSubView('writing');
+            };
+
+            div.innerHTML = `
+                <span class="kana-char">${mainChar}</span>
+                <span class="kana-romaji">${item.romaji}</span>
+            `;
+            gridContainer.appendChild(div);
+        });
+
+        if (currentWritingList.length > 0) {
+            loadKanaToWritingBoard(currentWritingList[0], tabKey === 'seion-kata');
+        }
+    }
+
+    function selectKanaItem(item, element, isKataMode) {
+        playClickSound();
+        const allItems = document.querySelectorAll('.kana-item');
+        allItems.forEach(el => el.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        const foundIdx = currentWritingList.findIndex(k => k.hira === item.hira);
+        if (foundIdx !== -1) currentWritingIndex = foundIdx;
+
+        loadKanaToWritingBoard(item, isKataMode);
+        speakWordDirectly(null, item.hira);
+    }
+
+    function loadKanaToWritingBoard(item, isKataMode) {
+        if (!item) return;
+        const char = isKataMode ? item.kata : item.hira;
+        document.getElementById('current-writing-label').textContent = `${char} (${item.romaji})`;
+        document.getElementById('writing-grade-feedback').textContent = '';
+        hasDrawnOnCanvas = false;
+
+        const wrapper = document.getElementById('canvas-wrapper');
+        const canvas = document.getElementById('strokeCanvas');
+        if (!wrapper || !canvas) return;
+
+        const isWide = (char.length > 1);
+        if (isWide) {
+            wrapper.classList.add('wide-mode');
+            canvas.width = 320;
+            canvas.height = 240;
+        } else {
+            wrapper.classList.remove('wide-mode');
+            canvas.width = 240;
+            canvas.height = 240;
+        }
+
+        drawGhostKanaOnCanvas(char);
+    }
+
+    function redrawCurrentKanaBoard() {
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        if (item) loadKanaToWritingBoard(item, isKataMode);
+    }
+
+    // 💡 乾淨的底字與田字格（無雜亂圓圈）
+    function drawGhostKanaOnCanvas(char) {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. 田字格輔助線
+        ctx.save();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+
+        if (char.length > 1) {
+            const halfW = canvas.width / 2;
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(halfW, 0); ctx.lineTo(halfW, canvas.height);
+            ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        } else {
+            ctx.strokeRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        // 2. 淺藍色標準底字
+        ctx.save();
+        if (char.length > 1) {
+            ctx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
+            ctx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
+        } else {
+            ctx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        }
+        ctx.restore();
+    }
+
+    function clearStrokeCanvas() {
+        playClickSound();
+        document.getElementById('writing-grade-feedback').textContent = '';
+        hasDrawnOnCanvas = false;
+        redrawCurrentKanaBoard();
+    }
+
+    function checkWritingGrade() {
+        const feedbackEl = document.getElementById('writing-grade-feedback');
+        const canvas = document.getElementById('strokeCanvas');
+        if (!hasDrawnOnCanvas || !canvas) {
+            feedbackEl.textContent = '🐣 還沒有動筆臨摹喔！請在白板上臨摹寫一次！';
+            feedbackEl.style.color = '#f59e0b';
+            playWrongSound();
+            return;
+        }
+
+        const isKataMode = (currentKanaTab === 'seion-kata');
+        const item = currentWritingList[currentWritingIndex];
+        const char = isKataMode ? item.kata : item.hira;
+
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = canvas.width;
+        offCanvas.height = canvas.height;
+        const offCtx = offCanvas.getContext('2d');
+
+        offCtx.save();
+        if (char.length > 1) {
+            offCtx.font = 'bold 105px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillStyle = '#000000';
+            offCtx.textAlign = 'center';
+            offCtx.textBaseline = 'middle';
+            offCtx.fillText(char[0], canvas.width * 0.28, canvas.height / 2 + 6);
+            offCtx.font = 'bold 78px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillText(char[1], canvas.width * 0.74, canvas.height / 2 + 16);
+        } else {
+            offCtx.font = 'bold 155px -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+            offCtx.fillStyle = '#000000';
+            offCtx.textAlign = 'center';
+            offCtx.textBaseline = 'middle';
+            offCtx.fillText(char, canvas.width / 2, canvas.height / 2 + 8);
+        }
+        offCtx.restore();
+
+        const refData = offCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+        const userCtx = canvas.getContext('2d');
+        const userData = userCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        let refPixelCount = 0;
+        let matchedPixelCount = 0;
+        let userStrokeCount = 0;
+
+        for (let i = 0; i < refData.length; i += 4) {
+            const isRef = refData[i + 3] > 100;
+            const isUserStroke = (userData[i] > 180 && userData[i + 1] < 120 && userData[i + 3] > 150);
+
+            if (isRef) refPixelCount++;
+            if (isUserStroke) userStrokeCount++;
+            if (isRef && isUserStroke) matchedPixelCount++;
+        }
+
+        const coverageRatio = refPixelCount > 0 ? (matchedPixelCount / refPixelCount) : 0;
+        const accuracyRatio = userStrokeCount > 0 ? (matchedPixelCount / userStrokeCount) : 0;
+
+        if (coverageRatio >= 0.40 && accuracyRatio >= 0.25) {
+            playSuccessSound();
+            addEXP(5);
+            feedbackEl.textContent = `🎉 完美達成！臨摹契合度 ${Math.floor(coverageRatio * 100)}%！(+5 EXP)`;
+            feedbackEl.style.color = '#22c55e';
+        } else {
+            playWrongSound();
+            feedbackEl.textContent = `💀 筆劃偏離過多（契合度 ${Math.floor(coverageRatio * 100)}%）！請對齊字形重新練習喔～`;
+            feedbackEl.style.color = '#ef4444';
+        }
+    }
+
+    function nextWritingKana() {
+        playClickSound();
+        if (currentWritingIndex < currentWritingList.length - 1) {
+            currentWritingIndex++;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function prevWritingKana() {
+        playClickSound();
+        if (currentWritingIndex > 0) {
+            currentWritingIndex--;
+            const isKataMode = (currentKanaTab === 'seion-kata');
+            loadKanaToWritingBoard(currentWritingList[currentWritingIndex], isKataMode);
+            speakCurrentWritingKana();
+        }
+    }
+
+    function setupCanvasEvents() {
+        const canvas = document.getElementById('strokeCanvas');
+        if (!canvas || canvas.dataset.hasEvents) return;
+        canvas.dataset.hasEvents = 'true';
+
+        const ctx = canvas.getContext('2d');
+
+        function startDraw(x, y) {
+            isDrawing = true;
+            hasDrawnOnCanvas = true;
+            lastX = x;
+            lastY = y;
+        }
+
+        function draw(x, y) {
+            if (!isDrawing) return;
+            ctx.save();
+            ctx.strokeStyle = '#ec4899';
+            ctx.lineWidth = 12;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.restore();
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
+        });
+        window.addEventListener('mouseup', stopDraw);
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            startDraw(pos.x, pos.y);
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const pos = getPos(e);
+            draw(pos.x, pos.y);
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', stopDraw);
+    }
+
+    // --- 7. 測驗與突發事件模組 ---
     function checkQuizStartFlow() {
         if (fullSourceList.length === 0) {
             alert('⏳ 單字庫載入中，請稍候！');
@@ -2352,6 +3433,7 @@
         document.getElementById('surpriseBossModal').style.display = 'none';
     }
 
+    // --- 8. 學習進度儀表板 ---
     function renderStatsDashboard() {
         renderQuestBoard();
         const gridContainer = document.getElementById('stats-category-grid');
