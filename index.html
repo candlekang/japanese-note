@@ -1636,7 +1636,7 @@
                 </div>
 
                 <div style="font-size:11px; color:#94a3b8;">
-                    💡 淺色字形是臨摹導引；60 分以上可獲得 EXP。分數評估「描寫位置與字形接近度」，不是正式筆順判定。
+                    💡 淺色字形是臨摹導引；70 分以上可獲得 EXP。評分會綜合字形完成度、筆跡精準度、大小比例與位置，不是正式筆順判定。
                 </div>
             </div>
         </div>
@@ -2185,7 +2185,7 @@
 
     let currentKanaTab = 'seion-hira';
     let currentKanaView = 'grid';
-    const WRITING_PASS_SCORE = 60;
+    const WRITING_PASS_SCORE = 70;
     const WRITING_PASS_EXP = 20;
     let currentWritingList = [];
     let currentWritingIndex = 0;
@@ -3346,13 +3346,18 @@
 
         const w = strokeCanvas.width;
         const h = strokeCanvas.height;
-        const tolerance = 9;
 
-        function maskNear(x, y) {
-            for (let dy = -tolerance; dy <= tolerance; dy += 3) {
+        // 評分容忍範圍：
+        // precisionTolerance：你的墨水離範本太遠就不算命中
+        // coverageTolerance：範本附近要真的有你的墨水，才算「有完成」
+        const precisionTolerance = 7;
+        const coverageTolerance = 8;
+
+        function hasMaskNear(x, y, tolerance) {
+            for (let dy = -tolerance; dy <= tolerance; dy += 2) {
                 const yy = y + dy;
                 if (yy < 0 || yy >= h) continue;
-                for (let dx = -tolerance; dx <= tolerance; dx += 3) {
+                for (let dx = -tolerance; dx <= tolerance; dx += 2) {
                     const xx = x + dx;
                     if (xx < 0 || xx >= w) continue;
                     const idx = (yy * w + xx) * 4 + 3;
@@ -3362,6 +3367,21 @@
             return false;
         }
 
+        function hasInkNear(x, y, tolerance) {
+            for (let dy = -tolerance; dy <= tolerance; dy += 2) {
+                const yy = y + dy;
+                if (yy < 0 || yy >= h) continue;
+                for (let dx = -tolerance; dx <= tolerance; dx += 2) {
+                    const xx = x + dx;
+                    if (xx < 0 || xx >= w) continue;
+                    const idx = (yy * w + xx) * 4 + 3;
+                    if (userData.data[idx] > 20) return true;
+                }
+            }
+            return false;
+        }
+
+        // A. Precision：使用者寫下的墨水，有多少真的落在正確字形附近
         let matchedInk = 0;
         let minX = w, minY = h, maxX = 0, maxY = 0;
 
@@ -3369,7 +3389,7 @@
             for (let x = 0; x < w; x++) {
                 const alpha = userData.data[(y * w + x) * 4 + 3];
                 if (alpha > 20) {
-                    if (maskNear(x, y)) matchedInk++;
+                    if (hasMaskNear(x, y, precisionTolerance)) matchedInk++;
                     if (x < minX) minX = x;
                     if (x > maxX) maxX = x;
                     if (y < minY) minY = y;
@@ -3380,13 +3400,18 @@
 
         const precision = matchedInk / Math.max(inkPixels, 1);
 
-        // 比較使用者筆跡與目標字形的外框大小，避免亂塗整個畫布也拿高分
-        let maskMinX = w, maskMinY = h, maskMaxX = 0, maskMaxY = 0, maskCount = 0;
+        // B. Coverage：正確字形本身，有多少真的被使用者寫到
+        let maskMinX = w, maskMinY = h, maskMaxX = 0, maskMaxY = 0;
+        let maskCount = 0;
+        let coveredMask = 0;
+
         for (let y = 0; y < h; y++) {
             for (let x = 0; x < w; x++) {
                 const alpha = maskData.data[(y * w + x) * 4 + 3];
                 if (alpha > 40) {
                     maskCount++;
+                    if (hasInkNear(x, y, coverageTolerance)) coveredMask++;
+
                     if (x < maskMinX) maskMinX = x;
                     if (x > maskMaxX) maskMaxX = x;
                     if (y < maskMinY) maskMinY = y;
@@ -3395,6 +3420,9 @@
             }
         }
 
+        const coverage = coveredMask / Math.max(maskCount, 1);
+
+        // C. Size：字的寬高比例是否接近範本
         const userW = Math.max(maxX - minX, 1);
         const userH = Math.max(maxY - minY, 1);
         const maskW = Math.max(maskMaxX - maskMinX, 1);
@@ -3405,22 +3433,40 @@
             1 - (Math.abs(userW - maskW) / maskW + Math.abs(userH - maskH) / maskH) / 2
         );
 
+        // D. Center：整個字的位置是否與範本大致一致
         const userCx = (minX + maxX) / 2;
         const userCy = (minY + maxY) / 2;
         const maskCx = (maskMinX + maskMaxX) / 2;
         const maskCy = (maskMinY + maskMaxY) / 2;
         const centerDistance = Math.hypot(userCx - maskCx, userCy - maskCy);
-        const centerSimilarity = Math.max(0, 1 - centerDistance / 80);
+        const centerSimilarity = Math.max(0, 1 - centerDistance / 70);
 
-        let score = Math.round((precision * 0.65 + sizeSimilarity * 0.20 + centerSimilarity * 0.15) * 100);
+        // 新版權重：
+        // 完成度 40%、精準度 35%、大小 15%、位置 10%
+        let score = Math.round(
+            (coverage * 0.40 +
+             precision * 0.35 +
+             sizeSimilarity * 0.15 +
+             centerSimilarity * 0.10) * 100
+        );
+
+        // Coverage 硬門檻：避免「只寫中一部分」或「亂畫但剛好壓到字」拿高分
+        if (coverage < 0.40) {
+            score = Math.min(score, 49);
+        } else if (coverage < 0.55) {
+            score = Math.min(score, 59);
+        } else if (coverage < 0.65) {
+            score = Math.min(score, 69);
+        }
+
         score = Math.max(0, Math.min(100, score));
 
         let comment = '';
-        if (score >= 90) comment = '🌟 超漂亮！位置、大小和字形都很接近範本。';
-        else if (score >= 80) comment = '🎉 很不錯！再注意轉折和收筆會更漂亮。';
-        else if (score >= 65) comment = '👍 有抓到字形，再沿著淺色輪廓多練一次。';
-        else if (score >= 45) comment = '🌱 已經有基礎，注意字的大小與中心位置。';
-        else comment = '💪 再試一次！建議慢慢沿著淺色字形描寫。';
+        if (score >= 95) comment = '👑 Perfect！完成度與筆跡位置都非常接近範本。';
+        else if (score >= 85) comment = '🌟 很漂亮！字形完整，位置與比例也很穩。';
+        else if (score >= 70) comment = '🎉 PASS！字形已經有完整抓到，再修一下轉折會更漂亮。';
+        else if (score >= 50) comment = '🌱 接近了！先把淡色字形完整描完，再注意線條位置。';
+        else comment = '💪 再試一次！目前字形完成度不足，建議沿著淡色輪廓慢慢描寫。';
 
         const rewardKey = `${currentKanaTab}:${char}`;
 
@@ -3439,12 +3485,12 @@
 
             box.style.display = 'block';
             main.textContent = `${score} 分・PASS`;
-            note.textContent = `${comment}${rewardText}　※ 此分數為臨摹相似度，不代表正式筆順正誤。`;
+            note.textContent = `${comment}${rewardText}　完成度 ${Math.round(coverage * 100)}%｜精準度 ${Math.round(precision * 100)}%｜大小 ${Math.round(sizeSimilarity * 100)}%｜位置 ${Math.round(centerSimilarity * 100)}%　※ 此分數為臨摹相似度，不代表正式筆順正誤。`;
         } else {
             playWrongSound();
             box.style.display = 'block';
             main.textContent = `${score} 分・再挑戰`;
-            note.textContent = `${comment}　未達 ${WRITING_PASS_SCORE} 分，再練一次就能挑戰 EXP！　※ 此分數為臨摹相似度，不代表正式筆順正誤。`;
+            note.textContent = `${comment}　完成度 ${Math.round(coverage * 100)}%｜精準度 ${Math.round(precision * 100)}%｜大小 ${Math.round(sizeSimilarity * 100)}%｜位置 ${Math.round(centerSimilarity * 100)}%　未達 ${WRITING_PASS_SCORE} 分，再練一次就能挑戰 EXP！　※ 此分數為臨摹相似度，不代表正式筆順正誤。`;
         }
     }
 
