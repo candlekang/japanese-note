@@ -1520,6 +1520,39 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
         }
 
+        .app-feedback-box {
+            margin-bottom: 10px;
+            padding: 10px 12px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.24);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+        }
+        .app-feedback-title {
+            color: #cbd5e1;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .app-feedback-link {
+            color: #38bdf8;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .app-feedback-link:hover {
+            text-decoration: underline;
+        }
+        .app-feedback-email {
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 10px;
+            word-break: break-all;
+        }
+
     </style>
 </head>
 <body>
@@ -1784,6 +1817,11 @@
 
 <!-- 🛠️ 版本資訊：只需更新 APP_VERSION / APP_UPDATE_NOTE，不需改 HTML -->
 <footer class="app-version-footer" id="app-version-footer" aria-label="版本資訊">
+    <div class="app-feedback-box">
+        <div class="app-feedback-title">🐞 發現錯字、資料錯誤或功能異常？</div>
+        <a class="app-feedback-link" id="app-feedback-link" href="#">✉️ 回報問題</a>
+        <div class="app-feedback-email">sabina6533@msn.com</div>
+    </div>
     <div class="app-version-number" id="app-version-number"></div>
     <div class="app-version-note" id="app-version-note"></div>
 </footer>
@@ -1909,14 +1947,33 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.7.1';
-    const APP_UPDATE_NOTE = '名詞分頁優化｜正面意思＋學習優先度｜新增版本資訊頁尾';
+    const APP_VERSION = 'v9.7.2';
+    const APP_UPDATE_NOTE = '名詞分頁優化｜正面意思＋學習優先度｜新增錯誤回報入口';
+    const APP_FEEDBACK_EMAIL = 'sabina6533@msn.com';
 
     function renderAppVersion() {
         const versionEl = document.getElementById('app-version-number');
         const noteEl = document.getElementById('app-version-note');
+        const feedbackLinkEl = document.getElementById('app-feedback-link');
+
         if (versionEl) versionEl.textContent = `目前版本 ${APP_VERSION}`;
         if (noteEl) noteEl.textContent = APP_UPDATE_NOTE;
+
+        if (feedbackLinkEl) {
+            const subject = `日文筆記網站｜錯誤回報｜${APP_VERSION}`;
+            const body = [
+                `目前版本：${APP_VERSION}`,
+                '',
+                '問題頁面／分類：',
+                '問題單字／內容：',
+                '發現的問題：',
+                '使用裝置（手機／電腦）：',
+                '',
+                '如方便，請附上問題畫面的截圖。'
+            ].join('\n');
+
+            feedbackLinkEl.href = `mailto:${APP_FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
     }
 
     const firebaseConfig = {
