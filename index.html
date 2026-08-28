@@ -1495,6 +1495,31 @@
             display: inline-block;
             margin-bottom: 8px;
         }
+    
+        /* 9.7.1：版本資訊頁尾 */
+        .app-version-footer {
+            width: 100%;
+            max-width: 520px;
+            box-sizing: border-box;
+            margin: 10px auto 4px;
+            padding: 12px 10px 6px;
+            text-align: center;
+            font-family: 'DotGothic16', sans-serif;
+            color: #64748b;
+            font-size: 10.5px;
+            line-height: 1.55;
+        }
+        .app-version-number {
+            color: #94a3b8;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+        .app-version-note {
+            margin-top: 2px;
+            color: #64748b;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+        }
+
     </style>
 </head>
 <body>
@@ -1757,6 +1782,12 @@
     </div>
 </div>
 
+<!-- 🛠️ 版本資訊：只需更新 APP_VERSION / APP_UPDATE_NOTE，不需改 HTML -->
+<footer class="app-version-footer" id="app-version-footer" aria-label="版本資訊">
+    <div class="app-version-number" id="app-version-number"></div>
+    <div class="app-version-note" id="app-version-note"></div>
+</footer>
+
 <!-- 👑 像素 RPG 等級指南彈窗 -->
 <div class="modal-overlay" id="rankGuideModal" onclick="closeRankGuideModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -1877,6 +1908,17 @@
 </div>
 
 <script>
+    // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
+    const APP_VERSION = 'v9.7.1';
+    const APP_UPDATE_NOTE = '名詞分頁優化｜正面意思＋學習優先度｜新增版本資訊頁尾';
+
+    function renderAppVersion() {
+        const versionEl = document.getElementById('app-version-number');
+        const noteEl = document.getElementById('app-version-note');
+        if (versionEl) versionEl.textContent = `目前版本 ${APP_VERSION}`;
+        if (noteEl) noteEl.textContent = APP_UPDATE_NOTE;
+    }
+
     const firebaseConfig = {
         apiKey: "AIzaSyClHAkJZ8EJuLHtksAsl8OoXYgdlKtjQZQ",
         authDomain: "japanese-note-4cb5a.firebaseapp.com",
@@ -4556,6 +4598,7 @@
         renderQuizQuestion();
     }
 
+    renderAppVersion();
     preloadAllCategories();
 </script>
 
