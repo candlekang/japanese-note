@@ -1547,6 +1547,29 @@
             text-decoration: underline;
         }
 
+    
+        .feedback-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .feedback-meta-card { background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px 12px; }
+        .feedback-meta-label { font-size:10px; color:#94a3b8; margin-bottom:3px; }
+        .feedback-meta-value { font-size:12px; color:#f8fafc; font-weight:700; word-break:break-word; }
+        .feedback-field { display:flex; flex-direction:column; gap:6px; }
+        .feedback-field label { font-size:12px; color:#cbd5e1; font-weight:700; }
+        .feedback-select, .feedback-textarea {
+            width:100%; box-sizing:border-box; background:#0f172a; color:#f8fafc;
+            border:1px solid #475569; border-radius:8px; padding:10px 12px; font-size:14px; outline:none;
+        }
+        .feedback-textarea { min-height:130px; resize:vertical; line-height:1.5; }
+        .feedback-select:focus, .feedback-textarea:focus { border-color:#38bdf8; }
+        .feedback-submit-btn {
+            width:100%; background:linear-gradient(90deg,#0284c7,#38bdf8); color:#fff;
+            border:none; border-radius:10px; padding:12px 14px; font-size:14px; font-weight:800; cursor:pointer;
+        }
+        .feedback-submit-btn:disabled { opacity:.55; cursor:not-allowed; }
+        .feedback-status { min-height:20px; text-align:center; font-size:12px; line-height:1.5; }
+        .feedback-status.success { color:#86efac; }
+        .feedback-status.error { color:#fca5a5; }
+        @media (max-width:420px) { .feedback-modal-grid { grid-template-columns:1fr; } }
+
     </style>
 </head>
 <body>
@@ -1813,11 +1836,46 @@
 <footer class="app-version-footer" id="app-version-footer" aria-label="版本資訊">
     <div class="app-feedback-box">
         <div class="app-feedback-title">🐞 發現錯字、資料錯誤或功能異常？</div>
-        <a class="app-feedback-link" id="app-feedback-link" href="#">✉️ 回報問題</a>
+        <button type="button" class="app-feedback-link" id="app-feedback-link" onclick="openFeedbackModal()">✉️ 回報問題</button>
     </div>
     <div class="app-version-number" id="app-version-number"></div>
     <div class="app-version-note" id="app-version-note"></div>
 </footer>
+
+
+<!-- 🐞 站內即時回饋 -->
+<div class="modal-overlay" id="feedbackModal" onclick="closeFeedbackModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🐞 問題回報</h3>
+            <button class="btn-modal-close" onclick="closeFeedbackModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="feedback-modal-grid">
+                <div class="feedback-meta-card"><div class="feedback-meta-label">回報時間</div><div class="feedback-meta-value" id="feedback-time">—</div></div>
+                <div class="feedback-meta-card"><div class="feedback-meta-label">目前版本</div><div class="feedback-meta-value" id="feedback-version">—</div></div>
+                <div class="feedback-meta-card"><div class="feedback-meta-label">所在分類</div><div class="feedback-meta-value" id="feedback-category">—</div></div>
+                <div class="feedback-meta-card"><div class="feedback-meta-label">目前單字</div><div class="feedback-meta-value" id="feedback-word">—</div></div>
+            </div>
+            <div class="feedback-field">
+                <label for="feedback-issue-type">問題類型</label>
+                <select id="feedback-issue-type" class="feedback-select">
+                    <option value="錯字／資料錯誤">錯字／資料錯誤</option>
+                    <option value="功能異常">功能異常</option>
+                    <option value="操作不順">操作不順</option>
+                    <option value="建議">建議</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="feedback-field">
+                <label for="feedback-message">問題描述</label>
+                <textarea id="feedback-message" class="feedback-textarea" maxlength="1000" placeholder="請描述你遇到的問題，若是單字或例句錯誤，也可以直接寫正確內容。"></textarea>
+            </div>
+            <button type="button" class="feedback-submit-btn" id="feedback-submit-btn" onclick="submitFeedback()">送出回報</button>
+            <div class="feedback-status" id="feedback-status" aria-live="polite"></div>
+        </div>
+    </div>
+</div>
 
 <!-- 👑 像素 RPG 等級指南彈窗 -->
 <div class="modal-overlay" id="rankGuideModal" onclick="closeRankGuideModal(event)">
@@ -1940,32 +1998,138 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.7.3';
-    const APP_UPDATE_NOTE = '名詞分頁優化｜正面意思＋學習優先度｜簡化錯誤回報入口';
-    const APP_FEEDBACK_EMAIL = 'sabina6533@msn.com';
+    const APP_VERSION = 'v9.8';
+    const APP_UPDATE_NOTE = '新增站內即時問題回報｜自動帶入時間、版本、分類與單字';
+    const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
         const versionEl = document.getElementById('app-version-number');
         const noteEl = document.getElementById('app-version-note');
-        const feedbackLinkEl = document.getElementById('app-feedback-link');
-
         if (versionEl) versionEl.textContent = `目前版本 ${APP_VERSION}`;
         if (noteEl) noteEl.textContent = APP_UPDATE_NOTE;
+    }
 
-        if (feedbackLinkEl) {
-            const subject = `日文筆記網站｜錯誤回報｜${APP_VERSION}`;
-            const body = [
-                `目前版本：${APP_VERSION}`,
-                '',
-                '問題頁面／分類：',
-                '問題單字／內容：',
-                '發現的問題：',
-                '使用裝置（手機／電腦）：',
-                '',
-                '如方便，請附上問題畫面的截圖。'
-            ].join('\n');
 
-            feedbackLinkEl.href = `mailto:${APP_FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    let lastFeedbackSubmitAt = 0;
+
+    function getCurrentFeedbackContext() {
+        const now = new Date();
+        const timeText = new Intl.DateTimeFormat('zh-TW', {
+            year:'numeric', month:'2-digit', day:'2-digit',
+            hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+        }).format(now);
+
+        const sheetSelect = document.getElementById('sheetSelect');
+        const category = sheetSelect ? (sheetSelect.selectedOptions[0]?.text || '') : '';
+
+        let word = '';
+        if (currentMode === 'review' && currentList.length > 0 && currentList[currentIndex]) {
+            const item = currentList[currentIndex];
+            if (!item.isIntroCard) {
+                word = item.kanji && item.kanji !== item.jp ? `${item.jp} / ${item.kanji}` : item.jp;
+            }
+        } else if (currentMode === 'quiz' && currentCorrectAnswer) {
+            word = currentCorrectAnswer.kanji && currentCorrectAnswer.kanji !== currentCorrectAnswer.jp
+                ? `${currentCorrectAnswer.jp} / ${currentCorrectAnswer.kanji}`
+                : currentCorrectAnswer.jp;
+        }
+
+        return {
+            timeText,
+            category,
+            word,
+            device: /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? '手機／平板' : '電腦',
+            browser: navigator.userAgent
+        };
+    }
+
+    function openFeedbackModal() {
+        playClickSound();
+        const ctx = getCurrentFeedbackContext();
+        document.getElementById('feedback-time').textContent = ctx.timeText;
+        document.getElementById('feedback-version').textContent = APP_VERSION;
+        document.getElementById('feedback-category').textContent = ctx.category || '未辨識';
+        document.getElementById('feedback-word').textContent = ctx.word || '—';
+        document.getElementById('feedback-message').value = '';
+        document.getElementById('feedback-issue-type').value = '錯字／資料錯誤';
+
+        const statusEl = document.getElementById('feedback-status');
+        statusEl.textContent = '';
+        statusEl.className = 'feedback-status';
+
+        const btn = document.getElementById('feedback-submit-btn');
+        btn.disabled = false;
+        btn.textContent = '送出回報';
+        document.getElementById('feedbackModal').style.display = 'flex';
+    }
+
+    function closeFeedbackModal(e) {
+        if (e && e.target !== document.getElementById('feedbackModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('feedbackModal').style.display = 'none';
+    }
+
+    async function submitFeedback() {
+        const messageEl = document.getElementById('feedback-message');
+        const issueTypeEl = document.getElementById('feedback-issue-type');
+        const statusEl = document.getElementById('feedback-status');
+        const btn = document.getElementById('feedback-submit-btn');
+        const message = (messageEl.value || '').trim();
+
+        if (!message) {
+            statusEl.textContent = '請先輸入問題描述。';
+            statusEl.className = 'feedback-status error';
+            messageEl.focus();
+            return;
+        }
+
+        if (Date.now() - lastFeedbackSubmitAt < 30000) {
+            statusEl.textContent = '請稍候一下再送出下一則回報。';
+            statusEl.className = 'feedback-status error';
+            return;
+        }
+
+        const ctx = getCurrentFeedbackContext();
+        const payload = {
+            version: APP_VERSION,
+            category: ctx.category,
+            word: ctx.word,
+            issueType: issueTypeEl.value,
+            message: message.slice(0, 1000),
+            screenshotUrl: '',
+            device: ctx.device,
+            browser: ctx.browser
+        };
+
+        btn.disabled = true;
+        btn.textContent = '送出中…';
+        statusEl.textContent = '正在送出回報…';
+        statusEl.className = 'feedback-status';
+
+        try {
+            await fetch(FEEDBACK_API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+
+            lastFeedbackSubmitAt = Date.now();
+            playSuccessSound();
+            statusEl.textContent = '✅ 已送出，謝謝你的回報！';
+            statusEl.className = 'feedback-status success';
+            btn.textContent = '已送出';
+            messageEl.value = '';
+            setTimeout(() => {
+                document.getElementById('feedbackModal').style.display = 'none';
+            }, 1200);
+        } catch (err) {
+            console.error('Feedback submit failed:', err);
+            playWrongSound();
+            statusEl.textContent = '送出失敗，請稍後再試。';
+            statusEl.className = 'feedback-status error';
+            btn.disabled = false;
+            btn.textContent = '重新送出';
         }
     }
 
