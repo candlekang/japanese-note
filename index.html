@@ -1570,6 +1570,138 @@
         .feedback-status.error { color:#fca5a5; }
         @media (max-width:420px) { .feedback-modal-grid { grid-template-columns:1fr; } }
 
+    
+        /* 🎴 每日運勢籤 */
+        .fortune-launch-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .fortune-launch-btn {
+            border: 1px solid rgba(250, 204, 21, 0.55);
+            background: linear-gradient(135deg, rgba(120, 53, 15, 0.78), rgba(127, 29, 29, 0.78));
+            color: #fef3c7;
+            border-radius: 999px;
+            padding: 7px 13px;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,.22);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+        .fortune-launch-btn:hover {
+            transform: translateY(-1px);
+            border-color: #fde047;
+            box-shadow: 0 6px 16px rgba(0,0,0,.28);
+        }
+        .fortune-paper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            border: 1px solid rgba(253, 224, 71, .42);
+            background:
+                radial-gradient(circle at 20% 15%, rgba(253,224,71,.10), transparent 28%),
+                linear-gradient(160deg, #27160f 0%, #451a1a 48%, #1f2937 100%);
+            padding: 22px 18px;
+            text-align: center;
+            min-height: 255px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+        .fortune-paper::before,
+        .fortune-paper::after {
+            content: "✦";
+            position: absolute;
+            color: rgba(253,224,71,.32);
+            font-size: 42px;
+        }
+        .fortune-paper::before { top: 10px; left: 14px; }
+        .fortune-paper::after { bottom: 8px; right: 14px; transform: rotate(35deg); }
+        .fortune-kicker {
+            color: #fbbf24;
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+        .fortune-rank {
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 42px;
+            line-height: 1;
+            color: #fef3c7;
+            text-shadow: 0 0 18px rgba(250,204,21,.28);
+            margin: 2px 0 6px;
+        }
+        .fortune-jp {
+            font-size: 15px;
+            color: #f8fafc;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+        .fortune-zh {
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        .fortune-lucky-word {
+            margin-top: 8px;
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(15,23,42,.64);
+            border: 1px solid rgba(148,163,184,.28);
+        }
+        .fortune-lucky-label {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+        .fortune-lucky-main {
+            font-size: 19px;
+            color: #7dd3fc;
+            font-weight: 800;
+        }
+        .fortune-lucky-meaning {
+            font-size: 12px;
+            color: #e2e8f0;
+            margin-top: 3px;
+        }
+        .fortune-note {
+            font-size: 11px;
+            color: #94a3b8;
+            text-align: center;
+            line-height: 1.5;
+        }
+        .fortune-draw-btn {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 16px;
+            background: linear-gradient(90deg, #b91c1c, #d97706);
+            color: #fff7ed;
+            font-family: 'DotGothic16', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 5px 14px rgba(185,28,28,.28);
+        }
+        .fortune-draw-btn:disabled {
+            opacity: .72;
+            cursor: default;
+        }
+        .fortune-shake {
+            animation: fortuneShake .55s ease;
+        }
+        @keyframes fortuneShake {
+            0%,100% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(-2deg) scale(1.01); }
+            40% { transform: rotate(2deg) scale(1.02); }
+            60% { transform: rotate(-1.5deg) scale(1.01); }
+            80% { transform: rotate(1deg) scale(1.01); }
+        }
+
     </style>
 </head>
 <body>
@@ -1619,6 +1751,9 @@
                     <span>⚡ 正在挑選今日必學單字...</span>
                 </div>
             </div>
+        </div>
+        <div class="fortune-launch-row">
+            <button type="button" class="fortune-launch-btn" id="fortune-launch-btn" onclick="openFortuneModal()">🎴 今日運勢</button>
         </div>
     </header>
 
@@ -1843,6 +1978,32 @@
 </footer>
 
 
+
+<!-- 🎴 每日運勢籤 -->
+<div class="modal-overlay" id="fortuneModal" onclick="closeFortuneModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🎴 今日の運勢</h3>
+            <button class="btn-modal-close" onclick="closeFortuneModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="fortune-paper" id="fortune-paper">
+                <div class="fortune-kicker">DAILY OMIKUJI</div>
+                <div class="fortune-rank" id="fortune-rank">？</div>
+                <div class="fortune-jp" id="fortune-jp">今日の運勢を引いてみよう！</div>
+                <div class="fortune-zh" id="fortune-zh">今天的你，會抽到哪一支籤呢？</div>
+                <div class="fortune-lucky-word" id="fortune-lucky-word" style="display:none;">
+                    <div class="fortune-lucky-label">今日のラッキーワード</div>
+                    <div class="fortune-lucky-main" id="fortune-lucky-main"></div>
+                    <div class="fortune-lucky-meaning" id="fortune-lucky-meaning"></div>
+                </div>
+            </div>
+            <button type="button" class="fortune-draw-btn" id="fortune-draw-btn" onclick="drawDailyFortune()">🎴 今日の籤を引く</button>
+            <div class="fortune-note" id="fortune-note">每天只能抽出一個結果；同一天重新開啟仍會是同一支籤。</div>
+        </div>
+    </div>
+</div>
+
 <!-- 🐞 站內即時回饋 -->
 <div class="modal-overlay" id="feedbackModal" onclick="closeFeedbackModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -1998,8 +2159,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.8.1';
-    const APP_UPDATE_NOTE = '切換至新版 Google 試算表資料來源｜保留站內即時回報';
+    const APP_VERSION = 'v9.9';
+    const APP_UPDATE_NOTE = '新增每日運勢籤｜每天一次固定結果＋今日幸運單字';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -2009,6 +2170,187 @@
         if (noteEl) noteEl.textContent = APP_UPDATE_NOTE;
     }
 
+
+
+    const DAILY_FORTUNES = [
+        {
+            rank: '大吉',
+            weight: 15,
+            jp: '今日は新しい一歩にぴったり！',
+            zh: '今天很適合踏出新的一步，把想做的事開始吧。'
+        },
+        {
+            rank: '中吉',
+            weight: 25,
+            jp: '少しずつ進めば、いい流れに乗れそう。',
+            zh: '穩穩前進就會漸入佳境，今天適合累積小小成果。'
+        },
+        {
+            rank: '小吉',
+            weight: 30,
+            jp: '小さな発見が、今日の味方になるよ。',
+            zh: '今天的小發現可能特別有用，留意那些容易忽略的細節。'
+        },
+        {
+            rank: '末吉',
+            weight: 20,
+            jp: '焦らず、自分のペースでいこう。',
+            zh: '不用急著追進度，照自己的節奏學習就很好。'
+        },
+        {
+            rank: '凶',
+            weight: 10,
+            jp: '今日はゆっくり進もう。無理は禁物！',
+            zh: '今天適合放慢腳步，穩穩學就好；「凶」也不會扣任何 EXP。'
+        }
+    ];
+
+    const DAILY_LUCKY_WORDS = [
+        { jp:'挑戦', kana:'ちょうせん', zh:'挑戰' },
+        { jp:'一歩', kana:'いっぽ', zh:'一步' },
+        { jp:'笑顔', kana:'えがお', zh:'笑容' },
+        { jp:'発見', kana:'はっけん', zh:'發現' },
+        { jp:'休憩', kana:'きゅうけい', zh:'休息' },
+        { jp:'集中', kana:'しゅうちゅう', zh:'專心、集中' },
+        { jp:'成長', kana:'せいちょう', zh:'成長' },
+        { jp:'勇気', kana:'ゆうき', zh:'勇氣' },
+        { jp:'習慣', kana:'しゅうかん', zh:'習慣' },
+        { jp:'余裕', kana:'よゆう', zh:'餘裕、從容' },
+        { jp:'確認', kana:'かくにん', zh:'確認' },
+        { jp:'復習', kana:'ふくしゅう', zh:'複習' },
+        { jp:'出会い', kana:'であい', zh:'相遇、邂逅' },
+        { jp:'工夫', kana:'くふう', zh:'下功夫、想辦法' },
+        { jp:'順調', kana:'じゅんちょう', zh:'順利' }
+    ];
+
+    function getFortuneDateKey() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function getDailyFortuneStorageKey() {
+        return `jp_daily_fortune_${getFortuneDateKey()}`;
+    }
+
+    function pickWeightedFortune() {
+        const total = DAILY_FORTUNES.reduce((sum, x) => sum + x.weight, 0);
+        let roll = Math.random() * total;
+        for (const item of DAILY_FORTUNES) {
+            roll -= item.weight;
+            if (roll < 0) return item;
+        }
+        return DAILY_FORTUNES[DAILY_FORTUNES.length - 1];
+    }
+
+    function getSavedDailyFortune() {
+        try {
+            const raw = localStorage.getItem(getDailyFortuneStorageKey());
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function saveDailyFortune(result) {
+        localStorage.setItem(getDailyFortuneStorageKey(), JSON.stringify(result));
+    }
+
+    function renderDailyFortune(result) {
+        if (!result) return;
+
+        document.getElementById('fortune-rank').textContent = result.rank;
+        document.getElementById('fortune-jp').textContent = result.jp;
+        document.getElementById('fortune-zh').textContent = result.zh;
+
+        const luckyBox = document.getElementById('fortune-lucky-word');
+        document.getElementById('fortune-lucky-main').textContent =
+            `${result.lucky.jp}（${result.lucky.kana}）`;
+        document.getElementById('fortune-lucky-meaning').textContent =
+            `今天的幸運單字：${result.lucky.zh}`;
+        luckyBox.style.display = 'block';
+
+        const btn = document.getElementById('fortune-draw-btn');
+        btn.textContent = '✓ 今日已抽籤';
+        btn.disabled = true;
+
+        const note = document.getElementById('fortune-note');
+        note.textContent = `📅 ${getFortuneDateKey()}｜明天會自動換一支新籤`;
+
+        const launch = document.getElementById('fortune-launch-btn');
+        if (launch) launch.textContent = `🎴 今日運勢・${result.rank}`;
+    }
+
+    function resetFortuneModalPreview() {
+        document.getElementById('fortune-rank').textContent = '？';
+        document.getElementById('fortune-jp').textContent = '今日の運勢を引いてみよう！';
+        document.getElementById('fortune-zh').textContent = '今天的你，會抽到哪一支籤呢？';
+        document.getElementById('fortune-lucky-word').style.display = 'none';
+
+        const btn = document.getElementById('fortune-draw-btn');
+        btn.textContent = '🎴 今日の籤を引く';
+        btn.disabled = false;
+        document.getElementById('fortune-note').textContent =
+            '每天只能抽出一個結果；同一天重新開啟仍會是同一支籤。';
+    }
+
+    function openFortuneModal() {
+        playClickSound();
+        const modal = document.getElementById('fortuneModal');
+        modal.style.display = 'flex';
+
+        const saved = getSavedDailyFortune();
+        if (saved) renderDailyFortune(saved);
+        else resetFortuneModalPreview();
+    }
+
+    function closeFortuneModal(e) {
+        if (e && e.target !== document.getElementById('fortuneModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('fortuneModal').style.display = 'none';
+    }
+
+    function drawDailyFortune() {
+        const saved = getSavedDailyFortune();
+        if (saved) {
+            renderDailyFortune(saved);
+            return;
+        }
+
+        playClickSound();
+        const paper = document.getElementById('fortune-paper');
+        const btn = document.getElementById('fortune-draw-btn');
+        btn.disabled = true;
+        btn.textContent = 'シャカシャカ…';
+        paper.classList.remove('fortune-shake');
+        void paper.offsetWidth;
+        paper.classList.add('fortune-shake');
+
+        setTimeout(() => {
+            const fortune = pickWeightedFortune();
+            const lucky = DAILY_LUCKY_WORDS[Math.floor(Math.random() * DAILY_LUCKY_WORDS.length)];
+            const result = {
+                rank: fortune.rank,
+                jp: fortune.jp,
+                zh: fortune.zh,
+                lucky,
+                date: getFortuneDateKey()
+            };
+            saveDailyFortune(result);
+            renderDailyFortune(result);
+            playSuccessSound();
+        }, 600);
+    }
+
+    function initDailyFortuneBadge() {
+        const saved = getSavedDailyFortune();
+        if (saved) {
+            const launch = document.getElementById('fortune-launch-btn');
+            if (launch) launch.textContent = `🎴 今日運勢・${saved.rank}`;
+        }
+    }
 
     let lastFeedbackSubmitAt = 0;
 
@@ -4813,6 +5155,7 @@
     }
 
     renderAppVersion();
+        initDailyFortuneBadge();
     preloadAllCategories();
 </script>
 
