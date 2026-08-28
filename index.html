@@ -1539,7 +1539,7 @@
         </div>
     </div>
 
-    <!-- 3. 🐣 菜雞互啄專區（純淨無雜點臨摹手寫板） -->
+    <!-- 3. 🐣 菜雞互啄專區 -->
     <div id="kana-section">
         <div class="kana-main-toggle">
             <button class="btn-sub-view active" id="btn-view-grid" onclick="setKanaSubView('grid')">📊 五十音總表</button>
@@ -1767,99 +1767,6 @@
     const db = firebase.firestore();
     let currentUser = null;
 
-    auth.onAuthStateChanged(async (user) => {
-        const userInfoEl = document.getElementById('user-info');
-        const authBtnText = document.getElementById('btn-auth-text');
-        
-        if (user) {
-            currentUser = user;
-            const photo = user.photoURL ? `<img src="${user.photoURL}" class="user-avatar">` : '<span class="user-status-dot online"></span>';
-            userInfoEl.innerHTML = `${photo} <span>${user.displayName || '使用者'} (已同步)</span>`;
-            authBtnText.textContent = '登出';
-            
-            await syncCloudData();
-        } else {
-            currentUser = null;
-            userInfoEl.innerHTML = `<span class="user-status-dot"></span> <span>訪客模式（點右側登入同步 ➔）</span>`;
-            authBtnText.textContent = 'Google 登入同步';
-        }
-
-        updateHUDLevel();
-        renderQuestBoard();
-        if (currentMode === 'review') updateReviewUI();
-        if (currentMode === 'stats') renderStatsDashboard();
-    });
-
-    async function toggleAuth() {
-        playClickSound();
-        if (currentUser) {
-            await auth.signOut();
-        } else {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                await auth.signInWithPopup(provider);
-            } catch (err) {
-                console.error(err);
-                alert('登入失敗，請確認是否已在 Firebase 授權 candlekang.github.io 網域！');
-            }
-        }
-    }
-
-    function forceAppReload() {
-        playClickSound();
-        window.location.reload(true);
-    }
-
-    async function syncCloudData() {
-        if (!currentUser) return;
-        try {
-            const docRef = db.collection('user_progress').doc(currentUser.uid);
-            const docSnap = await docRef.get();
-            
-            let localData = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                if (k.startsWith('jp_progress_') || k.startsWith('jp_rpg_') || k.startsWith('jp_quest_') || k.startsWith('jp_learned_') || k.startsWith('jp_surprise_')) {
-                    try {
-                        localData[k] = JSON.parse(localStorage.getItem(k));
-                    } catch(e) {
-                        localData[k] = localStorage.getItem(k);
-                    }
-                }
-            }
-
-            if (docSnap.exists) {
-                const cloudData = docSnap.data().progress || {};
-                for (const [key, cVal] of Object.entries(cloudData)) {
-                    if (key.startsWith('jp_progress_')) {
-                        const lVal = localData[key] || { read: 0, quiz: 0 };
-                        localData[key] = {
-                            read: Math.max(lVal.read || 0, cVal.read || 0),
-                            quiz: Math.max(lVal.quiz || 0, cVal.quiz || 0)
-                        };
-                    } else if (key === 'jp_rpg_exp') {
-                        localData[key] = Math.max(localData[key] || 0, cVal || 0);
-                    } else if (key.startsWith('jp_quest_daily_')) {
-                        const lProg = localData[key] || { readCount: 0, quizCount: 0, rewardClaimed: false };
-                        localData[key] = {
-                            readCount: Math.max(lProg.readCount || 0, cVal.readCount || 0),
-                            quizCount: Math.max(lProg.quizCount || 0, cVal.quizCount || 0),
-                            rewardClaimed: lProg.rewardClaimed || cVal.rewardClaimed || false
-                        };
-                    } else {
-                        localData[key] = cVal;
-                    }
-                    localStorage.setItem(key, typeof localData[key] === 'object' ? JSON.stringify(localData[key]) : localData[key]);
-                }
-            }
-
-            await docRef.set({ progress: localData, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-            renderQuestBoard();
-        } catch (e) {
-            console.error('雲端同步失敗:', e);
-        }
-    }
-
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) {
@@ -2086,7 +1993,6 @@
         { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
     ];
 
-    // 🐣 五十音資料庫（宣告一次，安全無誤）
     const KANA_DATA = {
         'seion-hira': [
             { hira: 'あ', kata: 'ア', romaji: 'a' }, { hira: 'い', kata: 'イ', romaji: 'i' }, { hira: 'う', kata: 'ウ', romaji: 'u' }, { hira: 'え', kata: 'エ', romaji: 'e' }, { hira: 'お', kata: 'オ', romaji: 'o' },
@@ -2097,7 +2003,7 @@
             { hira: 'は', kata: 'ハ', romaji: 'ha' }, { hira: 'ひ', kata: 'ヒ', romaji: 'hi' }, { hira: 'ふ', kata: 'フ', romaji: 'fu' }, { hira: 'へ', kata: 'ヘ', romaji: 'he' }, { hira: 'ほ', kata: 'ホ', romaji: 'ho' },
             { hira: 'ま', kata: 'マ', romaji: 'ma' }, { hira: 'み', kata: 'ミ', romaji: 'mi' }, { hira: 'む', kata: 'ム', romaji: 'mu' }, { hira: 'め', kata: 'メ', romaji: 'me' }, { hira: 'も', kata: 'モ', romaji: 'mo' },
             { hira: 'や', kata: 'ヤ', romaji: 'ya' }, null, { hira: 'ゆ', kata: 'ユ', romaji: 'yu' }, null, { hira: 'よ', kata: 'ヨ', romaji: 'yo' },
-            { hira: 'ら', kata: '拉', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
+            { hira: 'ら', kata: 'ラ', romaji: 'ra' }, { hira: 'り', kata: 'リ', romaji: 'ri' }, { hira: 'る', kata: 'ル', romaji: 'ru' }, { hira: 'れ', kata: 'レ', romaji: 're' }, { hira: 'ろ', kata: 'ロ', romaji: 'ro' },
             { hira: 'わ', kata: 'ワ', romaji: 'wa' }, null, null, null, { hira: 'を', kata: 'ヲ', romaji: 'o/wo' },
             { hira: 'ん', kata: 'ン', romaji: 'n' }, null, null, null, null
         ],
@@ -2145,9 +2051,8 @@
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
-    allSearchableWords = [];
+    let allSearchableWords = [];
 
-    // 🐣 菜雞互啄專區模組
     function initKanaSection() {
         switchKanaGroup(currentKanaTab);
         setupCanvasEvents();
@@ -3242,6 +3147,29 @@
         quizIndex++;
         renderQuizQuestion();
     }
+
+    auth.onAuthStateChanged(async (user) => {
+        const userInfoEl = document.getElementById('user-info');
+        const authBtnText = document.getElementById('btn-auth-text');
+        
+        if (user) {
+            currentUser = user;
+            const photo = user.photoURL ? `<img src="${user.photoURL}" class="user-avatar">` : '<span class="user-status-dot online"></span>';
+            userInfoEl.innerHTML = `${photo} <span>${user.displayName || '使用者'} (已同步)</span>`;
+            authBtnText.textContent = '登出';
+            
+            await syncCloudData();
+        } else {
+            currentUser = null;
+            userInfoEl.innerHTML = `<span class="user-status-dot"></span> <span>訪客模式（點右側登入同步 ➔）</span>`;
+            authBtnText.textContent = 'Google 登入同步';
+        }
+
+        updateHUDLevel();
+        renderQuestBoard();
+        if (currentMode === 'review') updateReviewUI();
+        if (currentMode === 'stats') renderStatsDashboard();
+    });
 
     preloadAllCategories();
 </script>
