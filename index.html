@@ -1702,6 +1702,29 @@
             80% { transform: rotate(1deg) scale(1.01); }
         }
 
+    
+        /* 🔢 數詞：特殊讀音／音變提示 */
+        .counter-reading-alert {
+            margin: 12px 0;
+            padding: 13px 14px;
+            border-radius: 12px;
+            border: 1px solid #f59e0b;
+            background: linear-gradient(135deg, #fff7ed, #fffbeb);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, .10);
+        }
+        .counter-reading-alert-title {
+            color: #b45309;
+            font-weight: 900;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+        .counter-reading-alert-text {
+            color: #78350f;
+            font-size: 13px;
+            line-height: 1.75;
+            white-space: pre-line;
+        }
+
     </style>
 </head>
 <body>
@@ -2159,8 +2182,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.9.1';
-    const APP_UPDATE_NOTE = '擴充每日運勢籤｜40 組籤文＋30 個幸運單字';
+    const APP_VERSION = 'v9.9.2';
+    const APP_UPDATE_NOTE = '數詞頁強化特殊讀音提示｜常見助數詞音變醒目顯示';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4444,6 +4467,64 @@
         }
     }
 
+
+    function getCounterSpecialReading(word) {
+        if (!word || word.catKey !== 'sheet3') return '';
+
+        // 1) 優先使用試算表本身的欄位，之後若新增「特殊讀音／音變／讀音」欄會自動採用
+        if (Array.isArray(word.rawHeaders) && Array.isArray(word.rawCols)) {
+            const idx = word.rawHeaders.findIndex(h => {
+                const header = (h || '').trim();
+                return header.includes('特殊讀音') ||
+                       header.includes('音變') ||
+                       header.includes('特殊念法') ||
+                       header.includes('讀音提醒');
+            });
+            if (idx !== -1 && word.rawCols[idx] && word.rawCols[idx].trim()) {
+                return word.rawCols[idx].trim();
+            }
+        }
+
+        // 2) 常見助數詞的固定特殊讀音提示
+        const probe = `${word.jp || ''} ${word.kanji || ''}`;
+
+        const rules = [
+            {
+                keys: ['本', 'ほん', 'ぽん', 'ぼん'],
+                text: '1本＝いっぽん\n3本＝さんぼん\n6本＝ろっぽん\n8本＝はっぽん\n10本＝じゅっぽん／じっぽん'
+            },
+            {
+                keys: ['匹', 'ひき', 'ぴき', 'びき'],
+                text: '1匹＝いっぴき\n3匹＝さんびき\n6匹＝ろっぴき\n8匹＝はっぴき\n10匹＝じゅっぴき／じっぴき'
+            },
+            {
+                keys: ['杯', 'はい', 'ぱい', 'ばい'],
+                text: '1杯＝いっぱい\n3杯＝さんばい\n6杯＝ろっぱい\n8杯＝はっぱい\n10杯＝じゅっぱい／じっぱい'
+            },
+            {
+                keys: ['分', 'ふん', 'ぷん'],
+                text: '1分＝いっぷん\n3分＝さんぷん\n4分＝よんぷん\n6分＝ろっぷん\n8分＝はっぷん\n10分＝じゅっぷん／じっぷん'
+            },
+            {
+                keys: ['階', 'かい', 'がい'],
+                text: '1階＝いっかい\n3階＝さんがい\n6階＝ろっかい\n8階＝はっかい\n10階＝じゅっかい／じっかい'
+            },
+            {
+                keys: ['人', 'にん'],
+                text: '1人＝ひとり\n2人＝ふたり\n※ 3人以上は基本上使用「～にん」'
+            },
+            {
+                keys: ['日', 'にち'],
+                text: '1日＝ついたち\n2日＝ふつか\n3日＝みっか\n4日＝よっか\n5日＝いつか\n6日＝むいか\n7日＝なのか\n8日＝ようか\n9日＝ここのか\n10日＝とおか\n14日＝じゅうよっか\n20日＝はつか\n24日＝にじゅうよっか'
+            }
+        ];
+
+        for (const rule of rules) {
+            if (rule.keys.some(k => probe.includes(k))) return rule.text;
+        }
+        return '';
+    }
+
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -4831,10 +4912,27 @@
             backHTML += `<div class="section-type-badge">👾 ${current.type}</div>`;
         }
 
+        const counterSpecialReading = getCounterSpecialReading(current);
+        if (counterSpecialReading) {
+            backHTML += `
+                <div class="counter-reading-alert">
+                    <div class="counter-reading-alert-title">⚠️ 特殊讀音／音變</div>
+                    <div class="counter-reading-alert-text">${counterSpecialReading}</div>
+                </div>
+            `;
+        }
+
         for (let i = 2; i < current.rawHeaders.length; i++) {
             const h = current.rawHeaders[i] ? current.rawHeaders[i].trim() : '';
             const val = current.rawCols[i] ? current.rawCols[i].trim() : '';
             if (!val || (i === 3 && val === current.type)) continue;
+
+            if (current.catKey === 'sheet3' && (
+                h.includes('特殊讀音') ||
+                h.includes('音變') ||
+                h.includes('特殊念法') ||
+                h.includes('讀音提醒')
+            )) continue;
 
             if (h.includes('例句')) {
                 const lines = val.split('\n').filter(Boolean);
