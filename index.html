@@ -359,6 +359,20 @@
             grid-template-columns: repeat(4, 1fr); 
             gap: 6px; 
         }
+
+        /* 9.6：手機版主功能改為 2 x 2，避免最右側按鈕超出畫面 */
+        @media (max-width: 480px) {
+            .button-group {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .button-group button {
+                width: 100%;
+                min-width: 0;
+                padding: 11px 6px;
+                font-size: 13px;
+            }
+        }
         button {
             padding: 10px 4px; border: none; border-radius: 8px; font-size: 13px;
             cursor: pointer; transition: all 0.2s ease; background: #e2e8f0;
@@ -1662,7 +1676,7 @@
 
             <div class="quest-item" style="margin-top: 10px;">
                 <div class="quest-info">
-                    <span>🏆 每日測驗練習（完成即可）</span>
+                    <span>🏆 每日完成測驗</span>
                     <span id="quest-quiz-text">0 / 10</span>
                 </div>
                 <div class="quest-bar-bg">
@@ -2447,7 +2461,10 @@
 
         const quizTextEl = document.getElementById('quest-quiz-text');
         const quizBarEl = document.getElementById('quest-quiz-bar');
-        if (quizTextEl) quizTextEl.textContent = `${todayProg.quizCount} / ${settings.quizTarget} (${quizPercent}%) ${quizPercent >= 100 ? '✅' : ''}`;
+        if (quizTextEl) {
+            const displayQuizCount = Math.min(todayProg.quizCount, settings.quizTarget);
+            quizTextEl.textContent = `${displayQuizCount} / ${settings.quizTarget} (${quizPercent}%) ${quizPercent >= 100 ? '✅' : ''}`;
+        }
         if (quizBarEl) quizBarEl.style.width = `${quizPercent}%`;
     }
 
@@ -4310,8 +4327,6 @@
             }
         });
 
-        saveTodayQuestProgress('quiz');
-
         if (selectedOptionData.jp === currentCorrectAnswer.jp) {
             playSuccessSound();
             if (clickedBtn) clickedBtn.classList.add('correct');
@@ -4325,6 +4340,8 @@
             
             speakWordDirectly(null, currentCorrectAnswer.jp);
         } else {
+            // 答錯不增加「答對次數」，但仍算完成 1 題每日測驗。
+            saveTodayQuestProgress('quiz');
             playWrongSound();
             if (clickedBtn) clickedBtn.classList.add('wrong');
             
