@@ -2429,8 +2429,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.9.8';
-    const APP_UPDATE_NOTE = '動詞專屬字卡｜改用欄位名稱讀取並支援未來新增學習優先度';
+    const APP_VERSION = 'v9.9.8.1';
+    const APP_UPDATE_NOTE = '修正動詞欄位辨識｜加入普通型／辭書形、第幾類與自動他動';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5531,8 +5531,9 @@
 
             const priorityVal = getVerbCol(['學習優先度', '優先度']);
             const kanaVal = getVerbCol(['我的平假名', '平假名', '假名']);
-            const groupVal = getVerbCol(['動詞型', '群組', '動詞群']);
-            const transitivityVal = getVerbCol(['自動詞', '他動詞', '自他動詞', '詞類']);
+            const dictionaryVal = getVerbCol(['普通型／辭書形', '普通型/辭書形', '普通型', '辭書形', '辞書形']);
+            const groupVal = getVerbCol(['第幾類', '第几类', '動詞型', '群組', '動詞群']);
+            const transitivityVal = getVerbCol(['自動他動', '自他動詞', '自動詞／他動詞', '自動詞/他動詞']);
             const meaningVal = getVerbCol(['意思', '中文']);
             const collocationVal = getVerbCol(['最常搭配', '常見搭配', '搭配']);
             const exampleVal = getVerbCol(['例句寶寶', '例句']);
@@ -5543,10 +5544,15 @@
             badgeEl.classList.add('verb-priority-badge');
             badgeEl.textContent = priorityVal || '🔥 動詞';
 
-            const frontKana = kanaVal || current.kanji || '';
+            const frontKana = kanaVal || '';
             mainTitleEl.textContent = current.jp;
-            if (frontKana && frontKana !== current.jp) {
-                subTitleEl.textContent = frontKana;
+
+            const frontSubParts = [];
+            if (dictionaryVal && dictionaryVal !== current.jp) frontSubParts.push(dictionaryVal);
+            if (frontKana && frontKana !== current.jp && frontKana !== dictionaryVal) frontSubParts.push(frontKana);
+
+            if (frontSubParts.length) {
+                subTitleEl.textContent = frontSubParts.join('｜');
                 subTitleEl.style.display = 'block';
             } else {
                 subTitleEl.textContent = '';
@@ -5565,6 +5571,15 @@
             ttsBtnEl.style.display = 'inline-flex';
 
             let backHTML = `<div class="kanji-title">${current.jp}${frontKana && frontKana !== current.jp ? `（${frontKana}）` : ''}</div>`;
+
+            if (dictionaryVal) {
+                backHTML += `
+                    <div class="verb-info-card" style="background:#f8fafc; border-color:#cbd5e1; border-left-color:#64748b;">
+                        <div class="verb-section-title" style="color:#334155;">📖 普通型／辭書形</div>
+                        <div class="verb-info-text" style="color:#0f172a; font-weight:800;">${dictionaryVal}</div>
+                    </div>
+                `;
+            }
 
             const meta = [];
             if (groupVal) meta.push(`🧩 ${groupVal}`);
