@@ -2088,6 +2088,106 @@
             line-height: 1.55;
         }
 
+    
+        /* 📘 動詞變化規則指南 v10.0.2 */
+        .verb-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+        .verb-guide-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .verb-guide-card {
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .verb-guide-card.i1 {
+            background: #fff7f7;
+            border-color: #fecaca;
+            box-shadow: inset 0 0 0 1px rgba(239,68,68,0.03);
+        }
+        .verb-guide-card.i2 {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            box-shadow: inset 0 0 0 1px rgba(34,197,94,0.03);
+        }
+        .verb-guide-card.i3 {
+            background: #fff7ed;
+            border-color: #fed7aa;
+            box-shadow: inset 0 0 0 1px rgba(249,115,22,0.03);
+        }
+        .verb-guide-card.extra {
+            background: #f5f3ff;
+            border-color: #ddd6fe;
+        }
+        .verb-guide-card-title {
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        .verb-guide-card.i1 .verb-guide-card-title { color: #dc2626; }
+        .verb-guide-card.i2 .verb-guide-card-title { color: #16a34a; }
+        .verb-guide-card.i3 .verb-guide-card-title { color: #ea580c; }
+        .verb-guide-card.extra .verb-guide-card-title { color: #7c3aed; }
+        .verb-guide-card-desc {
+            font-size: 13px;
+            line-height: 1.72;
+            color: #334155;
+        }
+        .verb-form-chip {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-right: 6px;
+            margin-bottom: 5px;
+            letter-spacing: .2px;
+        }
+        .vf-masu { background: #dbeafe; color: #1d4ed8; }
+        .vf-dict { background: #e2e8f0; color: #334155; }
+        .vf-nai  { background: #fee2e2; color: #b91c1c; }
+        .vf-te   { background: #dcfce7; color: #15803d; }
+        .vf-ta   { background: #ffedd5; color: #c2410c; }
+        .vf-adv  { background: #ede9fe; color: #6d28d9; }
+        .verb-guide-mini-table {
+            margin-top: 10px;
+            border-top: 1px dashed rgba(148,163,184,.5);
+            padding-top: 9px;
+        }
+        .verb-guide-rule-line {
+            margin: 4px 0;
+        }
+        .verb-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            line-height: 1.68;
+        }
+        .verb-guide-advanced {
+            margin-top: 12px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+        .verb-guide-advanced b {
+            color: #0f172a;
+        }
+
     </style>
 </head>
 <body>
@@ -2375,67 +2475,94 @@
             <button class="btn-modal-close" onclick="closeVerbGuideModal()">✕</button>
         </div>
         <div class="modal-body">
-            <div class="verb-guide-intro">
-    日文動詞最重要的是先看「第幾類」，因為不同類型的變化方式不一樣。先掌握下面三類，再搭配每張動詞卡的「🔄 看這個動詞怎麼變」，會比只背名稱更容易上手。
+            
+<div class="verb-guide-intro">
+    學動詞時，先看 <b>第幾類</b>，再看 <b>怎麼變化</b>。下面把最常用的三類動詞與 5 種核心變化整理在一起，你可以搭配每張卡上的「🔄 看這個動詞怎麼變」一起看。
 </div>
 
-<div class="verb-guide-card" style="margin-bottom:10px;">
-    <div class="verb-guide-card-title">🔥 Ⅰ類動詞（五段動詞）</div>
-    <div class="verb-guide-card-desc">
-        最後一個假名會跟著變化。<br><br>
-        <b>例：書く（かく）</b><br>
-        ます形：書きます<br>
-        ない形：書かない<br>
-        て形：書いて<br>
-        た形：書いた<br><br>
-        <b>て形／た形快速規則：</b><br>
-        う・つ・る → って／った<br>
-        む・ぶ・ぬ → んで／んだ<br>
-        く → いて／いた<br>
-        ぐ → いで／いだ<br>
-        す → して／した<br>
-        ※ 行く → 行って／行った
+<div class="verb-guide-stack">
+    <div class="verb-guide-card i1">
+        <div class="verb-guide-card-title">🔥 Ⅰ類動詞（五段動詞）</div>
+        <div class="verb-guide-card-desc">
+            最後一個假名會跟著變化。<br><br>
+            <b>例：書く（かく）</b><br>
+            <span class="verb-form-chip vf-masu">ます形</span>書きます<br>
+            <span class="verb-form-chip vf-dict">辭書形</span>書く<br>
+            <span class="verb-form-chip vf-nai">ない形</span>書かない<br>
+            <span class="verb-form-chip vf-te">て形</span>書いて<br>
+            <span class="verb-form-chip vf-ta">た形</span>書いた
+
+            <div class="verb-guide-mini-table">
+                <div class="verb-guide-rule-line"><span class="verb-form-chip vf-te">て形</span><span class="verb-form-chip vf-ta">た形</span>快速規則：</div>
+                <div class="verb-guide-rule-line">う・つ・る → って／った</div>
+                <div class="verb-guide-rule-line">む・ぶ・ぬ → んで／んだ</div>
+                <div class="verb-guide-rule-line">く → いて／いた</div>
+                <div class="verb-guide-rule-line">ぐ → いで／いだ</div>
+                <div class="verb-guide-rule-line">す → して／した</div>
+                <div class="verb-guide-rule-line">※ 行く → 行って／行った</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="verb-guide-card i2">
+        <div class="verb-guide-card-title">🌿 Ⅱ類動詞（一段動詞）</div>
+        <div class="verb-guide-card-desc">
+            多數只要把辭書形最後的「る」拿掉，再接不同詞尾。<br><br>
+            <b>例：食べる（たべる）</b><br>
+            <span class="verb-form-chip vf-masu">ます形</span>食べます<br>
+            <span class="verb-form-chip vf-dict">辭書形</span>食べる<br>
+            <span class="verb-form-chip vf-nai">ない形</span>食べない<br>
+            <span class="verb-form-chip vf-te">て形</span>食べて<br>
+            <span class="verb-form-chip vf-ta">た形</span>食べた
+        </div>
+    </div>
+
+    <div class="verb-guide-card i3">
+        <div class="verb-guide-card-title">⚡ Ⅲ類動詞（不規則動詞）</div>
+        <div class="verb-guide-card-desc">
+            主要先記住「する」與「来る」。<br><br>
+            <b>する</b><br>
+            <span class="verb-form-chip vf-masu">ます形</span>します<br>
+            <span class="verb-form-chip vf-dict">辭書形</span>する<br>
+            <span class="verb-form-chip vf-nai">ない形</span>しない<br>
+            <span class="verb-form-chip vf-te">て形</span>して<br>
+            <span class="verb-form-chip vf-ta">た形</span>した<br><br>
+
+            <b>来る（くる）</b><br>
+            <span class="verb-form-chip vf-masu">ます形</span>来ます（きます）<br>
+            <span class="verb-form-chip vf-dict">辭書形</span>来る（くる）<br>
+            <span class="verb-form-chip vf-nai">ない形</span>来ない（こない）<br>
+            <span class="verb-form-chip vf-te">て形</span>来て（きて）<br>
+            <span class="verb-form-chip vf-ta">た形</span>来た（きた）
+        </div>
+    </div>
+
+    <div class="verb-guide-card extra">
+        <div class="verb-guide-card-title">📘 這 5 種先學最實用</div>
+        <div class="verb-guide-card-desc">
+            <span class="verb-form-chip vf-masu">ます形</span>禮貌說法<br>
+            <span class="verb-form-chip vf-dict">辭書形</span>字典裡看到的基本形<br>
+            <span class="verb-form-chip vf-nai">ない形</span>表示「不～」<br>
+            <span class="verb-form-chip vf-te">て形</span>連接動作、請求、進行等很多句型都會用到<br>
+            <span class="verb-form-chip vf-ta">た形</span>表示已完成、過去等
+        </div>
     </div>
 </div>
 
-<div class="verb-guide-card" style="margin-bottom:10px;">
-    <div class="verb-guide-card-title">🌿 Ⅱ類動詞（一段動詞）</div>
-    <div class="verb-guide-card-desc">
-        大多數只要把辭書形最後的「る」拿掉，再接不同結尾。<br><br>
-        <b>例：食べる（たべる）</b><br>
-        ます形：食べます<br>
-        ない形：食べない<br>
-        て形：食べて<br>
-        た形：食べた
-    </div>
-</div>
-
-<div class="verb-guide-card" style="margin-bottom:10px;">
-    <div class="verb-guide-card-title">⚡ Ⅲ類動詞（不規則動詞）</div>
-    <div class="verb-guide-card-desc">
-        主要先記住「する」與「来る」。<br><br>
-        <b>する</b><br>
-        します／しない／して／した<br><br>
-        <b>来る（くる）</b><br>
-        来ます（きます）／来ない（こない）／来て（きて）／来た（きた）
-    </div>
-</div>
-
-<div class="verb-guide-card" style="margin-bottom:10px;">
-    <div class="verb-guide-card-title">📘 這 5 種先學最實用</div>
-    <div class="verb-guide-card-desc">
-        <b>ます形</b>：禮貌說法<br>
-        <b>辭書形</b>：字典裡看到的基本形<br>
-        <b>ない形</b>：表示「不～」<br>
-        <b>て形</b>：連接動作、請求、進行等很多句型都會用到<br>
-        <b>た形</b>：表示已完成、過去等
-    </div>
+<div class="verb-guide-advanced">
+    <b>進階補充｜六大活用形</b><br>
+    <span class="verb-form-chip vf-adv">未然形</span>常用於否定、意志等尚未實現的語意。<br>
+    <span class="verb-form-chip vf-adv">連用形</span>可連接其他助動詞或形成禮貌表現，例如「ます」。<br>
+    <span class="verb-form-chip vf-adv">終止形</span>用來結束句子；現代日語通常與辭書形相同。<br>
+    <span class="verb-form-chip vf-adv">連體形</span>用來修飾名詞；現代日語通常與辭書形相同。<br>
+    <span class="verb-form-chip vf-adv">假定形</span>表示假設條件，常見於「～ば」等句型。<br>
+    <span class="verb-form-chip vf-adv">命令形</span>用於命令或強烈要求；語氣較直接，要注意使用情境。
 </div>
 
 <div class="verb-guide-note">
-    💡 上面的「未然形、連用形、終止形、連體形、假定形、命令形」屬於更完整的文法分類。初學時不用一次背完，先把Ⅰ／Ⅱ／Ⅲ類和這 5 種常用變化學熟，就很夠用了。
+    💡 建議先熟悉 <b>Ⅰ／Ⅱ／Ⅲ類</b> 與 <b>ます形、辭書形、ない形、て形、た形</b>；等基礎穩定後，再回頭看六大活用形，會更好理解。
 </div>
-        </div>
+</div>
     </div>
 </div>
 
@@ -2619,8 +2746,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.0.1';
-    const APP_UPDATE_NOTE = '重寫動詞變化規則指南｜改為學習者導向並補上Ⅰ／Ⅱ／Ⅲ類實際變化規則';
+    const APP_VERSION = 'v10.0.2';
+    const APP_UPDATE_NOTE = '優化動詞變化規則指南｜補回六大活用形並加上重點配色';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
