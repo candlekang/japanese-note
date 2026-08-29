@@ -2034,6 +2034,60 @@
             .verb-guide-grid { grid-template-columns: 1fr; }
         }
 
+    
+        /* 🔄 動詞變化第二階段 */
+        .verb-conj-toggle {
+            width: 100%;
+            margin: 2px 0 12px;
+            border: 1px solid #93c5fd;
+            background: linear-gradient(135deg, #eff6ff, #eef2ff);
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .verb-conj-panel {
+            display: none;
+            margin: -4px 0 12px;
+            padding: 10px;
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            border-radius: 10px;
+        }
+        .verb-conj-panel.open {
+            display: block;
+        }
+        .verb-conj-row {
+            display: grid;
+            grid-template-columns: 82px 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 7px 4px;
+            border-bottom: 1px dashed #dbeafe;
+        }
+        .verb-conj-row:last-child {
+            border-bottom: none;
+        }
+        .verb-conj-label {
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .verb-conj-value {
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 800;
+        }
+        .verb-conj-note {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
     </style>
 </head>
 <body>
@@ -2539,8 +2593,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.9.9';
-    const APP_UPDATE_NOTE = '動詞整合第一階段｜隱藏獨立變化分類並新增動詞變化規則指南入口';
+    const APP_VERSION = 'v10.0';
+    const APP_UPDATE_NOTE = '動詞整合第二階段｜每張動詞卡新增ます形／辭書形／ない形／て形／た形';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4918,6 +4972,140 @@
         return '';
     }
 
+
+    function normalizeVerbGroup(groupVal) {
+        const g = (groupVal || '').replace(/\s+/g, '').toUpperCase();
+
+        if (
+            g.includes('Ⅲ') || g.includes('III') ||
+            g.includes('3類') || g.includes('三類') ||
+            g.includes('第3類') || g.includes('第三類')
+        ) return 3;
+
+        if (
+            g.includes('Ⅱ') || g.includes('II') ||
+            g.includes('2類') || g.includes('二類') ||
+            g.includes('第2類') || g.includes('第二類')
+        ) return 2;
+
+        if (
+            g.includes('Ⅰ') || g === 'I' || g.includes('I類') ||
+            g.includes('1類') || g.includes('一類') ||
+            g.includes('第1類') || g.includes('第一類')
+        ) return 1;
+
+        return 0;
+    }
+
+    function conjugateVerb(dictionaryForm, groupVal, masuForm) {
+        const dict = (dictionaryForm || '').trim();
+        if (!dict) return null;
+
+        const group = normalizeVerbGroup(groupVal);
+        const result = {
+            masu: (masuForm || '').trim() || '',
+            dictionary: dict,
+            nai: '',
+            te: '',
+            ta: ''
+        };
+
+        // Ⅲ類：する／～する、来る
+        if (group === 3 || dict === 'する' || dict.endsWith('する') || dict === '来る' || dict === 'くる') {
+            if (dict === '来る' || dict === 'くる') {
+                const kanjiMode = dict === '来る';
+                result.nai = kanjiMode ? '来ない' : 'こない';
+                result.te = kanjiMode ? '来て' : 'きて';
+                result.ta = kanjiMode ? '来た' : 'きた';
+            } else if (dict === 'する' || dict.endsWith('する')) {
+                const stem = dict.slice(0, -2);
+                result.nai = `${stem}しない`;
+                result.te = `${stem}して`;
+                result.ta = `${stem}した`;
+            }
+            return result;
+        }
+
+        // Ⅱ類：去掉最後的「る」
+        if (group === 2) {
+            if (!dict.endsWith('る')) return null;
+            const stem = dict.slice(0, -1);
+            result.nai = `${stem}ない`;
+            result.te = `${stem}て`;
+            result.ta = `${stem}た`;
+            return result;
+        }
+
+        // Ⅰ類（五段）
+        if (group === 1) {
+            // 「ある」的ない形是不規則的「ない」
+            if (dict === 'ある') {
+                result.nai = 'ない';
+                result.te = 'あって';
+                result.ta = 'あった';
+                return result;
+            }
+
+            const last = dict.slice(-1);
+            const stem = dict.slice(0, -1);
+
+            const naiMap = {
+                'う': 'わない',
+                'く': 'かない',
+                'ぐ': 'がない',
+                'す': 'さない',
+                'つ': 'たない',
+                'ぬ': 'なない',
+                'ぶ': 'ばない',
+                'む': 'まない',
+                'る': 'らない'
+            };
+
+            if (!naiMap[last]) return null;
+            result.nai = stem + naiMap[last];
+
+            // 行く是て／た形特例
+            if (dict === '行く' || dict === 'いく') {
+                result.te = stem + 'って';
+                result.ta = stem + 'った';
+                return result;
+            }
+
+            if (last === 'う' || last === 'つ' || last === 'る') {
+                result.te = stem + 'って';
+                result.ta = stem + 'った';
+            } else if (last === 'む' || last === 'ぶ' || last === 'ぬ') {
+                result.te = stem + 'んで';
+                result.ta = stem + 'んだ';
+            } else if (last === 'く') {
+                result.te = stem + 'いて';
+                result.ta = stem + 'いた';
+            } else if (last === 'ぐ') {
+                result.te = stem + 'いで';
+                result.ta = stem + 'いだ';
+            } else if (last === 'す') {
+                result.te = stem + 'して';
+                result.ta = stem + 'した';
+            }
+            return result;
+        }
+
+        return null;
+    }
+
+    function toggleVerbConjugation(event, panelId, buttonId) {
+        if (event) event.stopPropagation();
+        playClickSound();
+
+        const panel = document.getElementById(panelId);
+        const btn = document.getElementById(buttonId);
+        if (!panel || !btn) return;
+
+        const willOpen = !panel.classList.contains('open');
+        panel.classList.toggle('open', willOpen);
+        btn.textContent = willOpen ? '🔼 收起動詞變化' : '🔄 看這個動詞怎麼變';
+    }
+
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -5715,6 +5903,43 @@
             if (transitivityVal) meta.push(`🔁 ${transitivityVal}`);
             if (meta.length) {
                 backHTML += `<div class="verb-meta-row">${meta.map(x => `<span class="verb-meta-chip">${x}</span>`).join('')}</div>`;
+            }
+
+            const conjugation = conjugateVerb(dictionaryVal, groupVal, current.jp);
+            if (conjugation) {
+                const panelId = `verb-conj-panel-${currentIndex}`;
+                const buttonId = `verb-conj-btn-${currentIndex}`;
+                backHTML += `
+                    <button type="button" id="${buttonId}" class="verb-conj-toggle"
+                        onclick="toggleVerbConjugation(event, '${panelId}', '${buttonId}')">
+                        🔄 看這個動詞怎麼變
+                    </button>
+                    <div id="${panelId}" class="verb-conj-panel">
+                        <div class="verb-conj-row">
+                            <div class="verb-conj-label">ます形</div>
+                            <div class="verb-conj-value">${conjugation.masu || '—'}</div>
+                        </div>
+                        <div class="verb-conj-row">
+                            <div class="verb-conj-label">辭書形</div>
+                            <div class="verb-conj-value">${conjugation.dictionary}</div>
+                        </div>
+                        <div class="verb-conj-row">
+                            <div class="verb-conj-label">ない形</div>
+                            <div class="verb-conj-value">${conjugation.nai || '—'}</div>
+                        </div>
+                        <div class="verb-conj-row">
+                            <div class="verb-conj-label">て形</div>
+                            <div class="verb-conj-value">${conjugation.te || '—'}</div>
+                        </div>
+                        <div class="verb-conj-row">
+                            <div class="verb-conj-label">た形</div>
+                            <div class="verb-conj-value">${conjugation.ta || '—'}</div>
+                        </div>
+                        <div class="verb-conj-note">
+                            依這張卡的「第幾類＋辭書形」自動產生；已處理「行く」「ある」「する／～する」「来る」等主要例外。
+                        </div>
+                    </div>
+                `;
             }
 
             if (meaningVal) {
