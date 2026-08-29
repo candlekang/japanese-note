@@ -1972,6 +1972,68 @@
         .verb-info-text { color: #7f1d1d; }
         .verb-family-text { color: #0c4a6e; }
 
+    
+        /* 📘 動詞變化規則指南 */
+        .verb-guide-launch {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #93c5fd;
+            background: linear-gradient(135deg, #eff6ff, #eef2ff);
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .verb-guide-launch:hover {
+            border-color: #60a5fa;
+            background: #eff6ff;
+        }
+        .verb-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .verb-guide-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+        .verb-guide-card {
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .verb-guide-card-title {
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+        .verb-guide-card-desc {
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .verb-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+        @media (max-width: 480px) {
+            .verb-guide-grid { grid-template-columns: 1fr; }
+        }
+
     </style>
 </head>
 <body>
@@ -2043,7 +2105,7 @@
             <option value="sheet5">な形容詞</option>
             <option value="sheet6">動詞</option>
             <option value="sheet7">形容詞的變化</option>
-            <option value="sheet8">動詞的變化</option>
+            <option value="sheet8" style="display:none;">動詞的變化</option>
             <option value="sheet9">一些知識&觀念</option>
             <option value="sheet10">接續詞</option>
             <option value="sheet11">接尾詞</option>
@@ -2061,6 +2123,7 @@
             <option value="sheet24">します的擴充包</option>
             <option value="sheet25">つけます的擴充包</option>
         </select>
+        <button type="button" id="verb-guide-launch" class="verb-guide-launch" onclick="openVerbGuideModal()">📘 動詞變化規則指南</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
@@ -2249,6 +2312,53 @@
 
 
 
+
+<!-- 📘 動詞變化規則指南 -->
+<div class="modal-overlay" id="verbGuideModal" onclick="closeVerbGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">📘 動詞變化規則指南</h3>
+            <button class="btn-modal-close" onclick="closeVerbGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="verb-guide-intro">
+                原本獨立的「動詞的變化」分類已整合進動詞學習流程。這裡先保留你工作表中的核心觀念，之後第二階段會再把每張動詞卡的實際變化直接算給你看。
+            </div>
+
+            <div class="verb-guide-grid">
+                <div class="verb-guide-card">
+                    <div class="verb-guide-card-title">1. 未然形</div>
+                    <div class="verb-guide-card-desc">常用於否定、意志等尚未實現的語意。</div>
+                </div>
+                <div class="verb-guide-card">
+                    <div class="verb-guide-card-title">2. 連用形</div>
+                    <div class="verb-guide-card-desc">可連接其他助動詞或形成禮貌表現，例如「ます」。</div>
+                </div>
+                <div class="verb-guide-card">
+                    <div class="verb-guide-card-title">3. 終止形</div>
+                    <div class="verb-guide-card-desc">用來結束句子；現代日語通常與辭書形相同。</div>
+                </div>
+                <div class="verb-guide-card">
+                    <div class="verb-guide-card-title">4. 連體形</div>
+                    <div class="verb-guide-card-desc">用來修飾名詞；現代日語通常與辭書形相同。</div>
+                </div>
+                <div class="verb-guide-card">
+                    <div class="verb-guide-card-title">5. 假定形</div>
+                    <div class="verb-guide-card-desc">表示假設條件，常見於「～ば」等句型。</div>
+                </div>
+                <div class="verb-guide-card">
+                    <div class="verb-guide-card-title">6. 命令形</div>
+                    <div class="verb-guide-card-desc">用於命令或強烈要求；語氣較直接，需要注意使用情境。</div>
+                </div>
+            </div>
+
+            <div class="verb-guide-note">
+                💡 第二階段預計整合最實用的五種變化：ます形／辭書形／ない形／て形／た形。完整活用觀念仍保留在原 Google Sheet「動詞的變化」工作頁，不會刪除。
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 🎴 每日運勢籤 -->
 <div class="modal-overlay" id="fortuneModal" onclick="closeFortuneModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -2429,8 +2539,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.9.8.1';
-    const APP_UPDATE_NOTE = '修正動詞欄位辨識｜加入普通型／辭書形、第幾類與自動他動';
+    const APP_VERSION = 'v9.9.9';
+    const APP_UPDATE_NOTE = '動詞整合第一階段｜隱藏獨立變化分類並新增動詞變化規則指南入口';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4068,10 +4178,29 @@
         updateReviewUI();
     }
 
+
+    function updateVerbGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('verb-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet6') ? 'block' : 'none';
+    }
+
+    function openVerbGuideModal() {
+        playClickSound();
+        document.getElementById('verbGuideModal').style.display = 'flex';
+    }
+
+    function closeVerbGuideModal(e) {
+        if (e && e.target !== document.getElementById('verbGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('verbGuideModal').style.display = 'none';
+    }
+
     function changeSheet() {
         playClickSound();
         const selected = document.getElementById('sheetSelect').value;
         document.getElementById('flashcard').classList.remove('is-flipped');
+        updateVerbGuideVisibility();
         loadSheetData(selected);
     }
 
@@ -6065,6 +6194,7 @@
     }
 
     renderAppVersion();
+        updateVerbGuideVisibility();
         initDailyFortuneBadge();
     preloadAllCategories();
 </script>
