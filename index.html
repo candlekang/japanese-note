@@ -1821,6 +1821,80 @@
             white-space: pre-wrap;
         }
 
+    
+        /* 🌿 な形容詞專屬字卡 */
+        .nadj-priority-badge {
+            background: rgba(16, 185, 129, 0.10) !important;
+            border-color: rgba(16, 185, 129, 0.30) !important;
+            color: #047857 !important;
+            letter-spacing: 0.2px;
+        }
+        .nadj-front-meaning {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em;
+            width: 92%;
+            text-align: center;
+            color: #475569;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #22c55e;
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.55;
+            padding: 9px 12px;
+            border-radius: 10px;
+            margin: 2px auto 12px auto;
+            box-sizing: border-box;
+        }
+        .nadj-back-meaning {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #22c55e;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .nadj-back-meaning-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #047857;
+            margin-bottom: 4px;
+        }
+        .nadj-back-meaning-text {
+            font-size: 14px;
+            color: #0f172a;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+        .nadj-antonym-block {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-left: 4px solid #f97316;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .nadj-antonym-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #c2410c;
+            margin-bottom: 4px;
+        }
+        .nadj-antonym-text {
+            color: #7c2d12;
+            font-size: 14px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
     </style>
 </head>
 <body>
@@ -2278,8 +2352,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v9.9.5';
-    const APP_UPDATE_NOTE = 'い形容詞專屬字卡｜學習優先度＋意思＋搭配＋例句朗讀＋反義詞';
+    const APP_VERSION = 'v9.9.6';
+    const APP_UPDATE_NOTE = 'な形容詞專屬字卡｜支援未來新增學習優先度欄並改用欄位名稱讀取';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4643,7 +4717,7 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
-        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge');
+        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
@@ -5234,7 +5308,123 @@
             return;
         }
 
-        // 💡 7. 一般分類標準版型
+
+        // 💡 7. な形容詞（sheet5）專屬版型
+        if (current.catKey === 'sheet5') {
+            const getNAdjCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const priorityVal = getNAdjCol(['學習優先度', '優先度']);
+            const meaningVal = getNAdjCol(['意思', '中文']);
+            const collocationVal = getNAdjCol(['最常搭配', '常見搭配', '搭配']);
+            const exampleVal = getNAdjCol(['例句寶寶', '例句']);
+            const antonymVal = getNAdjCol(['反義詞']);
+            const noteVal = getNAdjCol(['備註', '備注']);
+
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('nadj-priority-badge');
+            badgeEl.textContent = priorityVal || '🌿 な形容詞';
+
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                mainTitleEl.textContent = current.kanji;
+                subTitleEl.textContent = current.jp;
+                subTitleEl.style.display = 'block';
+            } else {
+                mainTitleEl.textContent = current.jp;
+                subTitleEl.textContent = '';
+                subTitleEl.style.display = 'none';
+            }
+            mainTitleEl.style.display = 'block';
+
+            if (meaningVal) {
+                meanBoxEl.className = 'nadj-front-meaning';
+                meanBoxEl.textContent = `💡 ${meaningVal}`;
+                meanBoxEl.style.display = '-webkit-box';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let fullBackTitle = current.jp;
+            if (current.kanji && current.kanji.trim() !== '' && current.kanji !== current.jp) {
+                fullBackTitle = `${current.kanji}（${current.jp}）`;
+            }
+
+            let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+
+            if (meaningVal) {
+                backHTML += `
+                    <div class="nadj-back-meaning">
+                        <div class="nadj-back-meaning-title">💡 意思</div>
+                        <div class="nadj-back-meaning-text">${meaningVal}</div>
+                    </div>
+                `;
+            }
+
+            if (collocationVal) {
+                backHTML += `
+                    <div class="grammar-rule-card" style="border-color:#bae6fd; background:#f0f9ff;">
+                        <div class="grammar-rule-title" style="color:#0369a1;">🔗 最常搭配</div>
+                        <div class="grammar-rule-content" style="color:#0c4a6e;">${collocationVal.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button type="button" class="btn-tts-small"
+                                    onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            if (antonymVal) {
+                backHTML += `
+                    <div class="nadj-antonym-block">
+                        <div class="nadj-antonym-title">↔️ 反義詞</div>
+                        <div class="nadj-antonym-text">${antonymVal.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="notes-block">
+                        <div class="notes-title">📝 備註</div>
+                        <div class="notes-content">${noteVal.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 8. 一般分類標準版型
+
 
 
         badgeEl.style.display = 'inline-block';
