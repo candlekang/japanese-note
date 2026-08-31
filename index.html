@@ -2378,6 +2378,76 @@
             line-height: 1.55;
         }
 
+    
+        /* ⏱️ 數詞：頻率導讀卡 */
+        .counter-frequency-card {
+            border: 1px solid #bae6fd;
+            background: linear-gradient(180deg, #f0f9ff, #f8fbff);
+            border-left: 4px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+        .counter-frequency-title {
+            color: #0369a1;
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        .counter-frequency-rule {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 9px 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px dashed #7dd3fc;
+            color: #0c4a6e;
+            font-size: 13px;
+            font-weight: 800;
+            text-align: center;
+        }
+        .counter-frequency-rule .plus {
+            color: #64748b;
+            font-weight: 700;
+        }
+        .counter-frequency-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+        .counter-frequency-example {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 9px 10px;
+            border-radius: 9px;
+            background: #ffffff;
+            border: 1px solid #e0f2fe;
+        }
+        .counter-frequency-jp {
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+        .counter-frequency-reading {
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .counter-frequency-zh {
+            color: #0369a1;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
     </style>
 </head>
 <body>
@@ -3057,8 +3127,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.3';
-    const APP_UPDATE_NOTE = '整合「一些知識／觀念」｜內容移入動詞與數詞並隱藏原分類';
+    const APP_VERSION = 'v10.3.1';
+    const APP_UPDATE_NOTE = '優化數詞頻率導讀排版｜改成公式＋三組例句卡片';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5762,16 +5832,41 @@
 
             if (current.catKey === 'sheet3') {
                 backHTML += `
-                    <div class="notes-block" style="border-left:4px solid #0ea5e9; background:#f0f9ff; border-color:#bae6fd;">
-                        <div class="notes-title" style="color:#0369a1;">⏱️ 頻率怎麼說：期間＋に＋次數</div>
-                        <div class="notes-content" style="color:#0c4a6e; line-height:1.8;">
-                            表示「在某段期間內做幾次」，常用：<b>期間 ＋ に ＋ 次數</b><br><br>
-                            一日に二回（いちにちに にかい）<br>
-                            一天兩次<br><br>
-                            一週間に三回（いっしゅうかんに さんかい）<br>
-                            一週三次<br><br>
-                            一年に一回（いちねんに いっかい）<br>
-                            一年一次
+                    <div class="counter-frequency-card">
+                        <div class="counter-frequency-title">⏱️ 頻率怎麼說</div>
+
+                        <div class="counter-frequency-rule">
+                            <span>期間</span>
+                            <span class="plus">＋</span>
+                            <span>に</span>
+                            <span class="plus">＋</span>
+                            <span>次數</span>
+                        </div>
+
+                        <div class="counter-frequency-examples">
+                            <div class="counter-frequency-example">
+                                <div>
+                                    <div class="counter-frequency-jp">一日に二回</div>
+                                    <div class="counter-frequency-reading">いちにちに にかい</div>
+                                </div>
+                                <div class="counter-frequency-zh">一天兩次</div>
+                            </div>
+
+                            <div class="counter-frequency-example">
+                                <div>
+                                    <div class="counter-frequency-jp">一週間に三回</div>
+                                    <div class="counter-frequency-reading">いっしゅうかんに さんかい</div>
+                                </div>
+                                <div class="counter-frequency-zh">一週三次</div>
+                            </div>
+
+                            <div class="counter-frequency-example">
+                                <div>
+                                    <div class="counter-frequency-jp">一年に一回</div>
+                                    <div class="counter-frequency-reading">いちねんに いっかい</div>
+                                </div>
+                                <div class="counter-frequency-zh">一年一次</div>
+                            </div>
                         </div>
                     </div>
                 `;
