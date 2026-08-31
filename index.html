@@ -2822,6 +2822,71 @@
             }
         }
 
+
+        /* 🧩 接頭詞規則指南 */
+        .prefix-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #facc15;
+            background:linear-gradient(135deg,#fff7cc,#fef3c7);color:#92400e;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+        .prefix-guide-hero{
+            border-radius:16px;border:1px solid #fde68a;
+            background:linear-gradient(135deg,#fffef2,#fff7cc);
+            padding:14px;margin-bottom:12px
+        }
+        .prefix-guide-hero-top{
+            display:flex;justify-content:space-between;align-items:flex-start;gap:12px
+        }
+        .prefix-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fef3c7;
+            color:#92400e;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+        .prefix-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+        .prefix-guide-reading{margin-top:4px;color:#b45309;font-size:14px;font-weight:800}
+        .prefix-guide-pronounce-btn{
+            border:1px solid #facc15;background:#fff;color:#92400e;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+        .prefix-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #fde68a;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+        .prefix-guide-grid{display:flex;flex-direction:column;gap:10px}
+        .prefix-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+        .prefix-guide-card:nth-child(5n+1){background:#fffef2;border-color:#fde68a}
+        .prefix-guide-card:nth-child(5n+2){background:#f0f9ff;border-color:#bae6fd}
+        .prefix-guide-card:nth-child(5n+3){background:#f0fdf4;border-color:#bbf7d0}
+        .prefix-guide-card:nth-child(5n+4){background:#fff7ed;border-color:#fed7aa}
+        .prefix-guide-card:nth-child(5n+5){background:#faf5ff;border-color:#ddd6fe}
+        .prefix-guide-title{font-size:14px;font-weight:900;color:#334155;margin-bottom:7px}
+        .prefix-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+        .prefix-guide-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+        .prefix-guide-chip{
+            display:inline-flex;align-items:center;border-radius:999px;padding:6px 10px;
+            background:#fff;border:1px solid #facc15;color:#92400e;font-size:12px;font-weight:800
+        }
+        .prefix-type-badge{
+            background:#fff7cc !important;border-color:#facc15 !important;color:#92400e !important;
+        }
+        .prefix-front-meaning{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #fde68a;border-left:4px solid #f59e0b;background:#fffef2;
+            color:#78350f;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+        .prefix-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;border:1px solid #e2e8f0;background:#f8fafc
+        }
+        .prefix-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+        .prefix-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+        @media(max-width:640px){
+            .prefix-guide-hero-top{flex-direction:column}
+            .prefix-guide-pronounce-btn{width:100%}
+            .prefix-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
 </style>
 </head>
 <body>
@@ -2916,6 +2981,7 @@
         <button type="button" id="counter-guide-launch" class="counter-guide-launch" onclick="openCounterGuideModal()">🔢 數詞規則指南</button>
         <button type="button" id="conj-guide-launch" class="conj-guide-launch" onclick="openConjGuideModal()">🔗 接續詞規則指南</button>
         <button type="button" id="suffix-guide-launch" class="suffix-guide-launch" onclick="openSuffixGuideModal()">🧩 接尾詞規則指南</button>
+        <button type="button" id="prefix-guide-launch" class="prefix-guide-launch" onclick="openPrefixGuideModal()">🧩 接頭詞規則指南</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
@@ -3108,6 +3174,29 @@
 
 
 
+
+
+<!-- 🧩 接頭詞規則指南 -->
+<div class="modal-overlay" id="prefixGuideModal" onclick="closePrefixGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🧩 接頭詞規則指南</h3>
+            <button class="btn-modal-close" onclick="closePrefixGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="conj-guide-intro">
+                接頭詞會放在詞的前面，幫原本的字補充程度、方向、狀態或語氣。先抓住「接在前面會多出什麼意思」，比單背中文更容易記住。
+            </div>
+            <div id="prefix-guide-hero"></div>
+            <div id="prefix-guide-stack" class="prefix-guide-grid">
+                <div class="prefix-guide-card">
+                    <div class="prefix-guide-title">載入中...</div>
+                    <div class="prefix-guide-text">正在整理接頭詞導讀內容。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 🧩 接尾詞規則指南 -->
 <div class="modal-overlay" id="suffixGuideModal" onclick="closeSuffixGuideModal(event)">
@@ -3608,8 +3697,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.6.3';
-    const APP_UPDATE_NOTE = '接尾詞字卡配合新欄位｜改為 A~E 結構並簡化正反面內容';
+    const APP_VERSION = 'v10.7.1';
+    const APP_UPDATE_NOTE = '修正接頭詞資料結構｜指南改用內建整理內容，A2 起維持一般字卡資料';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5228,7 +5317,7 @@
         let normalWords = sourceData.filter(w => !w.isIntroCard);
         normalWords.sort(() => Math.random() - 0.5);
 
-        // 數詞、接續詞、接尾詞導讀改到上方規則指南，不再占用翻卡序列。
+        // 數詞、接續詞、接尾詞導讀改到上方規則指南，不再占用翻卡序列；接頭詞本身沒有 A2:G3 導讀列。
         fullSourceList = (urlKey === 'sheet3' || urlKey === 'sheet10' || urlKey === 'sheet11')
             ? [...normalWords]
             : (introCard ? [introCard, ...normalWords] : [...normalWords]);
@@ -5270,6 +5359,119 @@
         const selected = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('suffix-guide-launch');
         if (btn) btn.style.display = (selected === 'sheet11') ? 'block' : 'none';
+    }
+
+
+    function updatePrefixGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('prefix-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet12') ? 'block' : 'none';
+    }
+
+    async function fillPrefixGuideFromCache() {
+        const heroEl = document.getElementById('prefix-guide-hero');
+        const stackEl = document.getElementById('prefix-guide-stack');
+        if (!heroEl || !stackEl) return;
+
+        heroEl.innerHTML = `
+            <div class="prefix-guide-hero">
+                <div class="prefix-guide-hero-top">
+                    <div>
+                        <div class="prefix-guide-badge">🧩 接在詞前面的語意前綴</div>
+                        <div class="prefix-guide-main">接頭詞</div>
+                        <div class="prefix-guide-reading">せっとうじ</div>
+                    </div>
+                    <button type="button" class="prefix-guide-pronounce-btn"
+                        onclick="speakWordDirectly(event, 'せっとうじ')">🔊 聽發音</button>
+                </div>
+                <div class="prefix-guide-desc">
+                    接頭詞（Prefix／前綴詞）放在詞的前面，幫原本的詞補充程度、狀態、範圍、時間或禮貌語氣。
+                    目前這個分類字卡不多，所以先用「看懂規則＋認得常見形式」為主。
+                </div>
+            </div>`;
+
+        stackEl.innerHTML = `
+            <div class="prefix-guide-card">
+                <div class="prefix-guide-title">💡 定義與功能</div>
+                <div class="prefix-guide-text">
+                    接在其他詞的前面，補充或限定原本的意思。它通常不能單獨使用，要和後面的詞合在一起看。
+                </div>
+            </div>
+
+            <div class="prefix-guide-card">
+                <div class="prefix-guide-title">🗂️ 常見分類</div>
+                <div class="prefix-guide-chip-wrap">
+                    <span class="prefix-guide-chip">程度／大小</span>
+                    <span class="prefix-guide-chip">新舊／時間</span>
+                    <span class="prefix-guide-chip">真偽／狀態</span>
+                    <span class="prefix-guide-chip">範圍／數量</span>
+                    <span class="prefix-guide-chip">尊敬／禮貌</span>
+                    <span class="prefix-guide-chip">否定／反義</span>
+                </div>
+            </div>
+
+            <div class="prefix-guide-card">
+                <div class="prefix-guide-title">📏 程度・大小</div>
+                <div class="prefix-guide-text">
+                    大〜：大型、大規模
+                    小〜：小型、小規模
+                    超〜：超高速、超便利
+                </div>
+            </div>
+
+            <div class="prefix-guide-card">
+                <div class="prefix-guide-title">🕒 新舊・時間・身分</div>
+                <div class="prefix-guide-text">
+                    新〜：新商品、新製品
+                    旧〜：旧市街、旧制度
+                    元〜：元彼、元首相
+                    前〜：前社長、前任
+                </div>
+            </div>
+
+            <div class="prefix-guide-card">
+                <div class="prefix-guide-title">🎭 真偽・狀態</div>
+                <div class="prefix-guide-text">
+                    真〜：真っ白、真っ直ぐ
+                    仮〜：仮登録、仮予約
+                    偽〜：偽物、偽名
+                </div>
+            </div>
+
+            <div class="prefix-guide-card">
+                <div class="prefix-guide-title">🙇 禮貌・尊敬</div>
+                <div class="prefix-guide-text">
+                    お〜：お茶、お名前
+                    ご〜：ご家族、ご案内
+
+                    ※ 「お／ご」並不是每個詞都能自由替換，很多時候要看慣用說法。
+                </div>
+            </div>
+
+            <div class="prefix-guide-card">
+                <div class="prefix-guide-title">⚠️ 記住這兩件事</div>
+                <div class="prefix-guide-text">
+                    1. 接頭詞通常不能單獨存在，要和後面的詞一起理解。
+                    2. 加上接頭詞後，整體意思有時不是單純逐字相加，所以遇到固定搭配時直接整組記會比較實用。
+                </div>
+            </div>
+        `;
+    }
+
+    async function openPrefixGuideModal() {
+        playClickSound();
+        document.getElementById('prefixGuideModal').style.display = 'flex';
+        const stackEl = document.getElementById('prefix-guide-stack');
+        if (stackEl) {
+            stackEl.innerHTML = '<div class="prefix-guide-card"><div class="prefix-guide-title">載入中...</div><div class="prefix-guide-text">正在讀取接頭詞導讀資料。</div></div>';
+        }
+        await fillPrefixGuideFromCache();
+    }
+
+    function closePrefixGuideModal(e) {
+        if (e && e.target !== document.getElementById('prefixGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('prefixGuideModal').style.display = 'none';
     }
 
     async function fillSuffixGuideFromCache() {
@@ -5581,7 +5783,8 @@
         updateCounterGuideVisibility();
         updateConjGuideVisibility();
         updateSuffixGuideVisibility();
-        updateSuffixGuideVisibility();
+        updatePrefixGuideVisibility();
+        updatePrefixGuideVisibility();
         loadSheetData(selected);
     }
 
@@ -6559,7 +6762,7 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
-        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge');
+        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
@@ -7697,7 +7900,102 @@
             return;
         }
 
-        // 💡 11. 一般分類標準版型
+
+        // 💡 11. 接頭詞（sheet12）專屬版型
+        // 工作表左側 A:E 才是正式字卡資料；右側黃色表格只是參考資料，不參與字卡渲染。
+        if (current.catKey === 'sheet12') {
+            const getPrefixCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const altVal = getPrefixCol(['我有漢字', '外來語']);
+            const meaningVal = getPrefixCol(['意思', '中文']);
+            const exampleVal = getPrefixCol(['例句寶寶', '例句']);
+            const noteVal = getPrefixCol(['備註', '注意事項', '注意']);
+
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('prefix-type-badge');
+            badgeEl.textContent = '🧩 接頭詞';
+
+            mainTitleEl.textContent = current.jp;
+            mainTitleEl.style.display = 'block';
+
+            if (altVal && altVal !== current.jp) {
+                subTitleEl.textContent = altVal;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.textContent = '';
+                subTitleEl.style.display = 'none';
+            }
+
+            if (meaningVal) {
+                meanBoxEl.className = 'prefix-front-meaning';
+                meanBoxEl.textContent = `💡 ${meaningVal}`;
+                meanBoxEl.style.display = '-webkit-box';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let fullBackTitle = current.jp;
+            if (altVal && altVal !== current.jp) {
+                fullBackTitle = `${current.jp}（${altVal}）`;
+            }
+
+            let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+
+            if (meaningVal) {
+                backHTML += `
+                    <div class="prefix-detail-card" style="background:#fffef2;border-color:#fde68a;">
+                        <div class="prefix-detail-title" style="color:#92400e;">💡 意思</div>
+                        <div class="prefix-detail-text">${meaningVal}</div>
+                    </div>`;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button type="button" class="btn-tts-small"
+                                    onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>`;
+                });
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="prefix-detail-card" style="background:#faf5ff;border-color:#ddd6fe;">
+                        <div class="prefix-detail-title" style="color:#7e22ce;">📝 備註</div>
+                        <div class="prefix-detail-text">${noteVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 12. 一般分類標準版型
+
+
 
 
 
