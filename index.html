@@ -3697,8 +3697,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.7.1';
-    const APP_UPDATE_NOTE = '修正接頭詞資料結構｜指南改用內建整理內容，A2 起維持一般字卡資料';
+    const APP_VERSION = 'v10.7.2';
+    const APP_UPDATE_NOTE = '補完整接頭詞指南｜完整收錄定義、四大分類、例子與核心文法';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5385,8 +5385,7 @@
                         onclick="speakWordDirectly(event, 'せっとうじ')">🔊 聽發音</button>
                 </div>
                 <div class="prefix-guide-desc">
-                    接頭詞（Prefix／前綴詞）放在詞的前面，幫原本的詞補充程度、狀態、範圍、時間或禮貌語氣。
-                    目前這個分類字卡不多，所以先用「看懂規則＋認得常見形式」為主。
+                    Prefix／又稱前綴。接在其他詞的前面，用來補充、限制或改變原本的語意與語感。
                 </div>
             </div>`;
 
@@ -5394,65 +5393,102 @@
             <div class="prefix-guide-card">
                 <div class="prefix-guide-title">💡 定義與功能</div>
                 <div class="prefix-guide-text">
-                    接在其他詞的前面，補充或限定原本的意思。它通常不能單獨使用，要和後面的詞合在一起看。
+不能單獨成詞，必須黏在其他單字（主要是名詞、形容詞、動詞）的最前面，用來改變語氣、語意或增強程度的輔助性成分。
+
+把它想成英文裡的 un-（unhappy）、re-（replay），或是中文裡的「超～」（超棒）、「小～」（小確幸）、「總～」（總經理），就非常好理解。
                 </div>
             </div>
 
             <div class="prefix-guide-card">
-                <div class="prefix-guide-title">🗂️ 常見分類</div>
+                <div class="prefix-guide-title">🗂️ 分類｜日文常見接頭詞依「語意功能」分四大類</div>
                 <div class="prefix-guide-chip-wrap">
-                    <span class="prefix-guide-chip">程度／大小</span>
-                    <span class="prefix-guide-chip">新舊／時間</span>
-                    <span class="prefix-guide-chip">真偽／狀態</span>
-                    <span class="prefix-guide-chip">範圍／數量</span>
-                    <span class="prefix-guide-chip">尊敬／禮貌</span>
-                    <span class="prefix-guide-chip">否定／反義</span>
+                    <span class="prefix-guide-chip">1. 美化與敬意類</span>
+                    <span class="prefix-guide-chip">2. 否定與相反類</span>
+                    <span class="prefix-guide-chip">3. 強調與程度類</span>
+                    <span class="prefix-guide-chip">4. 順序與時空位置類</span>
                 </div>
             </div>
 
             <div class="prefix-guide-card">
-                <div class="prefix-guide-title">📏 程度・大小</div>
+                <div class="prefix-guide-title">🙇 1. 美化與敬意類（美化語／敬語接頭詞）</div>
                 <div class="prefix-guide-text">
-                    大〜：大型、大規模
-                    小〜：小型、小規模
-                    超〜：超高速、超便利
+最常見的兩大天王，用來表示對對方的敬意，讓語氣變得優雅柔和。
+
+<b>お（O）</b>：通常加在和語（日本固有詞彙）前面。
+お金（おかね／錢）
+お茶（おちゃ／茶）
+お手伝い（おてつだい／幫忙）
+
+<b>ご（Go）</b>：通常加在漢語（音讀詞彙）前面。
+ご家族（ごかぞく／家人）
+ご意見（ごいけん／意見）
+ご案内（ごあんない／導覽）
                 </div>
             </div>
 
             <div class="prefix-guide-card">
-                <div class="prefix-guide-title">🕒 新舊・時間・身分</div>
+                <div class="prefix-guide-title">🚫 2. 否定與相反類</div>
                 <div class="prefix-guide-text">
-                    新〜：新商品、新製品
-                    旧〜：旧市街、旧制度
-                    元〜：元彼、元首相
-                    前〜：前社長、前任
+用來表示「沒有、不是、不符合」。
+
+<b>不（ふ／ぶ）</b>：不……、缺乏
+不安（不安）、不便（不便）、不気味（令人不舒服）
+
+<b>無（む／ぶ）</b>：沒有、無
+無責任（不負責任）、無意識（無意識）、無作法（沒規矩）
+
+<b>非（ひ）</b>：非、違背
+非公式（非官方）、非日常（非日常生活）
+
+<b>未（み）</b>：尚未、還沒
+未成年（未成年）、未経験（無經驗）
                 </div>
             </div>
 
             <div class="prefix-guide-card">
-                <div class="prefix-guide-title">🎭 真偽・狀態</div>
+                <div class="prefix-guide-title">🔥 3. 強調與程度類</div>
                 <div class="prefix-guide-text">
-                    真〜：真っ白、真っ直ぐ
-                    仮〜：仮登録、仮予約
-                    偽〜：偽物、偽名
+用來放大動作、狀態或強調極致程度。
+
+<b>大（おお／だい）</b>：極度、廣大。
+大急ぎ（おおいそぎ／十萬火急）
+大成功（だいせいこう／大獲成功）
+
+<b>真（ま／まっ）</b>：純粹、正中、毫不含糊。
+真夜中（まよなか／正半夜）
+真っ白（まっしろ／純白、一片空白）
+真っ赤（まっか／通紅、純紅）
+
+<b>小（こ）</b>：微小、帶點輕微狀態（有時帶有可愛或略微輕蔑的語感）。
+小走り（こばしり／小跑步碎步）
+小雨（こさめ／毛毛雨）
                 </div>
             </div>
 
             <div class="prefix-guide-card">
-                <div class="prefix-guide-title">🙇 禮貌・尊敬</div>
+                <div class="prefix-guide-title">🕒 4. 順序與時空位置類</div>
                 <div class="prefix-guide-text">
-                    お〜：お茶、お名前
-                    ご〜：ご家族、ご案内
+用來標示時間的前後、身分的更替或位置關係。
 
-                    ※ 「お／ご」並不是每個詞都能自由替換，很多時候要看慣用說法。
+<b>再（さい）</b>：再次、更新。
+再開（さいかい／重新開始）、再確認（さいかくにん／再次確認）
+
+<b>新（しん）／旧（きゅう）</b>：新舊對比。
+新商品（新商品）、旧市街（老城區）
+
+<b>前（ぜん）／元（もと）</b>：先前的身分。
+前大統領（前總統）、元彼（前男友）
                 </div>
             </div>
 
             <div class="prefix-guide-card">
-                <div class="prefix-guide-title">⚠️ 記住這兩件事</div>
+                <div class="prefix-guide-title">⚠️ 核心文法</div>
                 <div class="prefix-guide-text">
-                    1. 接頭詞通常不能單獨存在，要和後面的詞一起理解。
-                    2. 加上接頭詞後，整體意思有時不是單純逐字相加，所以遇到固定搭配時直接整組記會比較實用。
+<b>1. 不能單獨存在</b>
+妳不能單獨就一句「今日は『真』ですね」，它必須跟後面的詞黏合（如：真っ黒）。
+
+<b>2. 改變詞性或語義焦點</b>
+原本普通的名詞，加上接頭詞後，可以直接賦予程度（白 → 真っ白）或敬意（名前 → お名前）。
                 </div>
             </div>
         `;
