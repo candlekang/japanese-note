@@ -2188,6 +2188,49 @@
             color: #0f172a;
         }
 
+    
+        /* 📚 六大活用形實際變化 */
+        .verb-advanced-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .verb-advanced-item {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 9px 10px;
+        }
+        .verb-advanced-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .verb-advanced-form {
+            font-weight: 900;
+            color: #6d28d9;
+            font-size: 13px;
+        }
+        .verb-advanced-change {
+            font-weight: 900;
+            color: #0f172a;
+            font-size: 13px;
+        }
+        .verb-advanced-desc {
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+        .verb-advanced-example {
+            margin-top: 4px;
+            color: #1e293b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
     </style>
 </head>
 <body>
@@ -2549,14 +2592,64 @@
     </div>
 </div>
 
+
 <div class="verb-guide-advanced">
-    <b>進階補充｜六大活用形</b><br>
-    <span class="verb-form-chip vf-adv">未然形</span>常用於否定、意志等尚未實現的語意。<br>
-    <span class="verb-form-chip vf-adv">連用形</span>可連接其他助動詞或形成禮貌表現，例如「ます」。<br>
-    <span class="verb-form-chip vf-adv">終止形</span>用來結束句子；現代日語通常與辭書形相同。<br>
-    <span class="verb-form-chip vf-adv">連體形</span>用來修飾名詞；現代日語通常與辭書形相同。<br>
-    <span class="verb-form-chip vf-adv">假定形</span>表示假設條件，常見於「～ば」等句型。<br>
-    <span class="verb-form-chip vf-adv">命令形</span>用於命令或強烈要求；語氣較直接，要注意使用情境。
+    <b>進階補充｜六大活用形（以「書く」為例）</b>
+    <div class="verb-advanced-list">
+        <div class="verb-advanced-item">
+            <div class="verb-advanced-head">
+                <span class="verb-advanced-form">未然形</span>
+                <span class="verb-advanced-change">書か</span>
+            </div>
+            <div class="verb-advanced-desc">常用於否定、意志等尚未實現的語意。</div>
+            <div class="verb-advanced-example">例：書かない</div>
+        </div>
+
+        <div class="verb-advanced-item">
+            <div class="verb-advanced-head">
+                <span class="verb-advanced-form">連用形</span>
+                <span class="verb-advanced-change">書き</span>
+            </div>
+            <div class="verb-advanced-desc">可連接其他助動詞或形成禮貌表現。</div>
+            <div class="verb-advanced-example">例：書きます</div>
+        </div>
+
+        <div class="verb-advanced-item">
+            <div class="verb-advanced-head">
+                <span class="verb-advanced-form">終止形</span>
+                <span class="verb-advanced-change">書く</span>
+            </div>
+            <div class="verb-advanced-desc">用來結束句子；現代日語通常與辭書形相同。</div>
+            <div class="verb-advanced-example">例：手紙を書く。</div>
+        </div>
+
+        <div class="verb-advanced-item">
+            <div class="verb-advanced-head">
+                <span class="verb-advanced-form">連體形</span>
+                <span class="verb-advanced-change">書く</span>
+            </div>
+            <div class="verb-advanced-desc">用來修飾名詞；現代日語通常與辭書形相同。</div>
+            <div class="verb-advanced-example">例：書く人</div>
+        </div>
+
+        <div class="verb-advanced-item">
+            <div class="verb-advanced-head">
+                <span class="verb-advanced-form">假定形</span>
+                <span class="verb-advanced-change">書け</span>
+            </div>
+            <div class="verb-advanced-desc">表示假設條件，常見於「～ば」句型。</div>
+            <div class="verb-advanced-example">例：書けば</div>
+        </div>
+
+        <div class="verb-advanced-item">
+            <div class="verb-advanced-head">
+                <span class="verb-advanced-form">命令形</span>
+                <span class="verb-advanced-change">書け</span>
+            </div>
+            <div class="verb-advanced-desc">用於命令或強烈要求；語氣較直接，要注意使用情境。</div>
+            <div class="verb-advanced-example">例：早く書け。</div>
+        </div>
+    </div>
 </div>
 
 <div class="verb-guide-note">
@@ -2746,8 +2839,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.0.2';
-    const APP_UPDATE_NOTE = '優化動詞變化規則指南｜補回六大活用形並加上重點配色';
+    const APP_VERSION = 'v10.0.3';
+    const APP_UPDATE_NOTE = '補強六大活用形｜加入「書く」實際變化與例句';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
