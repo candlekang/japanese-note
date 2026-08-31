@@ -2231,6 +2231,93 @@
             font-weight: 700;
         }
 
+    
+        /* 🌸 形容詞變化規則指南 */
+        .adj-guide-launch {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #f9a8d4;
+            background: linear-gradient(135deg, #fdf2f8, #f5f3ff);
+            color: #be185d;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .adj-guide-launch:hover {
+            border-color: #f472b6;
+            background: #fdf2f8;
+        }
+        .adj-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+        .adj-guide-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .adj-guide-card {
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .adj-guide-card.iadj {
+            background: #fff7fb;
+            border-color: #fbcfe8;
+        }
+        .adj-guide-card.nadj {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        .adj-guide-card.exception {
+            background: #fff7ed;
+            border-color: #fed7aa;
+        }
+        .adj-guide-title {
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        .adj-guide-card.iadj .adj-guide-title { color: #be185d; }
+        .adj-guide-card.nadj .adj-guide-title { color: #047857; }
+        .adj-guide-card.exception .adj-guide-title { color: #c2410c; }
+        .adj-guide-desc {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.72;
+        }
+        .adj-form-chip {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-right: 6px;
+            margin-bottom: 5px;
+        }
+        .af-now { background:#dbeafe; color:#1d4ed8; }
+        .af-neg { background:#fee2e2; color:#b91c1c; }
+        .af-past { background:#ffedd5; color:#c2410c; }
+        .af-te { background:#dcfce7; color:#15803d; }
+        .af-adv { background:#ede9fe; color:#6d28d9; }
+        .af-attr { background:#fef3c7; color:#92400e; }
+        .adj-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.68;
+        }
+
     </style>
 </head>
 <body>
@@ -2301,7 +2388,7 @@
             <option value="sheet4">い形容詞</option>
             <option value="sheet5">な形容詞</option>
             <option value="sheet6">動詞</option>
-            <option value="sheet7">形容詞的變化</option>
+            <option value="sheet7" style="display:none;">形容詞的變化</option>
             <option value="sheet8" style="display:none;">動詞的變化</option>
             <option value="sheet9">一些知識&觀念</option>
             <option value="sheet10">接續詞</option>
@@ -2321,6 +2408,7 @@
             <option value="sheet25">つけます的擴充包</option>
         </select>
         <button type="button" id="verb-guide-launch" class="verb-guide-launch" onclick="openVerbGuideModal()">📘 動詞變化規則指南</button>
+        <button type="button" id="adj-guide-launch" class="adj-guide-launch" onclick="openAdjGuideModal()">🌸 形容詞變化規則指南</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
@@ -2509,6 +2597,65 @@
 
 
 
+
+
+<!-- 🌸 形容詞變化規則指南 -->
+<div class="modal-overlay" id="adjGuideModal" onclick="closeAdjGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🌸 形容詞變化規則指南</h3>
+            <button class="btn-modal-close" onclick="closeAdjGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="adj-guide-intro">
+                い形容詞和な形容詞的變化方式不一樣。先分清楚是哪一類，再看下面常用變化，會比較不容易混在一起。
+            </div>
+
+            <div class="adj-guide-stack">
+                <div class="adj-guide-card iadj">
+                    <div class="adj-guide-title">🌸 い形容詞｜例：高い</div>
+                    <div class="adj-guide-desc">
+                        <span class="adj-form-chip af-now">現在肯定</span>高い<br>
+                        <span class="adj-form-chip af-neg">現在否定</span>高くない<br>
+                        <span class="adj-form-chip af-past">過去肯定</span>高かった<br>
+                        <span class="adj-form-chip af-neg">過去否定</span>高くなかった<br>
+                        <span class="adj-form-chip af-te">て形</span>高くて<br>
+                        <span class="adj-form-chip af-adv">副詞形</span>高く
+                    </div>
+                </div>
+
+                <div class="adj-guide-card exception">
+                    <div class="adj-guide-title">⚠️ い形容詞例外｜いい</div>
+                    <div class="adj-guide-desc">
+                        「いい」在變化時要用「よい」的詞幹來變。<br><br>
+                        <span class="adj-form-chip af-neg">現在否定</span>よくない<br>
+                        <span class="adj-form-chip af-past">過去肯定</span>よかった<br>
+                        <span class="adj-form-chip af-neg">過去否定</span>よくなかった<br>
+                        <span class="adj-form-chip af-te">て形</span>よくて<br>
+                        <span class="adj-form-chip af-adv">副詞形</span>よく
+                    </div>
+                </div>
+
+                <div class="adj-guide-card nadj">
+                    <div class="adj-guide-title">🌿 な形容詞｜例：静か</div>
+                    <div class="adj-guide-desc">
+                        <span class="adj-form-chip af-now">現在肯定</span>静かだ／静かです<br>
+                        <span class="adj-form-chip af-neg">現在否定</span>静かではない／静かじゃない<br>
+                        <span class="adj-form-chip af-past">過去肯定</span>静かだった／静かでした<br>
+                        <span class="adj-form-chip af-neg">過去否定</span>静かではなかった／静かじゃなかった<br>
+                        <span class="adj-form-chip af-attr">連體形</span>静かな＋名詞<br>
+                        <span class="adj-form-chip af-te">て形</span>静かで<br>
+                        <span class="adj-form-chip af-adv">副詞形</span>静かに
+                    </div>
+                </div>
+            </div>
+
+            <div class="adj-guide-note">
+                💡 い形容詞重點是「把最後的い換掉」；な形容詞則常搭配「だ／です、ではない、だった、な、で、に」。之後第二階段可以再把這些變化直接放進每張形容詞卡。
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 📘 動詞變化規則指南 -->
 <div class="modal-overlay" id="verbGuideModal" onclick="closeVerbGuideModal(event)">
@@ -2839,8 +2986,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.0.3';
-    const APP_UPDATE_NOTE = '補強六大活用形｜加入「書く」實際變化與例句';
+    const APP_VERSION = 'v10.1';
+    const APP_UPDATE_NOTE = '形容詞變化整合第一階段｜隱藏獨立分類並加入い／な形容詞變化指南';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4479,6 +4626,24 @@
     }
 
 
+
+    function updateAdjGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('adj-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet4' || selected === 'sheet5') ? 'block' : 'none';
+    }
+
+    function openAdjGuideModal() {
+        playClickSound();
+        document.getElementById('adjGuideModal').style.display = 'flex';
+    }
+
+    function closeAdjGuideModal(e) {
+        if (e && e.target !== document.getElementById('adjGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('adjGuideModal').style.display = 'none';
+    }
+
     function updateVerbGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('verb-guide-launch');
@@ -4501,6 +4666,8 @@
         const selected = document.getElementById('sheetSelect').value;
         document.getElementById('flashcard').classList.remove('is-flipped');
         updateVerbGuideVisibility();
+        updateAdjGuideVisibility();
+        updateAdjGuideVisibility();
         loadSheetData(selected);
     }
 
