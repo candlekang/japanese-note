@@ -2517,6 +2517,66 @@
             white-space: pre-wrap;
         }
 
+    
+        /* 🔢 數詞規則指南 */
+        .counter-guide-launch {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #7dd3fc;
+            background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+            color: #0369a1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .counter-guide-launch:hover {
+            border-color: #38bdf8;
+            background: #f0f9ff;
+        }
+        .counter-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+        .counter-guide-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .counter-guide-card {
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #bae6fd;
+            background: #f8fbff;
+        }
+        .counter-guide-title {
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 900;
+            margin-bottom: 7px;
+        }
+        .counter-guide-text {
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.72;
+            white-space: pre-wrap;
+        }
+        .counter-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            line-height: 1.68;
+        }
+
     </style>
 </head>
 <body>
@@ -2608,6 +2668,7 @@
         </select>
         <button type="button" id="verb-guide-launch" class="verb-guide-launch" onclick="openVerbGuideModal()">📘 動詞變化規則指南</button>
         <button type="button" id="adj-guide-launch" class="adj-guide-launch" onclick="openAdjGuideModal()">🌸 形容詞變化規則指南</button>
+        <button type="button" id="counter-guide-launch" class="counter-guide-launch" onclick="openCounterGuideModal()">🔢 數詞規則指南</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
@@ -2797,6 +2858,65 @@
 
 
 
+
+
+<!-- 🔢 數詞規則指南 -->
+<div class="modal-overlay" id="counterGuideModal" onclick="closeCounterGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🔢 數詞規則指南</h3>
+            <button class="btn-modal-close" onclick="closeCounterGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="counter-guide-intro">
+                數詞最重要的是先知道「怎麼數」以及不同物品會搭配哪些助數詞。需要複習規則時，再打開這份指南即可。
+            </div>
+
+            <div class="counter-guide-stack">
+                <div class="counter-guide-card">
+                    <div class="counter-guide-title">📖 計數系統</div>
+                    <div class="counter-guide-text" id="counter-guide-core">載入中...</div>
+                </div>
+
+                <div class="counter-guide-card">
+                    <div class="counter-guide-title">🔗 體系對照速查</div>
+                    <div class="counter-guide-text" id="counter-guide-system">載入中...</div>
+                </div>
+
+                <div class="counter-guide-card">
+                    <div class="counter-guide-title">💡 使用時機與語感</div>
+                    <div class="counter-guide-text" id="counter-guide-usage">載入中...</div>
+                </div>
+
+                <div class="counter-guide-card">
+                    <div class="counter-guide-title">👨‍👩‍👧‍👦 範例速查</div>
+                    <div class="counter-guide-text" id="counter-guide-examples">載入中...</div>
+                </div>
+
+                <div class="counter-guide-card">
+                    <div class="counter-guide-title">⚠️ 特殊讀音／音變</div>
+                    <div class="counter-guide-text">1本＝いっぽん　3本＝さんぼん　6本＝ろっぽん　8本＝はっぽん
+1匹＝いっぴき　3匹＝さんびき　6匹＝ろっぴき　8匹＝はっぴき
+1杯＝いっぱい　3杯＝さんばい　6杯＝ろっぱい　8杯＝はっぱい
+1人＝ひとり　2人＝ふたり</div>
+                </div>
+
+                <div class="counter-guide-card">
+                    <div class="counter-guide-title">⏱️ 頻率怎麼說</div>
+                    <div class="counter-guide-text"><b>期間 ＋ に ＋ 次數</b>
+
+一日に二回（いちにちに にかい）＝一天兩次
+一週間に三回（いっしゅうかんに さんかい）＝一週三次
+一年に一回（いちねんに いっかい）＝一年一次</div>
+                </div>
+            </div>
+
+            <div class="counter-guide-note">
+                💡 想直接背數詞時，可以跳過指南；需要整理規則、音變或頻率表達時再回來看。
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 🌸 形容詞變化規則指南 -->
 <div class="modal-overlay" id="adjGuideModal" onclick="closeAdjGuideModal(event)">
@@ -3196,8 +3316,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.4.1';
-    const APP_UPDATE_NOTE = '修正例句助詞朗讀｜保守判斷「は→わ」「へ→え」並保留原文顯示';
+    const APP_VERSION = 'v10.5';
+    const APP_UPDATE_NOTE = '數詞規則指南整合｜A2:G3 改為上方指南，不再當翻卡導讀卡';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4816,7 +4936,10 @@
         let normalWords = sourceData.filter(w => !w.isIntroCard);
         normalWords.sort(() => Math.random() - 0.5);
 
-        fullSourceList = introCard ? [introCard, ...normalWords] : [...normalWords];
+        // 數詞導讀改到上方「數詞規則指南」，不再占用翻卡序列。
+        fullSourceList = (urlKey === 'sheet3')
+            ? [...normalWords]
+            : (introCard ? [introCard, ...normalWords] : [...normalWords]);
 
         const settings = getQuestSettings();
         const targetLimit = targetWordJp ? fullSourceList.length : settings.readTarget;
@@ -4847,6 +4970,48 @@
     }
 
 
+
+
+    function updateCounterGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('counter-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet3') ? 'block' : 'none';
+    }
+
+    function fillCounterGuideFromCache() {
+        const data = sheetDataCache['sheet3'] || [];
+        const intro = data.find(w => w.isIntroCard && w.isStructuredIntro);
+
+        const coreEl = document.getElementById('counter-guide-core');
+        const systemEl = document.getElementById('counter-guide-system');
+        const usageEl = document.getElementById('counter-guide-usage');
+        const examplesEl = document.getElementById('counter-guide-examples');
+
+        if (!intro) {
+            [coreEl, systemEl, usageEl, examplesEl].forEach(el => {
+                if (el) el.textContent = '目前沒有可顯示的導讀資料。';
+            });
+            return;
+        }
+
+        const values = intro.introValues || [];
+        if (coreEl) coreEl.innerHTML = (values[2] || '').replace(/\n/g, '<br>');
+        if (systemEl) systemEl.innerHTML = (values[3] || '').replace(/\n/g, '<br>');
+        if (usageEl) usageEl.innerHTML = (values[4] || '').replace(/\n/g, '<br>');
+        if (examplesEl) examplesEl.innerHTML = (values[5] || '').replace(/\n/g, '<br>');
+    }
+
+    function openCounterGuideModal() {
+        playClickSound();
+        fillCounterGuideFromCache();
+        document.getElementById('counterGuideModal').style.display = 'flex';
+    }
+
+    function closeCounterGuideModal(e) {
+        if (e && e.target !== document.getElementById('counterGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('counterGuideModal').style.display = 'none';
+    }
 
     function updateAdjGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
@@ -4888,7 +5053,7 @@
         document.getElementById('flashcard').classList.remove('is-flipped');
         updateVerbGuideVisibility();
         updateAdjGuideVisibility();
-        updateAdjGuideVisibility();
+        updateCounterGuideVisibility();
         loadSheetData(selected);
     }
 
@@ -7320,7 +7485,8 @@
 
     renderAppVersion();
         updateVerbGuideVisibility();
-        initDailyFortuneBadge();
+        
+        updateCounterGuideVisibility();initDailyFortuneBadge();
     preloadAllCategories();
 </script>
 
