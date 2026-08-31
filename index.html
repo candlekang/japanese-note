@@ -3555,8 +3555,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.6';
-    const APP_UPDATE_NOTE = '接尾詞導讀整合｜A2:G3 改為上方規則指南並加入大標、發音與彩色重點';
+    const APP_VERSION = 'v10.6.1';
+    const APP_UPDATE_NOTE = '修正接尾詞指南資料連線｜快取找不到導讀時直接讀取 Sheet A2:G3';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5219,16 +5219,42 @@
         if (btn) btn.style.display = (selected === 'sheet11') ? 'block' : 'none';
     }
 
-    function fillSuffixGuideFromCache() {
-        const data = sheetDataCache['sheet11'] || [];
-        const intro = data.find(w => w.isIntroCard && w.isStructuredIntro);
+    async function fillSuffixGuideFromCache() {
+        let data = sheetDataCache['sheet11'] || [];
+        let intro = data.find(w => w.isIntroCard && w.isStructuredIntro);
+
+        // 若預載快取裡沒有導讀卡，直接從接尾詞 CSV 讀 A2:G3。
+        // 這樣即使快取仍是舊資料，指南也能抓到試算表最新的導讀內容。
+        if (!intro) {
+            try {
+                const url = SHEETS_CONFIG['sheet11'];
+                const res = await fetch(url, { cache: 'no-store' });
+                const csvText = await res.text();
+                const parsed = parseCSVText(csvText);
+
+                const row2 = parsed[1] || [];
+                const row3 = parsed[2] || [];
+
+                if (row2.length && row3.length && row3.some(v => (v || '').trim() !== '')) {
+                    intro = {
+                        isIntroCard: true,
+                        isStructuredIntro: true,
+                        introHeaders: row2,
+                        introValues: row3
+                    };
+                }
+            } catch (err) {
+                console.warn('接尾詞指南直接讀取失敗：', err);
+            }
+        }
+
         const heroEl = document.getElementById('suffix-guide-hero');
         const stackEl = document.getElementById('suffix-guide-stack');
         if (!heroEl || !stackEl) return;
 
         if (!intro) {
             heroEl.innerHTML = '';
-            stackEl.innerHTML = '<div class="suffix-guide-card"><div class="suffix-guide-title">目前沒有可顯示的導讀資料</div><div class="suffix-guide-text">請確認接尾詞工作表 A2:G3 是否有填入導讀內容。</div></div>';
+            stackEl.innerHTML = '<div class="suffix-guide-card"><div class="suffix-guide-title">目前還抓不到導讀資料</div><div class="suffix-guide-text">請重新整理一次頁面；若剛修改 Google Sheet，發布資料可能需要一點時間同步。</div></div>';
             return;
         }
 
@@ -5258,15 +5284,39 @@
             const title = (headers[i] || '').trim();
             const content = getVal(i);
             if (!title && !content) continue;
-            cards.push(`<div class="suffix-guide-card"><div class="suffix-guide-title">${title || '補充說明'}</div><div class="suffix-guide-text">${(content || '—').replace(/\n/g,'<br>')}</div></div>`);
+
+            // 第 F 欄「家屬範例」若是逗號/頓號/換行分隔，改成標籤顯示，避免重複。
+            if (title.includes('家屬') || title.includes('範例')) {
+                const items = content.split(/[、,\n]/).map(s => s.trim()).filter(Boolean);
+                cards.push(`
+                    <div class="suffix-guide-card">
+                        <div class="suffix-guide-title">👨‍👩‍👧‍👦 ${title || '家屬範例'}</div>
+                        ${items.length
+                            ? `<div class="conj-guide-chip-wrap">${items.map(item => `<span class="conj-guide-chip">${item}</span>`).join('')}</div>`
+                            : `<div class="suffix-guide-text">${content || '—'}</div>`}
+                    </div>`);
+            } else {
+                cards.push(`
+                    <div class="suffix-guide-card">
+                        <div class="suffix-guide-title">${title || '補充說明'}</div>
+                        <div class="suffix-guide-text">${(content || '—').replace(/\n/g,'<br>')}</div>
+                    </div>`);
+            }
         }
+
         stackEl.innerHTML = cards.join('') || '<div class="suffix-guide-card"><div class="suffix-guide-title">目前沒有其他導讀內容</div></div>';
     }
 
-    function openSuffixGuideModal() {
+    async function openSuffixGuideModal() {
         playClickSound();
-        fillSuffixGuideFromCache();
         document.getElementById('suffixGuideModal').style.display = 'flex';
+
+        const stackEl = document.getElementById('suffix-guide-stack');
+        if (stackEl) {
+            stackEl.innerHTML = '<div class="suffix-guide-card"><div class="suffix-guide-title">載入中...</div><div class="suffix-guide-text">正在讀取接尾詞導讀資料。</div></div>';
+        }
+
+        await fillSuffixGuideFromCache();
     }
 
     function closeSuffixGuideModal(e) {
