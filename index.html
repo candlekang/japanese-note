@@ -2749,7 +2749,27 @@
             }
         }
 
-    </style>
+    
+        /* 🧩 接尾詞規則指南 */
+        .suffix-guide-launch{display:none;width:100%;margin-top:8px;border:1px solid #c4b5fd;background:linear-gradient(135deg,#f5f3ff,#faf5ff);color:#6d28d9;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;cursor:pointer;box-sizing:border-box}
+        .suffix-guide-hero{border-radius:16px;border:1px solid #ddd6fe;background:linear-gradient(135deg,#f5f3ff,#faf5ff);padding:14px;margin-bottom:12px}
+        .suffix-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+        .suffix-guide-badge{display:inline-flex;border-radius:999px;padding:6px 10px;background:#ede9fe;color:#6d28d9;font-size:11px;font-weight:900;margin-bottom:8px}
+        .suffix-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+        .suffix-guide-reading{margin-top:4px;color:#7c3aed;font-size:14px;font-weight:800}
+        .suffix-guide-pronounce-btn{border:1px solid #c4b5fd;background:#fff;color:#6d28d9;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+        .suffix-guide-desc{margin-top:10px;padding-top:9px;border-top:1px dashed #ddd6fe;color:#475569;font-size:13px;line-height:1.7}
+        .suffix-guide-grid{display:flex;flex-direction:column;gap:10px}
+        .suffix-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+        .suffix-guide-card:nth-child(4n+1){background:#f0f9ff;border-color:#bae6fd}
+        .suffix-guide-card:nth-child(4n+2){background:#f5f3ff;border-color:#ddd6fe}
+        .suffix-guide-card:nth-child(4n+3){background:#f0fdf4;border-color:#bbf7d0}
+        .suffix-guide-card:nth-child(4n+4){background:#fff7ed;border-color:#fed7aa}
+        .suffix-guide-title{font-size:14px;font-weight:900;color:#334155;margin-bottom:7px}
+        .suffix-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+        @media(max-width:640px){.suffix-guide-hero-top{flex-direction:column}.suffix-guide-pronounce-btn{width:100%}}
+
+</style>
 </head>
 <body>
 
@@ -2842,6 +2862,7 @@
         <button type="button" id="adj-guide-launch" class="adj-guide-launch" onclick="openAdjGuideModal()">🌸 形容詞變化規則指南</button>
         <button type="button" id="counter-guide-launch" class="counter-guide-launch" onclick="openCounterGuideModal()">🔢 數詞規則指南</button>
         <button type="button" id="conj-guide-launch" class="conj-guide-launch" onclick="openConjGuideModal()">🔗 接續詞規則指南</button>
+        <button type="button" id="suffix-guide-launch" class="suffix-guide-launch" onclick="openSuffixGuideModal()">🧩 接尾詞規則指南</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
@@ -3033,6 +3054,22 @@
 
 
 
+
+
+<!-- 🧩 接尾詞規則指南 -->
+<div class="modal-overlay" id="suffixGuideModal" onclick="closeSuffixGuideModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">🧩 接尾詞規則指南</h3>
+      <button class="btn-modal-close" onclick="closeSuffixGuideModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="conj-guide-intro">接尾詞會接在詞的後面，補充語意、語氣或詞性。先看懂它「接在哪裡、加上去後變成什麼意思」，會比單背中文更好記。</div>
+      <div id="suffix-guide-hero"></div>
+      <div id="suffix-guide-stack" class="suffix-guide-grid"></div>
+    </div>
+  </div>
+</div>
 
 <!-- 🔗 接續詞規則指南 -->
 <div class="modal-overlay" id="conjGuideModal" onclick="closeConjGuideModal(event)">
@@ -3518,8 +3555,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.5.4';
-    const APP_UPDATE_NOTE = '修正接續詞正面文字截斷｜放寬摘要高度並優化手機顯示';
+    const APP_VERSION = 'v10.6';
+    const APP_UPDATE_NOTE = '接尾詞導讀整合｜A2:G3 改為上方規則指南並加入大標、發音與彩色重點';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5138,8 +5175,8 @@
         let normalWords = sourceData.filter(w => !w.isIntroCard);
         normalWords.sort(() => Math.random() - 0.5);
 
-        // 數詞、接續詞導讀改到上方規則指南，不再占用翻卡序列。
-        fullSourceList = (urlKey === 'sheet3' || urlKey === 'sheet10')
+        // 數詞、接續詞、接尾詞導讀改到上方規則指南，不再占用翻卡序列。
+        fullSourceList = (urlKey === 'sheet3' || urlKey === 'sheet10' || urlKey === 'sheet11')
             ? [...normalWords]
             : (introCard ? [introCard, ...normalWords] : [...normalWords]);
 
@@ -5174,6 +5211,69 @@
 
 
 
+
+
+    function updateSuffixGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('suffix-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet11') ? 'block' : 'none';
+    }
+
+    function fillSuffixGuideFromCache() {
+        const data = sheetDataCache['sheet11'] || [];
+        const intro = data.find(w => w.isIntroCard && w.isStructuredIntro);
+        const heroEl = document.getElementById('suffix-guide-hero');
+        const stackEl = document.getElementById('suffix-guide-stack');
+        if (!heroEl || !stackEl) return;
+
+        if (!intro) {
+            heroEl.innerHTML = '';
+            stackEl.innerHTML = '<div class="suffix-guide-card"><div class="suffix-guide-title">目前沒有可顯示的導讀資料</div><div class="suffix-guide-text">請確認接尾詞工作表 A2:G3 是否有填入導讀內容。</div></div>';
+            return;
+        }
+
+        const headers = intro.introHeaders || [];
+        const values = intro.introValues || [];
+        const getVal = i => (values[i] || '').trim();
+
+        const mainTitle = getVal(0) || '接尾詞';
+        const reading = getVal(1) || 'せつびご';
+        const safeReading = reading.replace(/'/g, "\\'");
+
+        heroEl.innerHTML = `
+            <div class="suffix-guide-hero">
+                <div class="suffix-guide-hero-top">
+                    <div>
+                        <div class="suffix-guide-badge">🧩 接在詞尾的小零件</div>
+                        <div class="suffix-guide-main">${mainTitle}</div>
+                        <div class="suffix-guide-reading">${reading}</div>
+                    </div>
+                    <button type="button" class="suffix-guide-pronounce-btn" onclick="speakWordDirectly(event, '${safeReading}')">🔊 聽發音</button>
+                </div>
+                <div class="suffix-guide-desc">接尾詞通常接在名詞、動詞或形容詞後面，用來補充人物、程度、狀態或其他語意。</div>
+            </div>`;
+
+        const cards = [];
+        for (let i = 2; i < headers.length; i++) {
+            const title = (headers[i] || '').trim();
+            const content = getVal(i);
+            if (!title && !content) continue;
+            cards.push(`<div class="suffix-guide-card"><div class="suffix-guide-title">${title || '補充說明'}</div><div class="suffix-guide-text">${(content || '—').replace(/\n/g,'<br>')}</div></div>`);
+        }
+        stackEl.innerHTML = cards.join('') || '<div class="suffix-guide-card"><div class="suffix-guide-title">目前沒有其他導讀內容</div></div>';
+    }
+
+    function openSuffixGuideModal() {
+        playClickSound();
+        fillSuffixGuideFromCache();
+        document.getElementById('suffixGuideModal').style.display = 'flex';
+    }
+
+    function closeSuffixGuideModal(e) {
+        if (e && e.target !== document.getElementById('suffixGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('suffixGuideModal').style.display = 'none';
+    }
 
     function updateConjGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
@@ -5377,7 +5477,8 @@
         updateAdjGuideVisibility();
         updateCounterGuideVisibility();
         updateConjGuideVisibility();
-        updateConjGuideVisibility();
+        updateSuffixGuideVisibility();
+        updateSuffixGuideVisibility();
         loadSheetData(selected);
     }
 
