@@ -2577,6 +2577,66 @@
             line-height: 1.68;
         }
 
+    
+        /* 🔗 接續詞規則指南 */
+        .conj-guide-launch {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #93c5fd;
+            background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+            color: #0369a1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .conj-guide-launch:hover {
+            border-color: #60a5fa;
+            background: #f0f9ff;
+        }
+        .conj-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+        .conj-guide-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .conj-guide-card {
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #bae6fd;
+            background: #f8fbff;
+        }
+        .conj-guide-title {
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 900;
+            margin-bottom: 7px;
+        }
+        .conj-guide-text {
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.72;
+            white-space: pre-wrap;
+        }
+        .conj-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.68;
+        }
+
     </style>
 </head>
 <body>
@@ -2669,6 +2729,7 @@
         <button type="button" id="verb-guide-launch" class="verb-guide-launch" onclick="openVerbGuideModal()">📘 動詞變化規則指南</button>
         <button type="button" id="adj-guide-launch" class="adj-guide-launch" onclick="openAdjGuideModal()">🌸 形容詞變化規則指南</button>
         <button type="button" id="counter-guide-launch" class="counter-guide-launch" onclick="openCounterGuideModal()">🔢 數詞規則指南</button>
+        <button type="button" id="conj-guide-launch" class="conj-guide-launch" onclick="openConjGuideModal()">🔗 接續詞規則指南</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
@@ -2859,6 +2920,33 @@
 
 
 
+
+
+<!-- 🔗 接續詞規則指南 -->
+<div class="modal-overlay" id="conjGuideModal" onclick="closeConjGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🔗 接續詞規則指南</h3>
+            <button class="btn-modal-close" onclick="closeConjGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="conj-guide-intro">
+                接續詞的重點不是只記中文，而是知道它在句子裡扮演什麼作用。需要整理觀念時，再打開這份指南即可。
+            </div>
+
+            <div id="conj-guide-stack" class="conj-guide-stack">
+                <div class="conj-guide-card">
+                    <div class="conj-guide-title">載入中...</div>
+                    <div class="conj-guide-text">正在整理接續詞導讀內容。</div>
+                </div>
+            </div>
+
+            <div class="conj-guide-note">
+                💡 想直接背接續詞時，可以跳過指南；需要分清楚轉折、因果、補充、換題等功能時，再回來看這份整理。
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 🔢 數詞規則指南 -->
 <div class="modal-overlay" id="counterGuideModal" onclick="closeCounterGuideModal(event)">
@@ -3316,8 +3404,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.5';
-    const APP_UPDATE_NOTE = '數詞規則指南整合｜A2:G3 改為上方指南，不再當翻卡導讀卡';
+    const APP_VERSION = 'v10.5.1';
+    const APP_UPDATE_NOTE = '接續詞導讀整合｜A2:G3 改為上方規則指南，不再當翻卡導讀卡';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4936,8 +5024,8 @@
         let normalWords = sourceData.filter(w => !w.isIntroCard);
         normalWords.sort(() => Math.random() - 0.5);
 
-        // 數詞導讀改到上方「數詞規則指南」，不再占用翻卡序列。
-        fullSourceList = (urlKey === 'sheet3')
+        // 數詞、接續詞導讀改到上方規則指南，不再占用翻卡序列。
+        fullSourceList = (urlKey === 'sheet3' || urlKey === 'sheet10')
             ? [...normalWords]
             : (introCard ? [introCard, ...normalWords] : [...normalWords]);
 
@@ -4971,6 +5059,65 @@
 
 
 
+
+
+    function updateConjGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('conj-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet10') ? 'block' : 'none';
+    }
+
+    function fillConjGuideFromCache() {
+        const data = sheetDataCache['sheet10'] || [];
+        const intro = data.find(w => w.isIntroCard && w.isStructuredIntro);
+        const stackEl = document.getElementById('conj-guide-stack');
+        if (!stackEl) return;
+
+        if (!intro) {
+            stackEl.innerHTML = `
+                <div class="conj-guide-card">
+                    <div class="conj-guide-title">目前沒有可顯示的導讀資料</div>
+                    <div class="conj-guide-text">請確認接續詞工作表 A2:G3 是否有填入導讀內容。</div>
+                </div>
+            `;
+            return;
+        }
+
+        const headers = intro.introHeaders || [];
+        const values = intro.introValues || [];
+        const cards = [];
+
+        for (let i = 0; i < headers.length; i++) {
+            const title = (headers[i] || '').trim();
+            const content = (values[i] || '').trim();
+            if (!title && !content) continue;
+            cards.push(`
+                <div class="conj-guide-card">
+                    <div class="conj-guide-title">${title || '補充說明'}</div>
+                    <div class="conj-guide-text">${(content || '—').replace(/\n/g, '<br>')}</div>
+                </div>
+            `);
+        }
+
+        stackEl.innerHTML = cards.length ? cards.join('') : `
+            <div class="conj-guide-card">
+                <div class="conj-guide-title">目前沒有可顯示的導讀資料</div>
+                <div class="conj-guide-text">請確認接續詞工作表 A2:G3 是否有填入導讀內容。</div>
+            </div>
+        `;
+    }
+
+    function openConjGuideModal() {
+        playClickSound();
+        fillConjGuideFromCache();
+        document.getElementById('conjGuideModal').style.display = 'flex';
+    }
+
+    function closeConjGuideModal(e) {
+        if (e && e.target !== document.getElementById('conjGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('conjGuideModal').style.display = 'none';
+    }
 
     function updateCounterGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
@@ -5054,6 +5201,8 @@
         updateVerbGuideVisibility();
         updateAdjGuideVisibility();
         updateCounterGuideVisibility();
+        updateConjGuideVisibility();
+        updateConjGuideVisibility();
         loadSheetData(selected);
     }
 
