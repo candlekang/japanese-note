@@ -2603,28 +2603,122 @@
             line-height: 1.75;
             margin-bottom: 12px;
         }
-        .conj-guide-stack {
+        .conj-guide-hero {
+            border-radius: 16px;
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(135deg, #eff6ff, #f8fbff);
+            padding: 14px 14px 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 18px rgba(14, 165, 233, .08);
+        }
+        .conj-guide-hero-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .conj-guide-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        .conj-guide-main {
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: 950;
+            line-height: 1.2;
+            letter-spacing: .02em;
+        }
+        .conj-guide-reading {
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+        .conj-guide-hero-desc {
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.7;
+            padding-top: 8px;
+            border-top: 1px dashed #bfdbfe;
+        }
+        .conj-guide-pronounce-btn {
+            border: 1px solid #f9a8d4;
+            background: #fff1f8;
+            color: #be185d;
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .conj-guide-grid {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
         .conj-guide-card {
-            border-radius: 12px;
-            padding: 12px;
-            border: 1px solid #bae6fd;
-            background: #f8fbff;
+            border-radius: 14px;
+            padding: 12px 13px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .conj-guide-card.theme-blue {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+        }
+        .conj-guide-card.theme-purple {
+            background: #f5f3ff;
+            border-color: #ddd6fe;
+        }
+        .conj-guide-card.theme-green {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        .conj-guide-card.theme-orange {
+            background: #fff7ed;
+            border-color: #fed7aa;
         }
         .conj-guide-title {
-            color: #0369a1;
             font-size: 14px;
             font-weight: 900;
             margin-bottom: 7px;
         }
+        .conj-guide-card.theme-blue .conj-guide-title { color: #0369a1; }
+        .conj-guide-card.theme-purple .conj-guide-title { color: #6d28d9; }
+        .conj-guide-card.theme-green .conj-guide-title { color: #15803d; }
+        .conj-guide-card.theme-orange .conj-guide-title { color: #c2410c; }
         .conj-guide-text {
             color: #334155;
             font-size: 13px;
             line-height: 1.72;
             white-space: pre-wrap;
+        }
+        .conj-guide-chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .conj-guide-chip {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: #ffffff;
+            border: 1px solid #fdba74;
+            color: #9a3412;
+            font-size: 12px;
+            font-weight: 800;
         }
         .conj-guide-note {
             margin-top: 12px;
@@ -2635,6 +2729,15 @@
             color: #475569;
             font-size: 12px;
             line-height: 1.68;
+        }
+        @media (max-width: 640px) {
+            .conj-guide-hero-top {
+                flex-direction: column;
+            }
+            .conj-guide-pronounce-btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
     </style>
@@ -2934,8 +3037,10 @@
                 接續詞的重點不是只記中文，而是知道它在句子裡扮演什麼作用。需要整理觀念時，再打開這份指南即可。
             </div>
 
-            <div id="conj-guide-stack" class="conj-guide-stack">
-                <div class="conj-guide-card">
+            <div id="conj-guide-hero"></div>
+
+            <div id="conj-guide-stack" class="conj-guide-grid">
+                <div class="conj-guide-card theme-blue">
                     <div class="conj-guide-title">載入中...</div>
                     <div class="conj-guide-text">正在整理接續詞導讀內容。</div>
                 </div>
@@ -3404,8 +3509,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.5.1';
-    const APP_UPDATE_NOTE = '接續詞導讀整合｜A2:G3 改為上方規則指南，不再當翻卡導讀卡';
+    const APP_VERSION = 'v10.5.2';
+    const APP_UPDATE_NOTE = '優化接續詞規則指南｜整合大標、發音按鈕與彩色重點卡片';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5070,12 +5175,14 @@
     function fillConjGuideFromCache() {
         const data = sheetDataCache['sheet10'] || [];
         const intro = data.find(w => w.isIntroCard && w.isStructuredIntro);
+        const heroEl = document.getElementById('conj-guide-hero');
         const stackEl = document.getElementById('conj-guide-stack');
-        if (!stackEl) return;
+        if (!heroEl || !stackEl) return;
 
         if (!intro) {
+            heroEl.innerHTML = '';
             stackEl.innerHTML = `
-                <div class="conj-guide-card">
+                <div class="conj-guide-card theme-blue">
                     <div class="conj-guide-title">目前沒有可顯示的導讀資料</div>
                     <div class="conj-guide-text">請確認接續詞工作表 A2:G3 是否有填入導讀內容。</div>
                 </div>
@@ -5085,22 +5192,80 @@
 
         const headers = intro.introHeaders || [];
         const values = intro.introValues || [];
+        const getVal = (i) => (values[i] || '').trim();
+        const getHeader = (i, fallback) => (headers[i] || '').trim() || fallback;
+
+        const mainTitle = getVal(0) || '接續詞';
+        const reading = getVal(1) || 'せつぞくし';
+        const definition = getVal(2);
+        const position = getVal(3);
+        const standAlone = getVal(4);
+        const familyExamples = getVal(5);
+
+        const safeReading = reading.replace(/'/g, "\\'");
+
+        heroEl.innerHTML = `
+            <div class="conj-guide-hero">
+                <div class="conj-guide-hero-top">
+                    <div>
+                        <div class="conj-guide-hero-badge">🧩 句子邏輯工具</div>
+                        <div class="conj-guide-main">${mainTitle}</div>
+                        <div class="conj-guide-reading">${reading}</div>
+                    </div>
+                    <button type="button" class="conj-guide-pronounce-btn"
+                        onclick="speakWordDirectly(event, '${safeReading}')">🔊 聽發音</button>
+                </div>
+                <div class="conj-guide-hero-desc">
+                    接續詞會幫你把句子、段落與語意關係連起來。看到接續詞時，可以先問自己：它是在轉折、補充、因果，還是在換話題？
+                </div>
+            </div>
+        `;
+
+        const familyItems = familyExamples
+            ? familyExamples.split(/[、\n]/).map(s => s.trim()).filter(Boolean)
+            : [];
+
         const cards = [];
 
-        for (let i = 0; i < headers.length; i++) {
-            const title = (headers[i] || '').trim();
-            const content = (values[i] || '').trim();
-            if (!title && !content) continue;
+        if (definition) {
             cards.push(`
-                <div class="conj-guide-card">
-                    <div class="conj-guide-title">${title || '補充說明'}</div>
-                    <div class="conj-guide-text">${(content || '—').replace(/\n/g, '<br>')}</div>
+                <div class="conj-guide-card theme-blue">
+                    <div class="conj-guide-title">💡 ${getHeader(2, '定義與功能')}</div>
+                    <div class="conj-guide-text">${definition.replace(/\n/g, '<br>')}</div>
+                </div>
+            `);
+        }
+
+        if (position) {
+            cards.push(`
+                <div class="conj-guide-card theme-purple">
+                    <div class="conj-guide-title">🔗 ${getHeader(3, '連接對象與位置')}</div>
+                    <div class="conj-guide-text">${position.replace(/\n/g, '<br>')}</div>
+                </div>
+            `);
+        }
+
+        if (standAlone) {
+            cards.push(`
+                <div class="conj-guide-card theme-green">
+                    <div class="conj-guide-title">✅ ${getHeader(4, '我可以單獨使用嗎')}</div>
+                    <div class="conj-guide-text">${standAlone.replace(/\n/g, '<br>')}</div>
+                </div>
+            `);
+        }
+
+        if (familyExamples) {
+            cards.push(`
+                <div class="conj-guide-card theme-orange">
+                    <div class="conj-guide-title">👨‍👩‍👧‍👦 ${getHeader(5, '家屬範例')}</div>
+                    ${familyItems.length ? `<div class="conj-guide-chip-wrap">${familyItems.map(item => `<span class="conj-guide-chip">${item}</span>`).join('')}</div>` : ''}
+                    <div class="conj-guide-text" style="margin-top:${familyItems.length ? '10px' : '0'};">${familyExamples.replace(/\n/g, '<br>')}</div>
                 </div>
             `);
         }
 
         stackEl.innerHTML = cards.length ? cards.join('') : `
-            <div class="conj-guide-card">
+            <div class="conj-guide-card theme-blue">
                 <div class="conj-guide-title">目前沒有可顯示的導讀資料</div>
                 <div class="conj-guide-text">請確認接續詞工作表 A2:G3 是否有填入導讀內容。</div>
             </div>
