@@ -2637,7 +2637,7 @@
             </div>
         </div>
 
-        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 24 分類快速導覽：</div>
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 22 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
         <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
@@ -3046,8 +3046,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.2';
-    const APP_UPDATE_NOTE = '形容詞變化整合第二階段｜每張い／な形容詞卡新增實際變化展開區';
+    const APP_VERSION = 'v10.2.1';
+    const APP_UPDATE_NOTE = '學習進度整理｜移除形容詞的變化與動詞的變化分類卡';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5259,7 +5259,7 @@
         let categoryMap = {};
         for (let i = 0; i < selectElement.options.length; i++) {
             const opt = selectElement.options[i];
-            if (opt.value !== 'all') {
+            if (opt.value !== 'all' && opt.value !== 'sheet7' && opt.value !== 'sheet8') {
                 categoryMap[opt.text] = [];
             }
         }
@@ -5291,6 +5291,7 @@
 
         let gridHtml = '';
         for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
+            if (catKey === 'sheet7' || catKey === 'sheet8') continue;
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
             const catName = optElement ? optElement.text : catKey;
             
