@@ -3509,8 +3509,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.5.2';
-    const APP_UPDATE_NOTE = '優化接續詞規則指南｜整合大標、發音按鈕與彩色重點卡片';
+    const APP_VERSION = 'v10.5.3';
+    const APP_UPDATE_NOTE = '精簡接續詞家屬範例｜保留標籤、移除下方重複文字';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5258,8 +5258,9 @@
             cards.push(`
                 <div class="conj-guide-card theme-orange">
                     <div class="conj-guide-title">👨‍👩‍👧‍👦 ${getHeader(5, '家屬範例')}</div>
-                    ${familyItems.length ? `<div class="conj-guide-chip-wrap">${familyItems.map(item => `<span class="conj-guide-chip">${item}</span>`).join('')}</div>` : ''}
-                    <div class="conj-guide-text" style="margin-top:${familyItems.length ? '10px' : '0'};">${familyExamples.replace(/\n/g, '<br>')}</div>
+                    ${familyItems.length
+                        ? `<div class="conj-guide-chip-wrap">${familyItems.map(item => `<span class="conj-guide-chip">${item}</span>`).join('')}</div>`
+                        : `<div class="conj-guide-text">${familyExamples.replace(/\n/g, '<br>')}</div>`}
                 </div>
             `);
         }
