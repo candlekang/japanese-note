@@ -3608,8 +3608,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.6.2';
-    const APP_UPDATE_NOTE = '接尾詞專屬字卡｜改用 A1:G1 正式欄位名稱，避免導讀欄位影響正反面';
+    const APP_VERSION = 'v10.6.3';
+    const APP_UPDATE_NOTE = '接尾詞字卡配合新欄位｜改為 A~E 結構並簡化正反面內容';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -7601,7 +7601,7 @@
 
 
         // 💡 10. 接尾詞（sheet11）專屬版型
-        // 正式字卡只讀 A1:G1 欄位名稱；A2:G3 僅供規則指南使用。
+        // 正式字卡只讀 A1:E1 欄位名稱；A2:G3 僅供規則指南使用。
         if (current.catKey === 'sheet11') {
             const getSuffixCol = (keywords) => {
                 const idx = current.rawHeaders.findIndex(h => {
@@ -7614,13 +7614,14 @@
             const altVal = getSuffixCol(['我有漢字', '外來語']);
             const meaningVal = getSuffixCol(['意思', '中文']);
             const exampleVal = getSuffixCol(['例句寶寶', '例句']);
-            const typeVal = getSuffixCol(['類型', '类型']);
+            const noteVal = getSuffixCol(['注意事項', '注意', '備註']);
 
+            // 這個分類本身就是接尾詞，因此正面只保留固定分類 badge，不再額外吃資料欄位。
             badgeEl.style.display = 'inline-block';
             badgeEl.classList.add('suffix-type-badge');
-            badgeEl.textContent = typeVal ? `🧩 ${typeVal}` : '🧩 接尾詞';
+            badgeEl.textContent = '🧩 接尾詞';
 
-            // A 欄「我是誰」是主標；B 欄若有漢字／外來語，放副標。
+            // A 欄是主標；B 欄若有漢字/外來語，放副標。
             mainTitleEl.textContent = current.jp;
             mainTitleEl.style.display = 'block';
 
@@ -7648,15 +7649,6 @@
             }
 
             let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
-
-            if (typeVal) {
-                backHTML += `
-                    <div class="suffix-detail-card" style="background:#faf5ff; border-color:#ddd6fe;">
-                        <div class="suffix-detail-title" style="color:#7e22ce;">🏷️ 類型</div>
-                        <div class="suffix-detail-text">${typeVal}</div>
-                    </div>
-                `;
-            }
 
             if (meaningVal) {
                 backHTML += `
@@ -7690,25 +7682,14 @@
                 });
             }
 
-            // 其餘正式欄位（例如第1欄、第2欄）若有資料才顯示；
-            // 不讀 A2:G3 的導讀標題。
-            current.rawHeaders.forEach((rawHeader, i) => {
-                if (i <= 4) return;
-                const h = (rawHeader || '').trim();
-                const val = (current.rawCols[i] || '').trim();
-                if (!val) return;
-
-                let displayTitle = h;
-                if (h === '第 1 欄' || h === '第1欄') displayTitle = '補充 1';
-                if (h === '第 2 欄' || h === '第2欄') displayTitle = '補充 2';
-
+            if (noteVal) {
                 backHTML += `
-                    <div class="suffix-detail-card">
-                        <div class="suffix-detail-title">📝 ${displayTitle || '補充'}</div>
-                        <div class="suffix-detail-text">${val.replace(/\n/g, '<br>')}</div>
+                    <div class="suffix-detail-card" style="background:#fff7ed; border-color:#fed7aa;">
+                        <div class="suffix-detail-title" style="color:#c2410c;">⚠️ 注意事項</div>
+                        <div class="suffix-detail-text">${noteVal.replace(/\n/g, '<br>')}</div>
                     </div>
                 `;
-            });
+            }
 
             backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
             backContainer.innerHTML = backHTML;
@@ -7717,6 +7698,7 @@
         }
 
         // 💡 11. 一般分類標準版型
+
 
 
 
