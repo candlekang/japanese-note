@@ -2769,6 +2769,59 @@
         .suffix-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
         @media(max-width:640px){.suffix-guide-hero-top{flex-direction:column}.suffix-guide-pronounce-btn{width:100%}}
 
+
+        /* 🧩 接尾詞專屬字卡 */
+        .suffix-type-badge {
+            background: #f3e8ff !important;
+            border-color: #d8b4fe !important;
+            color: #7e22ce !important;
+        }
+        .suffix-front-meaning {
+            width: 94%;
+            margin: 6px auto 12px;
+            padding: 10px 12px;
+            border-radius: 11px;
+            border: 1px solid #ddd6fe;
+            border-left: 4px solid #8b5cf6;
+            background: #faf5ff;
+            color: #312e81;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.6;
+            text-align: left;
+            box-sizing: border-box;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+        }
+        .suffix-detail-card {
+            border-radius: 11px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .suffix-detail-title {
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 5px;
+            color: #475569;
+        }
+        .suffix-detail-text {
+            font-size: 13px;
+            line-height: 1.72;
+            color: #1e293b;
+            white-space: pre-wrap;
+        }
+        @media (max-width: 640px) {
+            .suffix-front-meaning {
+                width: 96%;
+                font-size: 12px;
+                -webkit-line-clamp: 4;
+            }
+        }
+
 </style>
 </head>
 <body>
@@ -3555,8 +3608,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.6.1';
-    const APP_UPDATE_NOTE = '修正接尾詞指南資料連線｜快取找不到導讀時直接讀取 Sheet A2:G3';
+    const APP_VERSION = 'v10.6.2';
+    const APP_UPDATE_NOTE = '接尾詞專屬字卡｜改用 A1:G1 正式欄位名稱，避免導讀欄位影響正反面';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6506,7 +6559,7 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
-        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge');
+        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
@@ -7546,7 +7599,125 @@
             return;
         }
 
-        // 💡 10. 一般分類標準版型
+
+        // 💡 10. 接尾詞（sheet11）專屬版型
+        // 正式字卡只讀 A1:G1 欄位名稱；A2:G3 僅供規則指南使用。
+        if (current.catKey === 'sheet11') {
+            const getSuffixCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const altVal = getSuffixCol(['我有漢字', '外來語']);
+            const meaningVal = getSuffixCol(['意思', '中文']);
+            const exampleVal = getSuffixCol(['例句寶寶', '例句']);
+            const typeVal = getSuffixCol(['類型', '类型']);
+
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('suffix-type-badge');
+            badgeEl.textContent = typeVal ? `🧩 ${typeVal}` : '🧩 接尾詞';
+
+            // A 欄「我是誰」是主標；B 欄若有漢字／外來語，放副標。
+            mainTitleEl.textContent = current.jp;
+            mainTitleEl.style.display = 'block';
+
+            if (altVal && altVal !== current.jp) {
+                subTitleEl.textContent = altVal;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.textContent = '';
+                subTitleEl.style.display = 'none';
+            }
+
+            if (meaningVal) {
+                meanBoxEl.className = 'suffix-front-meaning';
+                meanBoxEl.textContent = `💡 ${meaningVal}`;
+                meanBoxEl.style.display = '-webkit-box';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let fullBackTitle = current.jp;
+            if (altVal && altVal !== current.jp) {
+                fullBackTitle = `${current.jp}（${altVal}）`;
+            }
+
+            let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+
+            if (typeVal) {
+                backHTML += `
+                    <div class="suffix-detail-card" style="background:#faf5ff; border-color:#ddd6fe;">
+                        <div class="suffix-detail-title" style="color:#7e22ce;">🏷️ 類型</div>
+                        <div class="suffix-detail-text">${typeVal}</div>
+                    </div>
+                `;
+            }
+
+            if (meaningVal) {
+                backHTML += `
+                    <div class="suffix-detail-card" style="background:#f0f9ff; border-color:#bae6fd;">
+                        <div class="suffix-detail-title" style="color:#0369a1;">💡 意思</div>
+                        <div class="suffix-detail-text">${meaningVal}</div>
+                    </div>
+                `;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button type="button" class="btn-tts-small"
+                                    onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            // 其餘正式欄位（例如第1欄、第2欄）若有資料才顯示；
+            // 不讀 A2:G3 的導讀標題。
+            current.rawHeaders.forEach((rawHeader, i) => {
+                if (i <= 4) return;
+                const h = (rawHeader || '').trim();
+                const val = (current.rawCols[i] || '').trim();
+                if (!val) return;
+
+                let displayTitle = h;
+                if (h === '第 1 欄' || h === '第1欄') displayTitle = '補充 1';
+                if (h === '第 2 欄' || h === '第2欄') displayTitle = '補充 2';
+
+                backHTML += `
+                    <div class="suffix-detail-card">
+                        <div class="suffix-detail-title">📝 ${displayTitle || '補充'}</div>
+                        <div class="suffix-detail-text">${val.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            });
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 11. 一般分類標準版型
+
 
 
 
