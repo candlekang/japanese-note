@@ -3196,8 +3196,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.4';
-    const APP_UPDATE_NOTE = '接續詞專屬字卡｜導讀固定 A2:G3，A4 起依正式欄位名稱顯示';
+    const APP_VERSION = 'v10.4.1';
+    const APP_UPDATE_NOTE = '修正例句助詞朗讀｜保守判斷「は→わ」「へ→え」並保留原文顯示';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4279,12 +4279,23 @@
     function normalizeJapaneseReadingForTTS(text) {
         if (!text) return '';
 
-        // 將「漢字（かな）」或「漢字(かな)」轉成「かな」供 TTS 使用。
-        // 例如：最後に一言（ひとこと）言いたい。→ 最後にひとこと言いたい。
-        // 只在括號內容主要由日文假名構成時替換，避免誤傷一般補充說明。
+        // 先把「漢字（かな）」／「漢字(かな)」換成括號內指定讀音。
         let normalized = text.replace(
             /([一-龯々〆ヵヶ]+)[（(]([ぁ-ゖァ-ヺー・\s]+)[）)]/g,
             (_, kanji, reading) => reading.replace(/\s+/g, '')
+        );
+
+        // 保守處理助詞「は」→「わ」：
+        // 只在前後都像完整日文語塊時處理，避免誤傷 はじめる／はなす／はやい。
+        normalized = normalized.replace(
+            /([ぁ-んァ-ヶー一-龯々]+)は(?=([ぁ-んァ-ヶー一-龯々]|[、。！？!?]|$))/g,
+            '$1わ'
+        );
+
+        // 保守處理方向助詞「へ」→「え」。
+        normalized = normalized.replace(
+            /([ぁ-んァ-ヶー一-龯々]+)へ(?=([ぁ-んァ-ヶー一-龯々]|[、。！？!?]|$))/g,
+            '$1え'
         );
 
         return normalized;
