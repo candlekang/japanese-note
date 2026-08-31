@@ -2318,6 +2318,66 @@
             line-height: 1.68;
         }
 
+    
+        /* 🔄 形容詞變化第二階段 */
+        .adj-conj-toggle {
+            width: 100%;
+            margin: 2px 0 12px;
+            border: 1px solid #f9a8d4;
+            background: linear-gradient(135deg, #fdf2f8, #f5f3ff);
+            color: #be185d;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .adj-conj-toggle.nadj {
+            border-color: #86efac;
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            color: #047857;
+        }
+        .adj-conj-panel {
+            display: none;
+            margin: -4px 0 12px;
+            padding: 10px;
+            border: 1px solid #fbcfe8;
+            background: #fff7fb;
+            border-radius: 10px;
+        }
+        .adj-conj-panel.nadj {
+            border-color: #bbf7d0;
+            background: #f0fdf4;
+        }
+        .adj-conj-panel.open { display: block; }
+        .adj-conj-row {
+            display: grid;
+            grid-template-columns: 92px 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 7px 4px;
+            border-bottom: 1px dashed rgba(148,163,184,.35);
+        }
+        .adj-conj-row:last-child { border-bottom: none; }
+        .adj-conj-label {
+            font-size: 12px;
+            font-weight: 900;
+            color: #7c3aed;
+        }
+        .adj-conj-value {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.55;
+        }
+        .adj-conj-note {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
     </style>
 </head>
 <body>
@@ -2651,7 +2711,7 @@
             </div>
 
             <div class="adj-guide-note">
-                💡 い形容詞重點是「把最後的い換掉」；な形容詞則常搭配「だ／です、ではない、だった、な、で、に」。之後第二階段可以再把這些變化直接放進每張形容詞卡。
+                💡 先分清楚是「い形容詞」還是「な形容詞」，再套用對應規則。看到單字時，也可以直接在字卡裡展開實際變化確認。
             </div>
         </div>
     </div>
@@ -2986,8 +3046,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.1';
-    const APP_UPDATE_NOTE = '形容詞變化整合第一階段｜隱藏獨立分類並加入い／な形容詞變化指南';
+    const APP_VERSION = 'v10.2';
+    const APP_UPDATE_NOTE = '形容詞變化整合第二階段｜每張い／な形容詞卡新增實際變化展開區';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5519,6 +5579,109 @@
         btn.textContent = willOpen ? '🔼 收起動詞變化' : '🔄 看這個動詞怎麼變';
     }
 
+
+    function conjugateIAdjective(base) {
+        const word = (base || '').trim();
+        if (!word) return null;
+
+        // いい／良い is irregular in conjugation.
+        if (word === 'いい' || word === '良い' || word === 'よい') {
+            return {
+                presentAffirmative: word,
+                presentNegative: 'よくない',
+                pastAffirmative: 'よかった',
+                pastNegative: 'よくなかった',
+                teForm: 'よくて',
+                adverbForm: 'よく'
+            };
+        }
+
+        if (!word.endsWith('い')) return null;
+        const stem = word.slice(0, -1);
+        return {
+            presentAffirmative: word,
+            presentNegative: `${stem}くない`,
+            pastAffirmative: `${stem}かった`,
+            pastNegative: `${stem}くなかった`,
+            teForm: `${stem}くて`,
+            adverbForm: `${stem}く`
+        };
+    }
+
+    function conjugateNaAdjective(base) {
+        const word = (base || '').trim();
+        if (!word) return null;
+
+        return {
+            presentAffirmative: `${word}だ／${word}です`,
+            presentNegative: `${word}ではない／${word}じゃない`,
+            pastAffirmative: `${word}だった／${word}でした`,
+            pastNegative: `${word}ではなかった／${word}じゃなかった`,
+            attributive: `${word}な＋名詞`,
+            teForm: `${word}で`,
+            adverbForm: `${word}に`
+        };
+    }
+
+    function toggleAdjectiveConjugation(event, panelId, buttonId) {
+        if (event) event.stopPropagation();
+        playClickSound();
+
+        const panel = document.getElementById(panelId);
+        const btn = document.getElementById(buttonId);
+        if (!panel || !btn) return;
+
+        const willOpen = !panel.classList.contains('open');
+        panel.classList.toggle('open', willOpen);
+        btn.textContent = willOpen ? '🔼 收起形容詞變化' : '🔄 看這個形容詞怎麼變';
+    }
+
+    function buildIAdjectiveConjugationHTML(base, idx) {
+        const c = conjugateIAdjective(base);
+        if (!c) return '';
+        const panelId = `iadj-conj-panel-${idx}`;
+        const buttonId = `iadj-conj-btn-${idx}`;
+
+        return `
+            <button type="button" id="${buttonId}" class="adj-conj-toggle"
+                onclick="toggleAdjectiveConjugation(event, '${panelId}', '${buttonId}')">
+                🔄 看這個形容詞怎麼變
+            </button>
+            <div id="${panelId}" class="adj-conj-panel">
+                <div class="adj-conj-row"><div class="adj-conj-label">現在肯定</div><div class="adj-conj-value">${c.presentAffirmative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">現在否定</div><div class="adj-conj-value">${c.presentNegative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">過去肯定</div><div class="adj-conj-value">${c.pastAffirmative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">過去否定</div><div class="adj-conj-value">${c.pastNegative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">て形</div><div class="adj-conj-value">${c.teForm}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">副詞形</div><div class="adj-conj-value">${c.adverbForm}</div></div>
+                <div class="adj-conj-note">「いい／良い」已套用特殊變化：よくない、よかった、よくて……</div>
+            </div>
+        `;
+    }
+
+    function buildNaAdjectiveConjugationHTML(base, idx) {
+        const c = conjugateNaAdjective(base);
+        if (!c) return '';
+        const panelId = `nadj-conj-panel-${idx}`;
+        const buttonId = `nadj-conj-btn-${idx}`;
+
+        return `
+            <button type="button" id="${buttonId}" class="adj-conj-toggle nadj"
+                onclick="toggleAdjectiveConjugation(event, '${panelId}', '${buttonId}')">
+                🔄 看這個形容詞怎麼變
+            </button>
+            <div id="${panelId}" class="adj-conj-panel nadj">
+                <div class="adj-conj-row"><div class="adj-conj-label">現在肯定</div><div class="adj-conj-value">${c.presentAffirmative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">現在否定</div><div class="adj-conj-value">${c.presentNegative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">過去肯定</div><div class="adj-conj-value">${c.pastAffirmative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">過去否定</div><div class="adj-conj-value">${c.pastNegative}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">連體形</div><div class="adj-conj-value">${c.attributive}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">て形</div><div class="adj-conj-value">${c.teForm}</div></div>
+                <div class="adj-conj-row"><div class="adj-conj-label">副詞形</div><div class="adj-conj-value">${c.adverbForm}</div></div>
+            </div>
+        `;
+    }
+
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
@@ -6067,6 +6230,8 @@
 
             let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
 
+            backHTML += buildIAdjectiveConjugationHTML(current.kanji && current.kanji.trim() ? current.kanji : current.jp, currentIndex);
+
             if (meaningVal) {
                 backHTML += `
                     <div class="iadj-back-meaning">
@@ -6181,6 +6346,8 @@
             }
 
             let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+
+            backHTML += buildNaAdjectiveConjugationHTML(current.kanji && current.kanji.trim() ? current.kanji : current.jp, currentIndex);
 
             if (meaningVal) {
                 backHTML += `
