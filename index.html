@@ -2450,7 +2450,7 @@
             <option value="sheet6">動詞</option>
             <option value="sheet7" style="display:none;">形容詞的變化</option>
             <option value="sheet8" style="display:none;">動詞的變化</option>
-            <option value="sheet9">一些知識&觀念</option>
+            <option value="sheet9" style="display:none;">一些知識&觀念</option>
             <option value="sheet10">接續詞</option>
             <option value="sheet11">接尾詞</option>
             <option value="sheet12">接頭詞</option>
@@ -2637,7 +2637,7 @@
             </div>
         </div>
 
-        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 22 分類快速導覽：</div>
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 21 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
         <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
@@ -2859,8 +2859,19 @@
     </div>
 </div>
 
+<div class="verb-guide-card extra" style="margin-top:12px;">
+    <div class="verb-guide-card-title">🎩 被動形也能表達尊敬</div>
+    <div class="verb-guide-card-desc">
+        日文裡，部分動詞的<b>被動形</b>也可以作為較禮貌的尊敬表現，常用來描述老師、上司、長輩等人的行為。<br><br>
+        <b>例：</b><br>
+        先生が来られます。<br>
+        老師會來。<br><br>
+        這裡的「来られます」不是「被來」，而是在提高對對方動作的敬意。
+    </div>
+</div>
+
 <div class="verb-guide-note">
-    💡 建議先熟悉 <b>Ⅰ／Ⅱ／Ⅲ類</b> 與 <b>ます形、辭書形、ない形、て形、た形</b>；等基礎穩定後，再回頭看六大活用形，會更好理解。
+    💡 建議先熟悉 <b>Ⅰ／Ⅱ／Ⅲ類</b> 與 <b>ます形、辭書形、ない形、て形、た形</b>；等基礎穩定後，再回頭看六大活用形與尊敬用法。
 </div>
 </div>
     </div>
@@ -3046,8 +3057,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.2.1';
-    const APP_UPDATE_NOTE = '學習進度整理｜移除形容詞的變化與動詞的變化分類卡';
+    const APP_VERSION = 'v10.3';
+    const APP_UPDATE_NOTE = '整合「一些知識／觀念」｜內容移入動詞與數詞並隱藏原分類';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5259,7 +5270,7 @@
         let categoryMap = {};
         for (let i = 0; i < selectElement.options.length; i++) {
             const opt = selectElement.options[i];
-            if (opt.value !== 'all' && opt.value !== 'sheet7' && opt.value !== 'sheet8') {
+            if (opt.value !== 'all' && opt.value !== 'sheet7' && opt.value !== 'sheet8' && opt.value !== 'sheet9') {
                 categoryMap[opt.text] = [];
             }
         }
@@ -5291,7 +5302,7 @@
 
         let gridHtml = '';
         for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
-            if (catKey === 'sheet7' || catKey === 'sheet8') continue;
+            if (catKey === 'sheet7' || catKey === 'sheet8' || catKey === 'sheet9') continue;
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
             const catName = optElement ? optElement.text : catKey;
             
@@ -5748,6 +5759,23 @@
             const col6Val = current.introValues[6] || '';
 
             let backHTML = `<div class="kanji-title">📖 ${current.catName}・修煉秘笈</div>`;
+
+            if (current.catKey === 'sheet3') {
+                backHTML += `
+                    <div class="notes-block" style="border-left:4px solid #0ea5e9; background:#f0f9ff; border-color:#bae6fd;">
+                        <div class="notes-title" style="color:#0369a1;">⏱️ 頻率怎麼說：期間＋に＋次數</div>
+                        <div class="notes-content" style="color:#0c4a6e; line-height:1.8;">
+                            表示「在某段期間內做幾次」，常用：<b>期間 ＋ に ＋ 次數</b><br><br>
+                            一日に二回（いちにちに にかい）<br>
+                            一天兩次<br><br>
+                            一週間に三回（いっしゅうかんに さんかい）<br>
+                            一週三次<br><br>
+                            一年に一回（いちねんに いっかい）<br>
+                            一年一次
+                        </div>
+                    </div>
+                `;
+            }
 
             if (col3Val) {
                 backHTML += `
