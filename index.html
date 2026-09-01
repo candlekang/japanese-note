@@ -2912,6 +2912,34 @@
         .prefix-accordion-body b{color:#1e293b}
         .prefix-accordion-hint{margin-top:6px;color:#64748b;font-size:12px;font-weight:700}
 
+
+        /* 👾 大魔王答題解析 / 測試模式 */
+        .boss-test-btn{
+            display:none;width:100%;margin-top:8px;padding:10px 12px;border-radius:10px;
+            border:1px dashed #f472b6;background:rgba(236,72,153,.10);color:#f9a8d4;
+            font-size:13px;font-weight:900;cursor:pointer;box-sizing:border-box
+        }
+        .boss-review-panel{
+            display:none;margin-top:10px;padding:12px;border-radius:12px;
+            background:#f8fafc;border:1px solid #cbd5e1;text-align:left
+        }
+        .boss-review-answer{
+            font-size:16px;font-weight:900;color:#0f172a;margin-bottom:8px
+        }
+        .boss-review-zh{
+            padding:9px 10px;border-radius:9px;background:#eff6ff;border-left:4px solid #3b82f6;
+            color:#1e3a8a;font-size:14px;font-weight:800;line-height:1.65;margin-bottom:8px
+        }
+        .boss-review-note{
+            padding:9px 10px;border-radius:9px;background:#fff7ed;border-left:4px solid #f97316;
+            color:#7c2d12;font-size:13px;line-height:1.65
+        }
+        .boss-test-label{
+            display:none;margin-bottom:8px;padding:5px 9px;border-radius:999px;
+            background:#fdf2f8;border:1px solid #f9a8d4;color:#be185d;
+            font-size:11px;font-weight:900;width:max-content
+        }
+
 </style>
 </head>
 <body>
@@ -3007,6 +3035,7 @@
         <button type="button" id="conj-guide-launch" class="conj-guide-launch" onclick="openConjGuideModal()">🔗 接續詞規則指南</button>
         <button type="button" id="suffix-guide-launch" class="suffix-guide-launch" onclick="openSuffixGuideModal()">🧩 接尾詞規則指南</button>
         <button type="button" id="prefix-guide-launch" class="prefix-guide-launch" onclick="openPrefixGuideModal()">🧩 接頭詞規則指南</button>
+        <button type="button" id="boss-test-btn" class="boss-test-btn" onclick="triggerSurpriseBossQuest(true)">👹 測試大魔王關卡</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
         <div class="button-group">
@@ -3710,6 +3739,12 @@
 
             <div class="quiz-options" id="boss-quiz-options" style="margin-top:6px;"></div>
             <div id="boss-quiz-feedback" class="quiz-feedback" style="min-height:22px; font-size:15px;"></div>
+            <div id="boss-test-label" class="boss-test-label">🧪 測試模式｜不計 EXP、不改三天觸發紀錄</div>
+            <div id="boss-review-panel" class="boss-review-panel">
+                <div id="boss-review-answer" class="boss-review-answer"></div>
+                <div id="boss-review-zh" class="boss-review-zh"></div>
+                <div id="boss-review-note" class="boss-review-note" style="display:none;"></div>
+            </div>
 
             <div style="display:flex; gap:8px; margin-top:6px;">
                 <button id="btn-boss-submit" class="quiz-action-btn" onclick="submitBossAnswer()" style="display:none; background:#ec4899; box-shadow:0 4px 12px rgba(236,72,153,0.35);">💥 迎頭痛擊（提交答案）</button>
@@ -3722,8 +3757,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.7.4';
-    const APP_UPDATE_NOTE = '接頭詞指南互動優化｜分類標籤可直接展開對應內容，預設全部收合';
+    const APP_VERSION = 'v10.8';
+    const APP_UPDATE_NOTE = '大魔王答題解析＋測試模式｜答題後顯示中文複習，?bossTest=1 可立即測試';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4466,6 +4501,7 @@
 
     let currentBossWord = null;
     let selectedBossOption = null;
+    let currentBossIsTestMode = false;
 
     let globalWordCategoryMap = {};
     let globalWordDataMap = {};
@@ -5025,6 +5061,58 @@
         checkSurpriseBossTrigger();
     }
 
+
+    function getBossReviewNote(word) {
+        if (!word || !word.rawHeaders || !word.rawCols) return '';
+        const preferred = ['注意事項', '備註', '定義與功能', '用法', '語感', '核心文法'];
+        for (const key of preferred) {
+            const idx = word.rawHeaders.findIndex(h => (h || '').includes(key));
+            if (idx !== -1 && word.rawCols[idx] && word.rawCols[idx].trim()) {
+                return word.rawCols[idx].trim();
+            }
+        }
+        return '';
+    }
+
+    function escapeBossHTML(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderBossReview(isCorrect) {
+        const panel = document.getElementById('boss-review-panel');
+        const answerEl = document.getElementById('boss-review-answer');
+        const zhEl = document.getElementById('boss-review-zh');
+        const noteEl = document.getElementById('boss-review-note');
+        if (!panel || !currentBossWord) return;
+
+        const zh = getQuizZhText(currentBossWord) || '目前這筆資料沒有中文解釋。';
+        const note = getBossReviewNote(currentBossWord);
+
+        answerEl.innerHTML = `${isCorrect ? '✅' : '📌'} 正解：<strong>${escapeBossHTML(currentBossWord.jp)}</strong>`;
+        zhEl.innerHTML = `🇹🇼 中文意思<br>${escapeBossHTML(zh).replace(/\n/g, '<br>')}`;
+
+        if (note) {
+            noteEl.style.display = 'block';
+            noteEl.innerHTML = `💡 快速複習<br>${escapeBossHTML(note).replace(/\n/g, '<br>')}`;
+        } else {
+            noteEl.style.display = 'none';
+            noteEl.innerHTML = '';
+        }
+        panel.style.display = 'block';
+    }
+
+    function initBossTestMode() {
+        const params = new URLSearchParams(window.location.search);
+        const enabled = params.get('bossTest') === '1';
+        const btn = document.getElementById('boss-test-btn');
+        if (btn) btn.style.display = enabled ? 'block' : 'none';
+    }
+
     function checkSurpriseBossTrigger() {
         const lastTrigger = localStorage.getItem('jp_surprise_last_date');
         const today = getTodayKey();
@@ -5045,8 +5133,12 @@
         }
     }
 
-    function triggerSurpriseBossQuest() {
-        if (allSearchableWords.length < 4) return;
+    function triggerSurpriseBossQuest(isTestMode = false) {
+        if (allSearchableWords.length < 4) {
+            if (isTestMode) alert('⏳ 單字資料還在載入中，請稍等一下再按測試大魔王。');
+            return;
+        }
+        currentBossIsTestMode = !!isTestMode;
 
         let weakCandidates = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -5114,6 +5206,11 @@
 
         document.getElementById('boss-quiz-feedback').textContent = '';
         document.getElementById('boss-quiz-feedback').className = 'quiz-feedback';
+        document.getElementById('boss-review-panel').style.display = 'none';
+        document.getElementById('boss-review-answer').textContent = '';
+        document.getElementById('boss-review-zh').textContent = '';
+        document.getElementById('boss-review-note').style.display = 'none';
+        document.getElementById('boss-test-label').style.display = currentBossIsTestMode ? 'inline-block' : 'none';
         document.getElementById('btn-boss-submit').style.display = 'none';
         document.getElementById('btn-boss-close').style.display = 'none';
         document.getElementById('btn-boss-flee').style.display = 'block';
@@ -5142,23 +5239,33 @@
         document.getElementById('btn-boss-submit').style.display = 'none';
         document.getElementById('btn-boss-flee').style.display = 'none';
         const feedbackEl = document.getElementById('boss-quiz-feedback');
+        const isCorrect = selectedBossOption.jp === currentBossWord.jp;
 
-        if (selectedBossOption.jp === currentBossWord.jp) {
+        if (isCorrect) {
             playSuccessSound();
-            addEXP(200);
-            feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
-            feedbackEl.className = 'quiz-feedback success';
-            localStorage.setItem('jp_surprise_last_date', getTodayKey());
-            if (currentUser) {
-                const obj = {};
-                obj['progress.jp_surprise_last_date'] = getTodayKey();
-                db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+
+            if (currentBossIsTestMode) {
+                feedbackEl.textContent = '🧪 測試擊破成功！測試模式不增加 EXP，也不更新三天觸發日期。';
+            } else {
+                addEXP(200);
+                feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
+                localStorage.setItem('jp_surprise_last_date', getTodayKey());
+                if (currentUser) {
+                    const obj = {};
+                    obj['progress.jp_surprise_last_date'] = getTodayKey();
+                    db.collection('user_progress').doc(currentUser.uid).update(obj).catch(() => {});
+                }
             }
+            feedbackEl.className = 'quiz-feedback success';
         } else {
             playWrongSound();
-            feedbackEl.textContent = `💀 挑戰失敗！正解是：${currentBossWord.jp} (${getQuizZhText(currentBossWord)})`;
+            feedbackEl.textContent = currentBossIsTestMode
+                ? `🧪 測試挑戰失敗！正解是：${currentBossWord.jp}`
+                : `💀 挑戰失敗！正解是：${currentBossWord.jp}`;
             feedbackEl.className = 'quiz-feedback error';
         }
+
+        renderBossReview(isCorrect);
 
         allBtns.forEach(b => {
             if (b.textContent.includes(currentBossWord.jp) || b.textContent.includes(getQuizZhText(currentBossWord))) {
@@ -5172,11 +5279,13 @@
     function closeSurpriseModal() {
         playClickSound();
         document.getElementById('surpriseBossModal').style.display = 'none';
+        currentBossIsTestMode = false;
     }
 
     function fleeSurpriseModal() {
         playClickSound();
         document.getElementById('surpriseBossModal').style.display = 'none';
+        currentBossIsTestMode = false;
     }
 
     function pickDailyFiveWords(dateString) {
@@ -8518,6 +8627,7 @@
     }
 
     renderAppVersion();
+    initBossTestMode();
         updateVerbGuideVisibility();
         
         updateCounterGuideVisibility();initDailyFortuneBadge();
