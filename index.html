@@ -3015,6 +3015,97 @@
             #stats-card-popup-host .card-container { height: 460px; }
         }
 
+
+        /* 📱 v10.9.1 手機字卡排版：避免內容彼此擠壓 */
+        @media (max-width: 600px) {
+            .card-container {
+                height: 610px;
+            }
+
+            .card-face {
+                padding: 54px 12px 54px 12px;
+            }
+
+            .card-front {
+                justify-content: flex-start;
+                overflow-y: auto;
+            }
+
+            .card-front .card-body-wrapper {
+                padding: 0 24px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                box-sizing: border-box;
+            }
+
+            .front-main-title {
+                font-size: 29px;
+                line-height: 1.25;
+                margin-bottom: 8px;
+            }
+
+            .front-sub-title {
+                font-size: 14px;
+                line-height: 1.5;
+                margin-bottom: 14px;
+            }
+
+            .front-mean-box,
+            .noun-front-meaning,
+            .conj-front-meaning,
+            .suffix-front-meaning,
+            .prefix-front-meaning {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 4px 0 16px 0 !important;
+                box-sizing: border-box;
+            }
+
+            .btn-tts {
+                margin-top: 2px;
+                margin-bottom: 14px;
+            }
+
+            .progress-text {
+                margin-top: 4px;
+                margin-bottom: 8px;
+                line-height: 1.45;
+            }
+
+            .card-counter-fixed {
+                top: 12px;
+            }
+
+            .card-nav-arrow {
+                top: 52%;
+            }
+
+            .hint {
+                bottom: 16px;
+            }
+
+            /* 學習進度 popup 裡的同一張字卡，也同步使用較高的手機高度 */
+            #stats-card-popup-host .card-container {
+                height: 610px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .card-container,
+            #stats-card-popup-host .card-container {
+                height: 630px;
+            }
+
+            .card-front .card-body-wrapper {
+                padding: 0 20px;
+            }
+
+            .front-main-title {
+                font-size: 27px;
+            }
+        }
+
 </style>
 </head>
 <body>
@@ -3848,8 +3939,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.9';
-    const APP_UPDATE_NOTE = '學習進度字卡快覽｜點擊學習明細單字可彈出原字卡，並支援正反面翻卡';
+    const APP_VERSION = 'v10.9.1';
+    const APP_UPDATE_NOTE = '手機字卡排版優化｜增加卡片高度與上下留白，避免意思、發音、進度互相擠壓';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
