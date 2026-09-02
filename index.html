@@ -2969,6 +2969,52 @@
         .quiz-btn.show-translation .boss-option-zh{ display:inline-flex; align-items:center; }
 
 
+
+        /* 📚 學習進度：字卡快覽 */
+        .progress-item.stats-card-clickable {
+            cursor: pointer;
+            transition: transform .15s ease, border-color .15s ease, background .15s ease;
+        }
+        .progress-item.stats-card-clickable:hover {
+            border-color: #38bdf8;
+            background: #f0f9ff;
+            transform: translateY(-1px);
+        }
+        .progress-item.stats-card-clickable:focus-visible {
+            outline: 3px solid rgba(56,189,248,.35);
+            outline-offset: 2px;
+        }
+        .stats-card-popup-box {
+            max-width: 540px;
+            background: #0f172a;
+        }
+        .stats-card-popup-body {
+            padding: 14px;
+            overflow-y: auto;
+        }
+        .stats-card-popup-hint {
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.55;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        #stats-card-popup-host .card-container {
+            margin: 0;
+            height: 500px;
+        }
+        #stats-card-popup-host .card-nav-arrow,
+        #stats-card-popup-host .card-counter-fixed {
+            display: none !important;
+        }
+        #stats-card-popup-host .card-face {
+            box-shadow: none;
+        }
+        @media (max-width: 600px) {
+            .stats-card-popup-body { padding: 10px; }
+            #stats-card-popup-host .card-container { height: 460px; }
+        }
+
 </style>
 </head>
 <body>
@@ -3258,6 +3304,21 @@
 
 
 
+
+
+<!-- 📚 學習進度：單字卡快覽 -->
+<div class="modal-overlay" id="statsCardPopupModal" onclick="closeStatsWordCard(event)">
+    <div class="modal-box stats-card-popup-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">📚 複習字卡</h3>
+            <button class="btn-modal-close" onclick="closeStatsWordCard()">✕</button>
+        </div>
+        <div class="stats-card-popup-body">
+            <div class="stats-card-popup-hint">點擊字卡即可翻面；發音與原字卡功能都保留。</div>
+            <div id="stats-card-popup-host"></div>
+        </div>
+    </div>
+</div>
 
 <!-- 🧩 接頭詞規則指南 -->
 <div class="modal-overlay" id="prefixGuideModal" onclick="closePrefixGuideModal(event)">
@@ -3787,8 +3848,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.8.2';
-    const APP_UPDATE_NOTE = '大魔王翻譯顯示優化｜作答後才揭示題目中文與選項中文，詳解集中在下方';
+    const APP_VERSION = 'v10.9';
+    const APP_UPDATE_NOTE = '學習進度字卡快覽｜點擊學習明細單字可彈出原字卡，並支援正反面翻卡';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -4524,6 +4585,9 @@
     let currentList = [];
     let currentIndex = 0;
     let currentMode = 'review';
+
+    // 學習進度字卡快覽：暫存原本翻卡狀態與 DOM 位置
+    let statsCardPopupState = null;
     let quizList = [];
     let quizIndex = 0;
     let currentCorrectAnswer = null;
@@ -6578,6 +6642,76 @@
         return wordObj.rawCols[4] || wordObj.rawCols[2] || '';
     }
 
+
+    function openStatsWordCard(event, encodedWordJp) {
+        if (event) event.stopPropagation();
+
+        const wordJp = decodeURIComponent(encodedWordJp);
+        const wordObj = globalWordDataMap[wordJp];
+        const flashcard = document.getElementById('flashcard');
+        const host = document.getElementById('stats-card-popup-host');
+        const modal = document.getElementById('statsCardPopupModal');
+
+        if (!wordObj || !flashcard || !host || !modal) return;
+
+        // 如果上一個快覽尚未正常關閉，先復原。
+        if (statsCardPopupState) closeStatsWordCard();
+
+        statsCardPopupState = {
+            currentList,
+            currentIndex,
+            fullSourceList,
+            parent: flashcard.parentNode,
+            nextSibling: flashcard.nextSibling
+        };
+
+        // 快覽期間直接使用原本的 flashcard DOM，因此所有專屬字卡版型、
+        // TTS、翻面與背面排版都會與正式翻卡模式完全一致。
+        currentList = [wordObj];
+        fullSourceList = [wordObj];
+        currentIndex = 0;
+
+        host.appendChild(flashcard);
+        flashcard.classList.remove('is-flipped');
+        updateReviewUI();
+
+        modal.style.display = 'flex';
+    }
+
+    function closeStatsWordCard(event) {
+        const modal = document.getElementById('statsCardPopupModal');
+        if (event && event.target !== modal && !event.target.classList.contains('btn-modal-close')) return;
+
+        if (!statsCardPopupState) {
+            if (modal) modal.style.display = 'none';
+            return;
+        }
+
+        const flashcard = document.getElementById('flashcard');
+        const { currentList: savedList, currentIndex: savedIndex, fullSourceList: savedFull, parent, nextSibling } = statsCardPopupState;
+
+        if (flashcard && parent) {
+            flashcard.classList.remove('is-flipped');
+            if (nextSibling && nextSibling.parentNode === parent) {
+                parent.insertBefore(flashcard, nextSibling);
+            } else {
+                parent.appendChild(flashcard);
+            }
+        }
+
+        currentList = savedList;
+        currentIndex = savedIndex;
+        fullSourceList = savedFull;
+        statsCardPopupState = null;
+
+        if (modal) modal.style.display = 'none';
+
+        // 復原原本翻卡內容，避免之後切回「翻卡複習」時仍停在快覽單字。
+        if (currentList && currentList.length > 0) {
+            updateReviewUI();
+        }
+    }
+
     function renderStatsDashboard() {
         renderQuestBoard();
         const gridContainer = document.getElementById('stats-category-grid');
@@ -6653,9 +6787,15 @@
                     kanjiText = /[a-zA-Z]/.test(item.wordObj.kanji) ? `${item.wordJp} (${item.wordObj.kanji})` : `${item.wordObj.kanji} (${item.wordJp})`;
                 }
                 const safeWordJp = item.wordJp.replace(/'/g, "\\'");
+                const encodedWordJp = encodeURIComponent(item.wordJp);
 
                 itemsHtml += `
-                    <div class="progress-item">
+                    <div class="progress-item stats-card-clickable"
+                        role="button"
+                        tabindex="0"
+                        title="點擊開啟字卡"
+                        onclick="openStatsWordCard(event, '${encodedWordJp}')"
+                        onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault();openStatsWordCard(event, '${encodedWordJp}');}">
                         <div class="progress-item-word">
                             <button class="btn-tts-micro" onclick="speakWordDirectly(event, '${safeWordJp}')" title="播放發音">🔊</button>
                             <span>${kanjiText}</span>
