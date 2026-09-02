@@ -2960,6 +2960,15 @@
         .quiz-btn.correct .boss-option-zh{ background:rgba(255,255,255,.66); border-color:rgba(34,197,94,.28); color:inherit; }
         .quiz-btn.wrong .boss-option-zh{ background:rgba(255,255,255,.66); border-color:rgba(239,68,68,.25); color:inherit; }
 
+        .boss-question-zh{
+            margin-top:10px;padding:10px 12px;border-radius:10px;background:#eff6ff;
+            border-left:4px solid #38bdf8;color:#1e3a8a;font-size:14px;font-weight:800;
+            line-height:1.65;white-space:pre-wrap
+        }
+        .boss-option-zh{ display:none; }
+        .quiz-btn.show-translation .boss-option-zh{ display:inline-flex; align-items:center; }
+
+
 </style>
 </head>
 <body>
@@ -3755,6 +3764,7 @@
             <div style="background:#1e293b; border:1px solid #475569; padding:12px; border-radius:10px; margin-top:4px;">
                 <div style="font-size:12px; color:#94a3b8; margin-bottom:4px;">題目試煉：</div>
                 <div id="boss-question-text" style="font-size:18px; font-weight:bold; color:#ffffff; white-space:pre-wrap;">載入試煉中...</div>
+                <div id="boss-question-zh" class="boss-question-zh" style="display:none;"></div>
             </div>
 
             <div class="quiz-options" id="boss-quiz-options" style="margin-top:6px;"></div>
@@ -3777,8 +3787,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.8.1';
-    const APP_UPDATE_NOTE = '大魔王選項顯示優化｜所有選項同步顯示日文＋中文，詳解統一放下方區塊';
+    const APP_VERSION = 'v10.8.2';
+    const APP_UPDATE_NOTE = '大魔王翻譯顯示優化｜作答後才揭示題目中文與選項中文，詳解集中在下方';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5082,6 +5092,17 @@
     }
 
 
+
+    function getBossQuestionMeaning(word) {
+        if (!word) return '目前這題沒有中文解釋。';
+        const rawExample = getQuizExampleText(word) || '';
+        const lines = rawExample.split('\n').map(s => s.trim()).filter(Boolean);
+        if (lines.length > 1) {
+            return lines.slice(1).join('\n');
+        }
+        return getQuizZhText(word) || '目前這題沒有中文解釋。';
+    }
+
     function getBossReviewNote(word) {
         if (!word || !word.rawHeaders || !word.rawCols) return '';
         const preferred = ['注意事項', '備註', '定義與功能', '用法', '語感', '核心文法'];
@@ -5218,6 +5239,7 @@
         options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'quiz-btn';
+            btn.dataset.bossJp = opt.jp || '';
             const jpText = opt.jp || '（未提供日文）';
             const zhText = getQuizZhText(opt) || '未提供中文';
             btn.innerHTML = `
@@ -5237,6 +5259,8 @@
         document.getElementById('boss-review-answer').textContent = '';
         document.getElementById('boss-review-zh').textContent = '';
         document.getElementById('boss-review-note').style.display = 'none';
+        document.getElementById('boss-question-zh').style.display = 'none';
+        document.getElementById('boss-question-zh').textContent = '';
         document.getElementById('boss-test-label').style.display = currentBossIsTestMode ? 'inline-block' : 'none';
         document.getElementById('btn-boss-submit').style.display = 'none';
         document.getElementById('btn-boss-close').style.display = 'none';
@@ -5292,11 +5316,19 @@
             feedbackEl.className = 'quiz-feedback error';
         }
 
+        const questionZhEl = document.getElementById('boss-question-zh');
+        const questionMeaning = getBossQuestionMeaning(currentBossWord);
+        questionZhEl.innerHTML = `🇹🇼 題目中文<br>${escapeBossHTML(questionMeaning).replace(/\n/g, '<br>')}`;
+        questionZhEl.style.display = 'block';
+
         renderBossReview(isCorrect);
 
         allBtns.forEach(b => {
-            if (b.textContent.includes(currentBossWord.jp) || b.textContent.includes(getQuizZhText(currentBossWord))) {
+            b.classList.add('show-translation');
+            if (b.dataset.bossJp === currentBossWord.jp) {
                 b.classList.add('correct');
+            } else if (b.dataset.bossJp === selectedBossOption.jp) {
+                b.classList.add('wrong');
             }
         });
 
