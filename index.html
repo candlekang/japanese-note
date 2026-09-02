@@ -2940,6 +2940,26 @@
             font-size:11px;font-weight:900;width:max-content
         }
 
+
+        .boss-option-row{
+            display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+            width:100%;
+        }
+        .boss-option-left{
+            display:flex; flex-direction:column; gap:4px; min-width:0; flex:1;
+        }
+        .boss-option-jp{
+            font-size:16px; font-weight:900; color:inherit; line-height:1.45; word-break:break-word;
+        }
+        .boss-option-zh{
+            font-size:13px; font-weight:800; color:#64748b; line-height:1.5;
+            background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px;
+            padding:4px 10px; white-space:nowrap; flex-shrink:0;
+        }
+        .quiz-btn.selected .boss-option-zh{ background:#e0f2fe; border-color:#7dd3fc; color:#0c4a6e; }
+        .quiz-btn.correct .boss-option-zh{ background:rgba(255,255,255,.66); border-color:rgba(34,197,94,.28); color:inherit; }
+        .quiz-btn.wrong .boss-option-zh{ background:rgba(255,255,255,.66); border-color:rgba(239,68,68,.25); color:inherit; }
+
 </style>
 </head>
 <body>
@@ -3757,8 +3777,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.8';
-    const APP_UPDATE_NOTE = '大魔王答題解析＋測試模式｜答題後顯示中文複習，?bossTest=1 可立即測試';
+    const APP_VERSION = 'v10.8.1';
+    const APP_UPDATE_NOTE = '大魔王選項顯示優化｜所有選項同步顯示日文＋中文，詳解統一放下方區塊';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5093,7 +5113,7 @@
         const zh = getQuizZhText(currentBossWord) || '目前這筆資料沒有中文解釋。';
         const note = getBossReviewNote(currentBossWord);
 
-        answerEl.innerHTML = `${isCorrect ? '✅' : '📌'} 正解：<strong>${escapeBossHTML(currentBossWord.jp)}</strong>`;
+        answerEl.innerHTML = `${isCorrect ? '✅' : '📌'} 正解：<strong>${escapeBossHTML(currentBossWord.jp)}</strong> <span style="font-size:13px;color:#64748b;font-weight:800;">｜${escapeBossHTML(zh.split('\n')[0] || zh)}</span>`;
         zhEl.innerHTML = `🇹🇼 中文意思<br>${escapeBossHTML(zh).replace(/\n/g, '<br>')}`;
 
         if (note) {
@@ -5198,8 +5218,15 @@
         options.forEach((opt, idx) => {
             const btn = document.createElement('button');
             btn.className = 'quiz-btn';
-            const optText = (exampleLine1 !== '') ? opt.jp : getQuizZhText(opt);
-            btn.innerHTML = `<span>[${idx + 1}] ${optText}</span>`;
+            const jpText = opt.jp || '（未提供日文）';
+            const zhText = getQuizZhText(opt) || '未提供中文';
+            btn.innerHTML = `
+                <div class="boss-option-row">
+                    <div class="boss-option-left">
+                        <div class="boss-option-jp">[${idx + 1}] ${escapeBossHTML(jpText)}</div>
+                    </div>
+                    <div class="boss-option-zh">${escapeBossHTML(zhText)}</div>
+                </div>`;
             btn.onclick = () => selectBossOption(btn, opt);
             optionsContainer.appendChild(btn);
         });
