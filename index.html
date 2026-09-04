@@ -3292,6 +3292,97 @@
             .fuku-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
         }
 
+
+        /* 🪄 助動詞使用指南 */
+        .aux-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #93c5fd;
+            background:linear-gradient(135deg,#eff6ff,#eef2ff);color:#1d4ed8;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+        .aux-guide-hero{
+            border-radius:16px;border:1px solid #bfdbfe;
+            background:linear-gradient(135deg,#eff6ff,#f8fafc);
+            padding:14px;margin-bottom:12px
+        }
+        .aux-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+        .aux-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#dbeafe;
+            color:#1d4ed8;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+        .aux-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+        .aux-guide-reading{margin-top:4px;color:#2563eb;font-size:14px;font-weight:800}
+        .aux-guide-pronounce-btn{
+            border:1px solid #93c5fd;background:#fff;color:#1d4ed8;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+        .aux-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #bfdbfe;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+        .aux-guide-grid{display:flex;flex-direction:column;gap:10px}
+        .aux-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+        .aux-guide-card.theme-blue{background:#eff6ff;border-color:#bfdbfe}
+        .aux-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+        .aux-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+        .aux-guide-card.theme-purple{background:#f5f3ff;border-color:#ddd6fe}
+        .aux-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+        .aux-guide-card.theme-blue .aux-guide-title{color:#1d4ed8}
+        .aux-guide-card.theme-green .aux-guide-title{color:#15803d}
+        .aux-guide-card.theme-orange .aux-guide-title{color:#c2410c}
+        .aux-guide-card.theme-purple .aux-guide-title{color:#6d28d9}
+        .aux-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+        .aux-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .aux-compare-box{
+            border-radius:12px;padding:11px;border:1px solid #e2e8f0;background:#fff
+        }
+        .aux-compare-title{font-size:13px;font-weight:900;margin-bottom:6px}
+        .aux-compare-text{font-size:12px;line-height:1.65;color:#475569}
+        .aux-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+        .aux-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #93c5fd;color:#1d4ed8;font-size:12px;font-weight:800
+        }
+
+        /* 🪄 助動詞專屬字卡 */
+        .aux-type-badge{
+            background:#dbeafe !important;border-color:#93c5fd !important;color:#1d4ed8 !important
+        }
+        .aux-sense-chip{
+            display:inline-flex;align-items:center;justify-content:center;
+            margin:4px auto 10px;padding:6px 10px;border-radius:999px;
+            background:#fff7ed;border:1px solid #fdba74;color:#9a3412;
+            font-size:12px;font-weight:900;max-width:92%;box-sizing:border-box
+        }
+        .aux-front-meaning{
+            width:94%;margin:4px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #bfdbfe;border-left:4px solid #3b82f6;background:#eff6ff;
+            color:#1e3a8a;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+        .aux-usage-card{
+            border-radius:12px;padding:11px 12px;margin-bottom:12px;
+            background:#fff7ed;border:1px solid #fdba74
+        }
+        .aux-usage-title{font-size:12px;font-weight:900;color:#c2410c;margin-bottom:7px}
+        .aux-usage-formula{
+            font-size:14px;line-height:1.75;font-weight:900;color:#7c2d12;
+            white-space:pre-wrap;word-break:break-word
+        }
+        .aux-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+        .aux-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+        .aux-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+        @media(max-width:640px){
+            .aux-guide-hero-top{flex-direction:column}
+            .aux-guide-pronounce-btn{width:100%}
+            .aux-compare-grid{grid-template-columns:1fr}
+            .aux-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
 </style>
 </head>
 <body>
@@ -3390,6 +3481,7 @@
         <button type="button" id="rentai-guide-launch" class="rentai-guide-launch" onclick="openRentaiGuideModal()">🧷 連體詞規則指南</button>
         <button type="button" id="adv-guide-launch" class="adv-guide-launch" onclick="openAdvGuideModal()">🧭 副詞＆疑問表現使用指南</button>
         <button type="button" id="fuku-guide-launch" class="fuku-guide-launch" onclick="openFukuGuideModal()">🧩 副助詞使用指南</button>
+        <button type="button" id="aux-guide-launch" class="aux-guide-launch" onclick="openAuxGuideModal()">🪄 助動詞使用指南</button>
         <button type="button" id="boss-test-btn" class="boss-test-btn" onclick="triggerSurpriseBossQuest(true)">👹 測試大魔王關卡</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
@@ -3588,6 +3680,73 @@
 
 
 
+
+
+<!-- 🪄 助動詞使用指南 -->
+<div class="modal-overlay" id="auxGuideModal" onclick="closeAuxGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🪄 助動詞使用指南</h3>
+            <button class="btn-modal-close" onclick="closeAuxGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="aux-guide-hero">
+                <div class="aux-guide-hero-top">
+                    <div>
+                        <div class="aux-guide-badge">🪄 少量但超重要的句型零件</div>
+                        <div class="aux-guide-main">助動詞</div>
+                        <div class="aux-guide-reading">じょどうし</div>
+                    </div>
+                    <button type="button" class="aux-guide-pronounce-btn"
+                        onclick="speakWordDirectly(event, 'じょどうし')">🔊 聽發音</button>
+                </div>
+                <div class="aux-guide-desc">
+                    這一頁資料不多，但每一個都很常用。重點不是背數量，而是分清楚「語感」與「前面要接什麼」。
+                </div>
+            </div>
+
+            <div class="aux-guide-grid">
+                <div class="aux-guide-card theme-blue">
+                    <div class="aux-guide-title">👀／👂 そう 有兩種完全不同的用法</div>
+                    <div class="aux-compare-grid">
+                        <div class="aux-compare-box">
+                            <div class="aux-compare-title">👀 樣態そう</div>
+                            <div class="aux-compare-text">看眼前狀況做判斷：看起來好像～<br><br>おいしそう。<br>看起來很好吃。</div>
+                        </div>
+                        <div class="aux-compare-box">
+                            <div class="aux-compare-title">👂 傳聞そう</div>
+                            <div class="aux-compare-text">轉述聽來的資訊：聽說～<br><br>雨が降るそうです。<br>聽說會下雨。</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="aux-guide-card theme-green">
+                    <div class="aux-guide-title">🎯 よう（に）常見三種方向</div>
+                    <div class="aux-chip-wrap">
+                        <span class="aux-chip">像～一樣</span>
+                        <span class="aux-chip">為了～</span>
+                        <span class="aux-chip">變得能～</span>
+                    </div>
+                    <div class="aux-guide-text" style="margin-top:8px;">例：忘れないようにメモを取ります。<br>為了不要忘記而做筆記。</div>
+                </div>
+
+                <div class="aux-guide-card theme-purple">
+                    <div class="aux-guide-title">💭 みたい：口語感比較強</div>
+                    <div class="aux-guide-text">表示「好像～／看起來像～」。會話中很常見，語氣比「ようだ」更口語、自然。</div>
+                </div>
+
+                <div class="aux-guide-card theme-orange">
+                    <div class="aux-guide-title">🧩 學習時先看接續公式</div>
+                    <div class="aux-guide-text">① 先分辨是哪一種語感
+② 再看「用法」確認接續
+③ 最後用例句確認真正意思
+
+尤其「そう」只看中文很容易混淆，所以字卡會把「樣態／傳聞」直接標出來。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 🧩 副助詞使用指南 -->
 <div class="modal-overlay" id="fukuGuideModal" onclick="closeFukuGuideModal(event)">
@@ -4278,8 +4437,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.12';
-    const APP_UPDATE_NOTE = '副助詞使用指南＋專屬字卡｜保留 A:F 現有欄位，強化用法公式與例句';
+    const APP_VERSION = 'v10.13';
+    const APP_UPDATE_NOTE = '助動詞使用指南＋專屬字卡｜強化 そう（樣態／傳聞）、よう（に）、みたい 的辨識與用法';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6052,6 +6211,24 @@
 
 
 
+
+    function updateAuxGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('aux-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet16') ? 'block' : 'none';
+    }
+
+    function openAuxGuideModal() {
+        playClickSound();
+        document.getElementById('auxGuideModal').style.display = 'flex';
+    }
+
+    function closeAuxGuideModal(e) {
+        if (e && e.target !== document.getElementById('auxGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('auxGuideModal').style.display = 'none';
+    }
+
     function updateFukuGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('fuku-guide-launch');
@@ -6717,6 +6894,7 @@
         updateRentaiGuideVisibility();
         updateAdvGuideVisibility();
         updateFukuGuideVisibility();
+        updateAuxGuideVisibility();
         loadSheetData(selected);
     }
 
@@ -7770,7 +7948,7 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
-        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge', 'fuku-type-badge');
+        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge', 'fuku-type-badge', 'aux-type-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
@@ -9318,7 +9496,130 @@
             return;
         }
 
-        // 💡 15. 一般分類標準版型
+
+        // 💡 15. 助動詞（sheet16）專屬版型
+        // A:F = 我是誰／我有漢字嗎／意思／例句／用法／備註
+        if (current.catKey === 'sheet16') {
+            const getAuxCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const altVal = getAuxCol(['我有漢字', '漢字']);
+            const meaningVal = getAuxCol(['意思', '中文']);
+            const exampleVal = getAuxCol(['例句寶寶', '例句']);
+            const usageVal = getAuxCol(['用法', '接續', '接法']);
+            const noteVal = getAuxCol(['備註', '注意事項', '注意']);
+
+            let senseLabel = '';
+            if (current.jp === 'そう') {
+                if (/傳聞|聽說|據說/.test(meaningVal + ' ' + usageVal + ' ' + noteVal)) {
+                    senseLabel = '👂 傳聞';
+                } else {
+                    senseLabel = '👀 樣態';
+                }
+            } else if ((current.jp || '').includes('よう')) {
+                senseLabel = '🎯 よう（に）';
+            } else if ((current.jp || '').includes('みたい')) {
+                senseLabel = '💭 みたい';
+            }
+
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('aux-type-badge');
+            badgeEl.textContent = '🪄 助動詞';
+
+            mainTitleEl.textContent = current.jp;
+            mainTitleEl.style.display = 'block';
+
+            if (altVal && altVal !== current.jp) {
+                subTitleEl.textContent = altVal;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.textContent = '';
+                subTitleEl.style.display = 'none';
+            }
+
+            if (meaningVal || senseLabel) {
+                meanBoxEl.className = 'aux-front-meaning';
+                meanBoxEl.innerHTML = `
+                    ${senseLabel ? `<div class="aux-sense-chip">${senseLabel}</div>` : ''}
+                    ${meaningVal ? `<div>💡 ${meaningVal}</div>` : ''}
+                `;
+                meanBoxEl.style.display = '-webkit-box';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let fullBackTitle = current.jp;
+            if (altVal && altVal !== current.jp) {
+                fullBackTitle = `${current.jp}（${altVal}）`;
+            }
+
+            let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+
+            if (senseLabel) {
+                backHTML += `<div class="aux-sense-chip" style="margin:0 auto 12px;">${senseLabel}</div>`;
+            }
+
+            if (meaningVal) {
+                backHTML += `
+                    <div class="aux-detail-card" style="background:#eff6ff;border-color:#bfdbfe;">
+                        <div class="aux-detail-title" style="color:#1d4ed8;">💡 意思</div>
+                        <div class="aux-detail-text">${meaningVal}</div>
+                    </div>`;
+            }
+
+            if (usageVal) {
+                backHTML += `
+                    <div class="aux-usage-card">
+                        <div class="aux-usage-title">🧩 用法／接續公式</div>
+                        <div class="aux-usage-formula">${usageVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button type="button" class="btn-tts-small"
+                                    onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>`;
+                });
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="aux-detail-card" style="background:#fff7ed;border-color:#fed7aa;">
+                        <div class="aux-detail-title" style="color:#c2410c;">📝 備註</div>
+                        <div class="aux-detail-text">${noteVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 16. 一般分類標準版型
+
 
 
 
