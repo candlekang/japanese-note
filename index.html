@@ -3293,7 +3293,7 @@
         }
 
 
-        /* 🪄 助動詞使用指南 */
+        /* <span class="aux-emoji">✨</span> 助動詞使用指南 */
         .aux-guide-launch{
             display:none;width:100%;margin-top:8px;border:1px solid #93c5fd;
             background:linear-gradient(135deg,#eff6ff,#eef2ff);color:#1d4ed8;
@@ -3344,7 +3344,7 @@
             border:1px solid #93c5fd;color:#1d4ed8;font-size:12px;font-weight:800
         }
 
-        /* 🪄 助動詞專屬字卡 */
+        /* ✨ 助動詞專屬字卡 */
         .aux-type-badge{
             background:#dbeafe !important;border-color:#93c5fd !important;color:#1d4ed8 !important
         }
@@ -3381,6 +3381,17 @@
             .aux-guide-pronounce-btn{width:100%}
             .aux-compare-grid{grid-template-columns:1fr}
             .aux-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
+
+        /* v10.13.1：避免部分手機把較新的 emoji 顯示成方框 */
+        .aux-emoji{
+            font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+            font-style:normal;
+            font-weight:400;
+            display:inline-block;
+            line-height:1;
+            vertical-align:-0.08em;
         }
 
 </style>
@@ -3481,7 +3492,7 @@
         <button type="button" id="rentai-guide-launch" class="rentai-guide-launch" onclick="openRentaiGuideModal()">🧷 連體詞規則指南</button>
         <button type="button" id="adv-guide-launch" class="adv-guide-launch" onclick="openAdvGuideModal()">🧭 副詞＆疑問表現使用指南</button>
         <button type="button" id="fuku-guide-launch" class="fuku-guide-launch" onclick="openFukuGuideModal()">🧩 副助詞使用指南</button>
-        <button type="button" id="aux-guide-launch" class="aux-guide-launch" onclick="openAuxGuideModal()">🪄 助動詞使用指南</button>
+        <button type="button" id="aux-guide-launch" class="aux-guide-launch" onclick="openAuxGuideModal()"><span class="aux-emoji">✨</span> 助動詞使用指南</button>
         <button type="button" id="boss-test-btn" class="boss-test-btn" onclick="triggerSurpriseBossQuest(true)">👹 測試大魔王關卡</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
@@ -3682,18 +3693,18 @@
 
 
 
-<!-- 🪄 助動詞使用指南 -->
+<!-- <span class="aux-emoji">✨</span> 助動詞使用指南 -->
 <div class="modal-overlay" id="auxGuideModal" onclick="closeAuxGuideModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <h3 class="modal-title">🪄 助動詞使用指南</h3>
+            <h3 class="modal-title"><span class="aux-emoji">✨</span> 助動詞使用指南</h3>
             <button class="btn-modal-close" onclick="closeAuxGuideModal()">✕</button>
         </div>
         <div class="modal-body">
             <div class="aux-guide-hero">
                 <div class="aux-guide-hero-top">
                     <div>
-                        <div class="aux-guide-badge">🪄 少量但超重要的句型零件</div>
+                        <div class="aux-guide-badge"><span class="aux-emoji">✨</span> 少量但超重要的句型零件</div>
                         <div class="aux-guide-main">助動詞</div>
                         <div class="aux-guide-reading">じょどうし</div>
                     </div>
@@ -3707,21 +3718,21 @@
 
             <div class="aux-guide-grid">
                 <div class="aux-guide-card theme-blue">
-                    <div class="aux-guide-title">👀／👂 そう 有兩種完全不同的用法</div>
+                    <div class="aux-guide-title"><span class="aux-emoji">👀</span>／<span class="aux-emoji">👂</span> そう 有兩種完全不同的用法</div>
                     <div class="aux-compare-grid">
                         <div class="aux-compare-box">
-                            <div class="aux-compare-title">👀 樣態そう</div>
+                            <div class="aux-compare-title"><span class="aux-emoji">👀</span> 樣態そう</div>
                             <div class="aux-compare-text">看眼前狀況做判斷：看起來好像～<br><br>おいしそう。<br>看起來很好吃。</div>
                         </div>
                         <div class="aux-compare-box">
-                            <div class="aux-compare-title">👂 傳聞そう</div>
+                            <div class="aux-compare-title"><span class="aux-emoji">👂</span> 傳聞そう</div>
                             <div class="aux-compare-text">轉述聽來的資訊：聽說～<br><br>雨が降るそうです。<br>聽說會下雨。</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="aux-guide-card theme-green">
-                    <div class="aux-guide-title">🎯 よう（に）常見三種方向</div>
+                    <div class="aux-guide-title"><span class="aux-emoji">🎯</span> よう（に）常見三種方向</div>
                     <div class="aux-chip-wrap">
                         <span class="aux-chip">像～一樣</span>
                         <span class="aux-chip">為了～</span>
@@ -3731,12 +3742,12 @@
                 </div>
 
                 <div class="aux-guide-card theme-purple">
-                    <div class="aux-guide-title">💭 みたい：口語感比較強</div>
+                    <div class="aux-guide-title"><span class="aux-emoji">💭</span> みたい：口語感比較強</div>
                     <div class="aux-guide-text">表示「好像～／看起來像～」。會話中很常見，語氣比「ようだ」更口語、自然。</div>
                 </div>
 
                 <div class="aux-guide-card theme-orange">
-                    <div class="aux-guide-title">🧩 學習時先看接續公式</div>
+                    <div class="aux-guide-title"><span class="aux-emoji">🧩</span> 學習時先看接續公式</div>
                     <div class="aux-guide-text">① 先分辨是哪一種語感
 ② 再看「用法」確認接續
 ③ 最後用例句確認真正意思
@@ -4437,8 +4448,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.13';
-    const APP_UPDATE_NOTE = '助動詞使用指南＋專屬字卡｜強化 そう（樣態／傳聞）、よう（に）、みたい 的辨識與用法';
+    const APP_VERSION = 'v10.13.1';
+    const APP_UPDATE_NOTE = '修正助動詞符號顯示｜替換較新 emoji，並指定 Emoji 字型避免手機顯示方框';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -9517,19 +9528,19 @@
             let senseLabel = '';
             if (current.jp === 'そう') {
                 if (/傳聞|聽說|據說/.test(meaningVal + ' ' + usageVal + ' ' + noteVal)) {
-                    senseLabel = '👂 傳聞';
+                    senseLabel = '<span class="aux-emoji">👂</span> 傳聞';
                 } else {
-                    senseLabel = '👀 樣態';
+                    senseLabel = '<span class="aux-emoji">👀</span> 樣態';
                 }
             } else if ((current.jp || '').includes('よう')) {
-                senseLabel = '🎯 よう（に）';
+                senseLabel = '<span class="aux-emoji">🎯</span> よう（に）';
             } else if ((current.jp || '').includes('みたい')) {
-                senseLabel = '💭 みたい';
+                senseLabel = '<span class="aux-emoji">💭</span> みたい';
             }
 
             badgeEl.style.display = 'inline-block';
             badgeEl.classList.add('aux-type-badge');
-            badgeEl.textContent = '🪄 助動詞';
+            badgeEl.innerHTML = '<span class="aux-emoji">✨</span> 助動詞';
 
             mainTitleEl.textContent = current.jp;
             mainTitleEl.style.display = 'block';
