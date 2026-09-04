@@ -3212,6 +3212,86 @@
             .adv-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
         }
 
+
+        /* 🧩 副助詞使用指南 */
+        .fuku-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #f9a8d4;
+            background:linear-gradient(135deg,#fdf2f8,#fff1f2);color:#be185d;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+        .fuku-guide-hero{
+            border-radius:16px;border:1px solid #fbcfe8;
+            background:linear-gradient(135deg,#fdf2f8,#fff7ed);
+            padding:14px;margin-bottom:12px
+        }
+        .fuku-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+        .fuku-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fce7f3;
+            color:#be185d;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+        .fuku-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+        .fuku-guide-reading{margin-top:4px;color:#db2777;font-size:14px;font-weight:800}
+        .fuku-guide-pronounce-btn{
+            border:1px solid #f9a8d4;background:#fff;color:#be185d;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+        .fuku-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #fbcfe8;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+        .fuku-guide-grid{display:flex;flex-direction:column;gap:10px}
+        .fuku-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+        .fuku-guide-card.theme-pink{background:#fdf2f8;border-color:#fbcfe8}
+        .fuku-guide-card.theme-blue{background:#f0f9ff;border-color:#bae6fd}
+        .fuku-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+        .fuku-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+        .fuku-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+        .fuku-guide-card.theme-pink .fuku-guide-title{color:#be185d}
+        .fuku-guide-card.theme-blue .fuku-guide-title{color:#0369a1}
+        .fuku-guide-card.theme-green .fuku-guide-title{color:#15803d}
+        .fuku-guide-card.theme-orange .fuku-guide-title{color:#c2410c}
+        .fuku-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+        .fuku-guide-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+        .fuku-guide-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #f9a8d4;color:#be185d;font-size:12px;font-weight:800
+        }
+
+        /* 🧩 副助詞專屬字卡 */
+        .fuku-type-badge{
+            background:#fce7f3 !important;border-color:#f9a8d4 !important;color:#be185d !important
+        }
+        .fuku-front-meaning{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #fbcfe8;border-left:4px solid #ec4899;background:#fdf2f8;
+            color:#831843;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+        .fuku-usage-card{
+            border-radius:12px;padding:11px 12px;margin-bottom:12px;
+            background:#fff7ed;border:1px solid #fdba74;
+        }
+        .fuku-usage-title{
+            font-size:12px;font-weight:900;color:#c2410c;margin-bottom:7px
+        }
+        .fuku-usage-formula{
+            font-size:14px;line-height:1.75;font-weight:900;color:#7c2d12;
+            white-space:pre-wrap;word-break:break-word
+        }
+        .fuku-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+        .fuku-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+        .fuku-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+        @media(max-width:640px){
+            .fuku-guide-hero-top{flex-direction:column}
+            .fuku-guide-pronounce-btn{width:100%}
+            .fuku-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
 </style>
 </head>
 <body>
@@ -3309,6 +3389,7 @@
         <button type="button" id="prefix-guide-launch" class="prefix-guide-launch" onclick="openPrefixGuideModal()">🧩 接頭詞規則指南</button>
         <button type="button" id="rentai-guide-launch" class="rentai-guide-launch" onclick="openRentaiGuideModal()">🧷 連體詞規則指南</button>
         <button type="button" id="adv-guide-launch" class="adv-guide-launch" onclick="openAdvGuideModal()">🧭 副詞＆疑問表現使用指南</button>
+        <button type="button" id="fuku-guide-launch" class="fuku-guide-launch" onclick="openFukuGuideModal()">🧩 副助詞使用指南</button>
         <button type="button" id="boss-test-btn" class="boss-test-btn" onclick="triggerSurpriseBossQuest(true)">👹 測試大魔王關卡</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
@@ -3506,6 +3587,71 @@
 
 
 
+
+
+<!-- 🧩 副助詞使用指南 -->
+<div class="modal-overlay" id="fukuGuideModal" onclick="closeFukuGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🧩 副助詞使用指南</h3>
+            <button class="btn-modal-close" onclick="closeFukuGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="fuku-guide-hero">
+                <div class="fuku-guide-hero-top">
+                    <div>
+                        <div class="fuku-guide-badge">🧩 接在其他詞後面，補上一層語意</div>
+                        <div class="fuku-guide-main">副助詞</div>
+                        <div class="fuku-guide-reading">ふくじょし</div>
+                    </div>
+                    <button type="button" class="fuku-guide-pronounce-btn"
+                        onclick="speakWordDirectly(event, 'ふくじょし')">🔊 聽發音</button>
+                </div>
+                <div class="fuku-guide-desc">
+                    副助詞通常接在名詞、動詞或其他成分後面，用來補充限定、強調、舉例、頻率、期限等語意。學習時最值得記的是「意思＋接續公式＋例句」。
+                </div>
+            </div>
+
+            <div class="fuku-guide-grid">
+                <div class="fuku-guide-card theme-pink">
+                    <div class="fuku-guide-title">💡 跟格助詞差在哪？</div>
+                    <div class="fuku-guide-text">格助詞偏向表示句子成分之間的關係；副助詞則常在原本句子上再加一層「限定、焦點、語氣或範圍」。</div>
+                </div>
+
+                <div class="fuku-guide-card theme-blue">
+                    <div class="fuku-guide-title">🎯 常見功能</div>
+                    <div class="fuku-guide-chip-wrap">
+                        <span class="fuku-guide-chip">限定｜だけ</span>
+                        <span class="fuku-guide-chip">強調｜こそ</span>
+                        <span class="fuku-guide-chip">舉例｜でも・とか</span>
+                        <span class="fuku-guide-chip">反覆｜たびに</span>
+                        <span class="fuku-guide-chip">期限｜までに</span>
+                        <span class="fuku-guide-chip">主題／關聯｜について</span>
+                    </div>
+                </div>
+
+                <div class="fuku-guide-card theme-green">
+                    <div class="fuku-guide-title">🧩 先記接續公式</div>
+                    <div class="fuku-guide-text">名詞 ＋ だけ
+動詞辭書形 ＋ たびに
+日期／時間 ＋ までに
+名詞 ＋ について ＋ 動詞
+
+看到字卡背面的「用法」卡，先確認前後要接什麼，再看例句會最好記。</div>
+                </div>
+
+                <div class="fuku-guide-card theme-orange">
+                    <div class="fuku-guide-title">📚 學習順序</div>
+                    <div class="fuku-guide-text">① 先看意思抓核心語感
+② 再看「用法」確認接續
+③ 最後用例句確認實際位置
+
+副助詞往往不是單靠中文翻譯就能掌握，所以「接續公式」會比死背中文更重要。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- 🧭 副詞＆疑問表現使用指南 -->
 <div class="modal-overlay" id="advGuideModal" onclick="closeAdvGuideModal(event)">
@@ -4132,8 +4278,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.11';
-    const APP_UPDATE_NOTE = '副詞＆疑問表現專屬頁｜新增使用指南，字卡改讀 A:H 新欄位與功能標籤';
+    const APP_VERSION = 'v10.12';
+    const APP_UPDATE_NOTE = '副助詞使用指南＋專屬字卡｜保留 A:F 現有欄位，強化用法公式與例句';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5905,6 +6051,24 @@
 
 
 
+
+    function updateFukuGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('fuku-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet15') ? 'block' : 'none';
+    }
+
+    function openFukuGuideModal() {
+        playClickSound();
+        document.getElementById('fukuGuideModal').style.display = 'flex';
+    }
+
+    function closeFukuGuideModal(e) {
+        if (e && e.target !== document.getElementById('fukuGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('fukuGuideModal').style.display = 'none';
+    }
+
     function updateAdvGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('adv-guide-launch');
@@ -6552,6 +6716,7 @@
         updatePrefixGuideVisibility();
         updateRentaiGuideVisibility();
         updateAdvGuideVisibility();
+        updateFukuGuideVisibility();
         loadSheetData(selected);
     }
 
@@ -7605,7 +7770,7 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
-        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge');
+        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge', 'fuku-type-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
@@ -9054,7 +9219,107 @@
             return;
         }
 
-        // 💡 14. 一般分類標準版型
+
+        // 💡 14. 副助詞（sheet15）專屬版型
+        // A:F = 我是誰／意思／功能／例句寶寶／用法／備註
+        if (current.catKey === 'sheet15') {
+            const getFukuCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const meaningVal = getFukuCol(['意思', '中文']);
+            const functionVal = getFukuCol(['功能']);
+            const exampleVal = getFukuCol(['例句寶寶', '例句']);
+            const usageVal = getFukuCol(['用法', '接續', '接法']);
+            const noteVal = getFukuCol(['備註', '注意事項', '注意']);
+
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('fuku-type-badge');
+            badgeEl.textContent = '🧩 副助詞';
+
+            mainTitleEl.textContent = current.jp;
+            mainTitleEl.style.display = 'block';
+            subTitleEl.textContent = '';
+            subTitleEl.style.display = 'none';
+
+            if (meaningVal) {
+                meanBoxEl.className = 'fuku-front-meaning';
+                meanBoxEl.textContent = `💡 ${meaningVal}`;
+                meanBoxEl.style.display = '-webkit-box';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let backHTML = `<div class="kanji-title">${current.jp}</div>`;
+
+            if (meaningVal) {
+                backHTML += `
+                    <div class="fuku-detail-card" style="background:#fdf2f8;border-color:#fbcfe8;">
+                        <div class="fuku-detail-title" style="color:#be185d;">💡 意思</div>
+                        <div class="fuku-detail-text">${meaningVal}</div>
+                    </div>`;
+            }
+
+            if (functionVal) {
+                backHTML += `
+                    <div class="fuku-detail-card" style="background:#f0f9ff;border-color:#bae6fd;">
+                        <div class="fuku-detail-title" style="color:#0369a1;">🎯 功能</div>
+                        <div class="fuku-detail-text">${functionVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            if (usageVal) {
+                backHTML += `
+                    <div class="fuku-usage-card">
+                        <div class="fuku-usage-title">🧩 用法／接續公式</div>
+                        <div class="fuku-usage-formula">${usageVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button type="button" class="btn-tts-small"
+                                    onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>`;
+                });
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="fuku-detail-card" style="background:#fff7ed;border-color:#fed7aa;">
+                        <div class="fuku-detail-title" style="color:#c2410c;">📝 備註</div>
+                        <div class="fuku-detail-text">${noteVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 15. 一般分類標準版型
+
 
 
 
