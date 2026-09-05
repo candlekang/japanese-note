@@ -5318,8 +5318,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.20.1';
-    const APP_UPDATE_NOTE = '修正します敬語擴充折疊互動｜點擊展開／收合時不再觸發整張字卡翻面';
+    const APP_VERSION = 'v10.20.2';
+    const APP_UPDATE_NOTE = '優化智慧搜尋排序｜中文核心意思完全符合或開頭符合時優先，搜尋「做」可優先找到します';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6933,10 +6933,30 @@
             const fullContent = (item.rawCols || []).join(' ').toLowerCase();
 
             tokens.forEach(tok => {
-                if (jp === tok || kanji === tok) score += 100;
-                else if (jp.includes(tok) || kanji.includes(tok)) score += 50;
-                if (zh.includes(tok)) score += 40;
-                else if (fullContent.includes(tok)) score += 15;
+                // 日文／漢字完全符合仍是最高優先
+                if (jp === tok || kanji === tok) {
+                    score += 140;
+                } else if (jp.startsWith(tok) || kanji.startsWith(tok)) {
+                    score += 90;
+                } else if (jp.includes(tok) || kanji.includes(tok)) {
+                    score += 60;
+                }
+
+                // 中文核心意思也分層計分。
+                // 例如「します」的意思是「做、會做」，
+                // 搜尋「做」時應該排在只是備註／例句中出現「做」的項目前面。
+                const zhParts = zh.split(/[、，,；;／/\s]+/).filter(Boolean);
+                if (zh === tok) {
+                    score += 120;
+                } else if (zhParts.some(part => part === tok)) {
+                    score += 100;
+                } else if (zh.startsWith(tok)) {
+                    score += 85;
+                } else if (zh.includes(tok)) {
+                    score += 55;
+                } else if (fullContent.includes(tok)) {
+                    score += 15;
+                }
             });
 
             expandedTargets.forEach(tgt => {
@@ -6958,7 +6978,7 @@
             return;
         }
 
-        const resultsHtml = scoredMatches.slice(0, 15).map(({ item }) => {
+        const resultsHtml = scoredMatches.slice(0, 20).map(({ item }) => {
             const zhText = getWordZhText(item);
             let mainDisplay = item.jp;
             if (item.kanji && item.kanji !== item.jp) {
