@@ -3514,6 +3514,109 @@
         .phrase-usage-text{font-size:13px;line-height:1.75;font-weight:800;color:#0c4a6e;white-space:pre-wrap;word-break:break-word}
         @media(max-width:640px){.phrase-guide-hero-top{flex-direction:column}.phrase-guide-pronounce-btn{width:100%}.phrase-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}}
 
+
+        /* 🧭 格助詞使用指南 */
+        .case-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #86efac;
+            background:linear-gradient(135deg,#f0fdf4,#ecfeff);color:#166534;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+        .case-guide-hero{
+            border-radius:16px;border:1px solid #bbf7d0;
+            background:linear-gradient(135deg,#f0fdf4,#f8fafc);
+            padding:14px;margin-bottom:12px
+        }
+        .case-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+        .case-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#dcfce7;
+            color:#166534;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+        .case-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+        .case-guide-reading{margin-top:4px;color:#15803d;font-size:14px;font-weight:800}
+        .case-guide-pronounce-btn{
+            border:1px solid #86efac;background:#fff;color:#166534;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+        .case-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #bbf7d0;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+        .case-guide-grid{display:flex;flex-direction:column;gap:10px}
+        .case-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+        .case-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+        .case-guide-card.theme-blue{background:#eff6ff;border-color:#bfdbfe}
+        .case-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+        .case-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+        .case-guide-card.theme-green .case-guide-title{color:#15803d}
+        .case-guide-card.theme-blue .case-guide-title{color:#1d4ed8}
+        .case-guide-card.theme-orange .case-guide-title{color:#c2410c}
+        .case-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+        .case-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+        .case-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #86efac;color:#166534;font-size:12px;font-weight:800
+        }
+
+        .case-compare-wrap{display:flex;flex-direction:column;gap:10px}
+        .case-compare{
+            border:1px solid #dbeafe;border-radius:14px;background:#fff;overflow:hidden
+        }
+        .case-compare summary{
+            list-style:none;cursor:pointer;padding:12px 14px;font-weight:900;color:#1e3a8a;
+            display:flex;align-items:center;justify-content:space-between;gap:8px
+        }
+        .case-compare summary::-webkit-details-marker{display:none}
+        .case-compare-arrow{color:#64748b;transition:transform .2s ease}
+        .case-compare[open] .case-compare-arrow{transform:rotate(180deg)}
+        .case-compare-body{padding:0 14px 14px}
+        .case-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .case-side{
+            border-radius:12px;padding:10px;border:1px solid #e2e8f0;background:#f8fafc
+        }
+        .case-side-title{font-size:14px;font-weight:900;margin-bottom:6px}
+        .case-side-desc{font-size:12px;line-height:1.65;color:#475569}
+        .case-memory{
+            margin-top:10px;padding:9px 10px;border-radius:10px;background:#fff7ed;
+            border-left:4px solid #f59e0b;color:#7c2d12;font-size:12px;font-weight:800;line-height:1.6
+        }
+
+        /* 🧭 格助詞專屬字卡 */
+        .case-type-badge{
+            background:#dcfce7 !important;border-color:#86efac !important;color:#166534 !important
+        }
+        .case-function-chip{
+            display:inline-flex;align-items:center;justify-content:center;
+            margin:4px auto 10px;padding:6px 10px;border-radius:999px;
+            background:#eff6ff;border:1px solid #93c5fd;color:#1d4ed8;
+            font-size:12px;font-weight:900;max-width:92%;box-sizing:border-box
+        }
+        .case-front-meaning{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #bbf7d0;border-left:4px solid #22c55e;background:#f0fdf4;
+            color:#14532d;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+        .case-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+        .case-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+        .case-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+        .case-usage-card{
+            border-radius:12px;padding:11px 12px;margin-bottom:12px;
+            background:#eff6ff;border:1px solid #93c5fd
+        }
+        .case-usage-title{font-size:12px;font-weight:900;color:#1d4ed8;margin-bottom:7px}
+        .case-usage-text{font-size:14px;line-height:1.75;font-weight:900;color:#1e3a8a;white-space:pre-wrap;word-break:break-word}
+        @media(max-width:640px){
+            .case-guide-hero-top{flex-direction:column}
+            .case-guide-pronounce-btn{width:100%}
+            .case-compare-grid{grid-template-columns:1fr}
+            .case-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
 </style>
 </head>
 <body>
@@ -3614,6 +3717,7 @@
         <button type="button" id="fuku-guide-launch" class="fuku-guide-launch" onclick="openFukuGuideModal()">🧩 副助詞使用指南</button>
         <button type="button" id="aux-guide-launch" class="aux-guide-launch" onclick="openAuxGuideModal()"><span class="aux-emoji">✨</span> 助動詞使用指南</button>
         <button type="button" id="phrase-guide-launch" class="phrase-guide-launch" onclick="openPhraseGuideModal()">💬 片語＆慣用表現使用指南</button>
+        <button type="button" id="case-guide-launch" class="case-guide-launch" onclick="openCaseGuideModal()">🧭 格助詞使用指南</button>
         <button type="button" id="boss-test-btn" class="boss-test-btn" onclick="triggerSurpriseBossQuest(true)">👹 測試大魔王關卡</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
@@ -4569,8 +4673,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.15';
-    const APP_UPDATE_NOTE = '片語＆慣用表現專屬頁｜新增會話情境指南與自動類型字卡';
+    const APP_VERSION = 'v10.16';
+    const APP_UPDATE_NOTE = '格助詞使用指南＋易混淆比較｜新增 はvsが、にvsへ、にvsで 折疊比較與專屬字卡';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6345,6 +6449,36 @@
 
 
 
+
+    function updateCaseGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('case-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet19') ? 'block' : 'none';
+    }
+
+    function openCaseGuideModal() {
+        playClickSound();
+        document.getElementById('caseGuideModal').style.display = 'flex';
+    }
+
+    function closeCaseGuideModal(e) {
+        if (e && e.target !== document.getElementById('caseGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('caseGuideModal').style.display = 'none';
+    }
+
+    function getCaseParticleFunction(word) {
+        const map = {
+            'は': '🎯 主題／對比',
+            'が': '👤 主語／新資訊',
+            'を': '🎯 動作對象',
+            'に': '📍 地點／時間／對象／到達點',
+            'へ': '➡️ 方向',
+            'で': '🛠️ 場所／方式／原因'
+        };
+        return map[word] || '🧭 格助詞';
+    }
+
     function updatePhraseGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('phrase-guide-launch');
@@ -7058,6 +7192,7 @@
         updateFukuGuideVisibility();
         updateAuxGuideVisibility();
         updatePhraseGuideVisibility();
+        updateCaseGuideVisibility();
         loadSheetData(selected);
     }
 
@@ -8139,7 +8274,7 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
-        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge', 'fuku-type-badge', 'aux-type-badge', 'grammar-type-badge', 'phrase-type-badge');
+        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge', 'fuku-type-badge', 'aux-type-badge', 'grammar-type-badge', 'phrase-type-badge', 'case-type-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
@@ -9986,7 +10121,94 @@
             return;
         }
 
-        // 💡 18. 一般分類標準版型
+
+        // 💡 18. 格助詞（sheet19）專屬版型
+        // A:E = 我是誰／功用／用法／例句／備註
+        if (current.catKey === 'sheet19') {
+            const getCaseCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const functionVal = getCaseCol(['功用', '功能', '意思']);
+            const usageVal = getCaseCol(['用法', '接續', '接法']);
+            const exampleVal = getCaseCol(['例句寶寶', '例句']);
+            const noteVal = getCaseCol(['備註', '注意事項', '注意']);
+            const functionTag = getCaseParticleFunction(current.jp);
+
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('case-type-badge');
+            badgeEl.textContent = '🧭 格助詞';
+
+            mainTitleEl.textContent = current.jp;
+            mainTitleEl.style.display = 'block';
+            subTitleEl.textContent = '';
+            subTitleEl.style.display = 'none';
+
+            meanBoxEl.className = 'case-front-meaning';
+            meanBoxEl.innerHTML = `<div class="case-function-chip">${functionTag}</div>${functionVal ? `<div>💡 ${functionVal}</div>` : ''}`;
+            meanBoxEl.style.display = 'block';
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let backHTML = `<div class="kanji-title">${current.jp}</div>`;
+            backHTML += `<div class="case-function-chip" style="margin:0 auto 12px;">${functionTag}</div>`;
+
+            if (functionVal) {
+                backHTML += `
+                    <div class="case-detail-card" style="background:#f0fdf4;border-color:#bbf7d0;">
+                        <div class="case-detail-title" style="color:#15803d;">💡 功用</div>
+                        <div class="case-detail-text">${functionVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            if (usageVal) {
+                backHTML += `
+                    <div class="case-usage-card">
+                        <div class="case-usage-title">🧩 用法</div>
+                        <div class="case-usage-text">${usageVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+                    backHTML += `
+                        <div class="example-block">
+                            <div class="example-jp-line">
+                                <span>💬 ${jpLine}</span>
+                                <button type="button" class="btn-tts-small"
+                                    onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button>
+                            </div>
+                            ${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>`;
+                });
+            }
+
+            if (noteVal) {
+                backHTML += `
+                    <div class="case-detail-card" style="background:#fff7ed;border-color:#fed7aa;">
+                        <div class="case-detail-title" style="color:#c2410c;">📝 備註</div>
+                        <div class="case-detail-text">${noteVal.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 19. 一般分類標準版型
+
 
 
 
