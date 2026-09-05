@@ -4673,8 +4673,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.16';
-    const APP_UPDATE_NOTE = '格助詞使用指南＋易混淆比較｜新增 はvsが、にvsへ、にvsで 折疊比較與專屬字卡';
+    const APP_VERSION = 'v10.16.1';
+    const APP_UPDATE_NOTE = '修正格助詞翻卡｜翻面優先執行並容錯進度寫入，同步辨識帶註解的 は／が 等名稱';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6468,6 +6468,12 @@
     }
 
     function getCaseParticleFunction(word) {
+        const normalized = String(word || '')
+            .trim()
+            .replace(/[（(].*?[）)]/g, '')
+            .trim()
+            .split(/\s+/)[0];
+
         const map = {
             'は': '🎯 主題／對比',
             'が': '👤 主語／新資訊',
@@ -6476,13 +6482,7 @@
             'へ': '➡️ 方向',
             'で': '🛠️ 場所／方式／原因'
         };
-        return map[word] || '🧭 格助詞';
-    }
-
-    function updatePhraseGuideVisibility() {
-        const selected = document.getElementById('sheetSelect').value;
-        const btn = document.getElementById('phrase-guide-launch');
-        if (btn) btn.style.display = (selected === 'sheet18') ? 'block' : 'none';
+        return map[normalized] || '🧭 格助詞';
     }
 
     function openPhraseGuideModal() {
@@ -10308,23 +10308,36 @@
         document.getElementById('flashcard').classList.remove('is-flipped');
     }
 
-    function flipCard() { 
-        playPageFlipSound();
+    function flipCard() {
         const flashcard = document.getElementById('flashcard');
+        if (!flashcard) return;
+
         const isFlipped = flashcard.classList.contains('is-flipped');
-        
+
+        // 先翻卡。即使音效、localStorage 或 Firebase 進度寫入失敗，
+        // 都不能阻止使用者看到背面。
+        flashcard.classList.toggle('is-flipped');
+
+        try { playPageFlipSound(); } catch (e) {}
+
         if (!isFlipped) {
-            const current = currentList[currentIndex];
-            if (!current.hasReadThisTime && !current.isIntroCard) {
-                saveProgress(current.jp, 'read');
-                current.hasReadThisTime = true;
-                const progress = getProgress(current.jp);
-                document.getElementById('card-progress').textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+            try {
+                const current = currentList[currentIndex];
+                if (current && !current.hasReadThisTime && !current.isIntroCard) {
+                    saveProgress(current.jp, 'read');
+                    current.hasReadThisTime = true;
+                    const progress = getProgress(current.jp);
+                    const progressEl = document.getElementById('card-progress');
+                    if (progressEl) {
+                        progressEl.textContent = `👀 翻閱: ${progress.read} 次 | 🏆 測驗答對: ${progress.quiz} 次`;
+                    }
+                }
+            } catch (e) {
+                console.warn('翻卡進度寫入失敗，但翻卡功能繼續：', e);
             }
         }
-        flashcard.classList.toggle('is-flipped'); 
     }
-    
+
     function nextCard(event) { 
         if (event) event.stopPropagation();
         playPageFlipSound(); 
