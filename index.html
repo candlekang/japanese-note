@@ -5419,8 +5419,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.21';
-    const APP_UPDATE_NOTE = '整合つけます擴充包｜sheet25 隱藏，着ける／付ける情境比較改放進「つけます」動詞字卡背面';
+    const APP_VERSION = 'v10.21.1';
+    const APP_UPDATE_NOTE = '優化つけます情境判斷表｜將 N/A 統一顯示為 ×，閱讀更直覺';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -8959,10 +8959,16 @@
             ];
         }
 
+        const normalizeScenarioCell = (value) => {
+            const v = String(value || '').trim();
+            if (!v || /^N\/?A$/i.test(v)) return '×';
+            return v;
+        };
+
         const scenarioHtml = scenarioRows.map(r => `
             <div class="tsukeru-cell tsukeru-head">${esc(r.situation)}</div>
-            <div class="tsukeru-cell">${esc(r.tsukeruWear || '—')}</div>
-            <div class="tsukeru-cell">${esc(r.tsukeruAttach || '—')}</div>
+            <div class="tsukeru-cell">${esc(normalizeScenarioCell(r.tsukeruWear))}</div>
+            <div class="tsukeru-cell">${esc(normalizeScenarioCell(r.tsukeruAttach))}</div>
         `).join('');
 
         return `
