@@ -356,7 +356,7 @@
         /* 💡 4 個主模式按鈕網格 */
         .button-group { 
             display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
+            grid-template-columns: repeat(5, 1fr); 
             gap: 6px; 
         }
 
@@ -4038,6 +4038,37 @@
             .tsukeru-cell{font-size:10px;padding:7px 5px}
         }
 
+
+        /* 🎙️ 口說跟讀 Beta */
+        #speaking-section{display:none;background:var(--card-bg);padding:24px 18px;border-radius:20px;box-shadow:var(--shadow);width:100%;box-sizing:border-box;margin-bottom:20px;border:2px solid #334155}
+        .speaking-shell{max-width:680px;margin:0 auto}
+        .speaking-beta{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#fef3c7;border:1px solid #fbbf24;color:#92400e;font-size:11px;font-weight:900;margin-bottom:10px}
+        .speaking-title{font-size:20px;font-weight:950;color:#0f172a;margin-bottom:5px}
+        .speaking-desc{font-size:12px;line-height:1.65;color:#64748b;margin-bottom:14px}
+        .speaking-card{border:1px solid #cbd5e1;border-radius:16px;background:#fff;padding:16px 14px;text-align:center}
+        .speaking-meta{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:12px}
+        .speaking-chip{display:inline-flex;padding:5px 8px;border-radius:999px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;font-weight:850}
+        .speaking-target{font-size:23px;font-weight:900;line-height:1.6;color:#0f172a;word-break:break-word;margin:8px 0 6px}
+        .speaking-zh{font-size:13px;line-height:1.6;color:#64748b;margin-bottom:14px}
+        .speaking-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+        .speaking-action{min-width:0;white-space:normal;padding:10px 8px;font-size:13px;font-weight:900}
+        .speaking-action.listen{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
+        .speaking-action.record{background:#fff1f2;border-color:#fda4af;color:#be123c}
+        .speaking-action.next{background:#f0fdf4;border-color:#86efac;color:#15803d}
+        .speaking-action.record.listening{background:#ffe4e6;box-shadow:0 0 0 3px rgba(244,63,94,.12)}
+        .speaking-status{margin-top:12px;min-height:22px;font-size:12px;font-weight:800;color:#64748b}
+        .speaking-result{display:none;margin-top:14px;border-radius:14px;padding:12px;border:1px solid #e2e8f0;background:#f8fafc;text-align:left}
+        .speaking-score-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+        .speaking-score{font-size:26px;font-weight:950;color:#0f172a}
+        .speaking-grade{padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900}
+        .speaking-grade.pass{background:#dcfce7;color:#15803d;border:1px solid #86efac}
+        .speaking-grade.retry{background:#fef3c7;color:#92400e;border:1px solid #fbbf24}
+        .speaking-grade.again{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+        .speaking-result-line{margin-top:7px;padding:8px 9px;border-radius:9px;background:#fff;border:1px solid #e2e8f0;font-size:12px;line-height:1.6;color:#475569}
+        .speaking-result-label{font-weight:900;color:#334155}
+        .speaking-note{margin-top:12px;font-size:11px;line-height:1.6;color:#94a3b8;text-align:left}
+        @media(max-width:640px){.speaking-target{font-size:20px}.speaking-actions{grid-template-columns:1fr}#speaking-section{padding:18px 12px}}
+
 </style>
 </head>
 <body>
@@ -4149,6 +4180,7 @@
             <button id="mode-review" class="active" onclick="setMode('review')">📖 翻卡複習</button>
             <button id="mode-quiz" onclick="setMode('quiz')">🏆 選擇測驗</button>
             <button id="mode-kana" onclick="setMode('kana')">🐣 菜雞互啄</button>
+            <button id="mode-speaking" onclick="setMode('speaking')">🎙️ 口說跟讀</button>
             <button id="mode-stats" onclick="setMode('stats')">📊 學習進度</button>
         </div>
     </div>
@@ -4270,7 +4302,42 @@
         </div>
     </div>
 
-    <!-- 4. 📊 個人學習進度儀表板 -->
+
+    <!-- 4. 🎙️ 口說跟讀 Beta -->
+    <div id="speaking-section">
+        <div class="speaking-shell">
+            <div class="speaking-beta">🎙️ Beta・先練「有沒有完整說出來」</div>
+            <div class="speaking-title">口說跟讀</div>
+            <div class="speaking-desc">從全站「例句」隨機抽題。先聽標準音，再開口跟讀；目前以瀏覽器日文語音辨識結果計算「跟讀完成度」，不是正式的發音腔調評分。</div>
+            <div class="speaking-card">
+                <div class="speaking-meta">
+                    <span class="speaking-chip" id="speaking-category">載入分類...</span>
+                    <span class="speaking-chip" id="speaking-source-word">來源字卡...</span>
+                    <span class="speaking-chip" id="speaking-pool-count">題庫 0 句</span>
+                </div>
+                <div class="speaking-target" id="speaking-target">正在整理全站例句...</div>
+                <div class="speaking-zh" id="speaking-zh"></div>
+                <div class="speaking-actions">
+                    <button type="button" class="speaking-action listen" onclick="playSpeakingTarget(event)">🔊 聽標準音</button>
+                    <button type="button" class="speaking-action record" id="speaking-record-btn" onclick="startSpeakingRecognition(event)">🎤 開始說話</button>
+                    <button type="button" class="speaking-action next" onclick="nextSpeakingSentence(event)">🎲 換一句</button>
+                </div>
+                <div class="speaking-status" id="speaking-status">先按「聽標準音」，再按「開始說話」。</div>
+                <div class="speaking-result" id="speaking-result">
+                    <div class="speaking-score-row">
+                        <div class="speaking-score" id="speaking-score">0 分</div>
+                        <div class="speaking-grade retry" id="speaking-grade">等待評分</div>
+                    </div>
+                    <div class="speaking-result-line"><span class="speaking-result-label">🎯 目標：</span><span id="speaking-result-target"></span></div>
+                    <div class="speaking-result-line"><span class="speaking-result-label">🎤 你說：</span><span id="speaking-transcript"></span></div>
+                    <div class="speaking-result-line" id="speaking-feedback"></div>
+                </div>
+                <div class="speaking-note">※ 此 Beta 版會使用裝置／瀏覽器提供的日文語音辨識。第一次使用時瀏覽器可能會詢問麥克風權限；若裝置不支援，會直接顯示提示，不會影響其他功能。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 📊 個人學習進度儀表板 -->
     <div id="stats-section">
         <div class="quest-board">
             <div class="quest-header">
@@ -5485,8 +5552,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.22';
-    const APP_UPDATE_NOTE = '全站穩定性檢查｜補回片語指南視窗、統一無資料顯示並修正介面文字';
+    const APP_VERSION = 'v10.23';
+    const APP_UPDATE_NOTE = '口說跟讀 Beta｜從全站例句抽題、日文語音辨識、跟讀完成度評分與下一題練習';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6222,6 +6289,10 @@
     let currentList = [];
     let currentIndex = 0;
     let currentMode = 'review';
+    let speakingSentencePool = [];
+    let currentSpeakingSentence = null;
+    let speakingRecognition = null;
+    let speakingIsListening = false;
 
     // 學習進度字卡快覽：暫存原本翻卡狀態與 DOM 位置
     let statsCardPopupState = null;
@@ -6790,6 +6861,8 @@
         await Promise.all(promises);
 
         sheetDataCache['all'] = [...allSearchableWords];
+        buildSpeakingSentencePool();
+        if (currentMode === 'speaking' && !currentSpeakingSentence && speakingSentencePool.length) nextSpeakingSentence(null, false);
         pickDailyFiveWords(dateString);
         updateHUDLevel();
 
@@ -8128,17 +8201,293 @@
         loadSheetData(selected);
     }
 
+
+    function getSpeakingExampleText(word) {
+        if (!word || !word.rawHeaders || !word.rawCols) return '';
+        const idx = word.rawHeaders.findIndex(h => {
+            const header = (h || '').trim();
+            return header.includes('例句');
+        });
+        return (idx !== -1 && word.rawCols[idx]) ? String(word.rawCols[idx]).trim() : '';
+    }
+
+    function cleanSpeakingLine(line) {
+        return String(line || '')
+            .replace(/<[^>]+>/g, '')
+            .replace(/\*\*/g, '')
+            .replace(/^[A-ZＡ-Ｚ0-9０-９①-⑳一二三四五六七八九十]+[：:、.)）]\s*/i, '')
+            .trim();
+    }
+
+    function looksLikeJapaneseSentence(line) {
+        const s = cleanSpeakingLine(line);
+        if (!s || !/[ぁ-ゖァ-ヺー]/.test(s)) return false;
+        const compact = s.replace(/\s+/g, '');
+        return compact.length >= 4 && compact.length <= 90;
+    }
+
+    function normalizeSpeakingText(text) {
+        return String(text || '')
+            .replace(/([一-龯々〆ヵヶ]+)[（(][ぁ-ゖァ-ヺー・\s]+[）)]/g, '$1')
+            .replace(/[「」『』【】（）()\[\]〈〉《》・、。！？!?…〜～~\-\s,.，．：:；;]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function buildSpeakingSentencePool() {
+        const pool = [];
+        const seen = new Set();
+
+        (allSearchableWords || []).forEach(word => {
+            if (!word || word.isIntroCard) return;
+            const raw = getSpeakingExampleText(word);
+            if (!raw) return;
+
+            const lines = raw.replace(/<br\s*\/?>/gi, '\n').split('\n').map(cleanSpeakingLine).filter(Boolean);
+
+            for (let i = 0; i < lines.length; i++) {
+                const jp = lines[i];
+                if (!looksLikeJapaneseSentence(jp)) continue;
+
+                const key = normalizeSpeakingText(jp);
+                if (!key || seen.has(key)) continue;
+                seen.add(key);
+
+                let zh = '';
+                const next = lines[i + 1] || '';
+                if (next && !/[ぁ-ゖァ-ヺー]/.test(next) && /[\u4e00-\u9fff]/.test(next)) zh = next;
+
+                pool.push({ jp, zh, catName: word.catName || '', sourceWord: word.jp || '' });
+            }
+        });
+
+        speakingSentencePool = pool;
+        const countEl = document.getElementById('speaking-pool-count');
+        if (countEl) countEl.textContent = `題庫 ${pool.length} 句`;
+        return pool;
+    }
+
+    function levenshteinDistance(a, b) {
+        const s = Array.from(a || '');
+        const t = Array.from(b || '');
+        const prev = Array(t.length + 1).fill(0).map((_, i) => i);
+        const curr = Array(t.length + 1).fill(0);
+
+        for (let i = 1; i <= s.length; i++) {
+            curr[0] = i;
+            for (let j = 1; j <= t.length; j++) {
+                const cost = s[i - 1] === t[j - 1] ? 0 : 1;
+                curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+            }
+            for (let j = 0; j <= t.length; j++) prev[j] = curr[j];
+        }
+        return prev[t.length];
+    }
+
+    function scoreSpeakingTranscript(target, transcript) {
+        const a = normalizeSpeakingText(target);
+        const b = normalizeSpeakingText(transcript);
+        if (!a || !b) return 0;
+        const distance = levenshteinDistance(a, b);
+        const denom = Math.max(Array.from(a).length, Array.from(b).length, 1);
+        return Math.max(0, Math.round((1 - distance / denom) * 100));
+    }
+
+    function renderSpeakingSentence(sentence) {
+        currentSpeakingSentence = sentence || null;
+        const targetEl = document.getElementById('speaking-target');
+        const zhEl = document.getElementById('speaking-zh');
+        const catEl = document.getElementById('speaking-category');
+        const sourceEl = document.getElementById('speaking-source-word');
+        const resultEl = document.getElementById('speaking-result');
+        const statusEl = document.getElementById('speaking-status');
+
+        if (!sentence) {
+            if (targetEl) targetEl.textContent = '目前還沒有可練習的例句';
+            if (zhEl) zhEl.textContent = '例句資料可能仍在載入中，稍後再按一次「口說跟讀」。';
+            if (catEl) catEl.textContent = '等待資料';
+            if (sourceEl) sourceEl.textContent = '—';
+            if (statusEl) statusEl.textContent = '⏳ 題庫尚未準備完成。';
+            if (resultEl) resultEl.style.display = 'none';
+            return;
+        }
+
+        if (targetEl) targetEl.textContent = sentence.jp;
+        if (zhEl) zhEl.textContent = sentence.zh || '';
+        if (catEl) catEl.textContent = sentence.catName || '綜合例句';
+        if (sourceEl) sourceEl.textContent = sentence.sourceWord ? `來源：${sentence.sourceWord}` : '例句';
+        if (resultEl) resultEl.style.display = 'none';
+        if (statusEl) statusEl.textContent = '先按「聽標準音」，再按「開始說話」。';
+    }
+
+    function initSpeakingMode() {
+        if (!speakingSentencePool.length) buildSpeakingSentencePool();
+        if (!speakingSentencePool.length) {
+            renderSpeakingSentence(null);
+            return;
+        }
+        if (!currentSpeakingSentence) nextSpeakingSentence(null, false);
+        else renderSpeakingSentence(currentSpeakingSentence);
+    }
+
+    function nextSpeakingSentence(event, withSound = true) {
+        if (event) event.stopPropagation();
+        if (withSound) playClickSound();
+        if (!speakingSentencePool.length) buildSpeakingSentencePool();
+        if (!speakingSentencePool.length) {
+            renderSpeakingSentence(null);
+            return;
+        }
+
+        let next = speakingSentencePool[Math.floor(Math.random() * speakingSentencePool.length)];
+        if (speakingSentencePool.length > 1 && currentSpeakingSentence) {
+            let guard = 0;
+            while (next.jp === currentSpeakingSentence.jp && guard < 8) {
+                next = speakingSentencePool[Math.floor(Math.random() * speakingSentencePool.length)];
+                guard++;
+            }
+        }
+        renderSpeakingSentence(next);
+    }
+
+    function playSpeakingTarget(event) {
+        if (event) event.stopPropagation();
+        if (!currentSpeakingSentence) return;
+        speakExampleJP(event, currentSpeakingSentence.jp);
+    }
+
+    function setSpeakingListeningUI(isListening, message) {
+        speakingIsListening = isListening;
+        const btn = document.getElementById('speaking-record-btn');
+        const status = document.getElementById('speaking-status');
+        if (btn) {
+            btn.classList.toggle('listening', isListening);
+            btn.textContent = isListening ? '⏹️ 正在聽...' : '🎤 開始說話';
+        }
+        if (status && message) status.textContent = message;
+    }
+
+    function startSpeakingRecognition(event) {
+        if (event) event.stopPropagation();
+        if (!currentSpeakingSentence) return;
+
+        if (speakingIsListening && speakingRecognition) {
+            try { speakingRecognition.stop(); } catch (e) {}
+            return;
+        }
+
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Recognition) {
+            setSpeakingListeningUI(false, '⚠️ 這個瀏覽器目前沒有提供語音辨識。可先用最新版 Chrome 測試。');
+            return;
+        }
+
+        try {
+            const recognition = new Recognition();
+            speakingRecognition = recognition;
+            recognition.lang = 'ja-JP';
+            recognition.interimResults = false;
+            recognition.continuous = false;
+            recognition.maxAlternatives = 5;
+
+            recognition.onstart = () => setSpeakingListeningUI(true, '🎧 正在聽你的日文，說完後稍等一下...');
+
+            recognition.onerror = (e) => {
+                let msg = '⚠️ 沒有成功辨識，請再試一次。';
+                if (e && e.error === 'not-allowed') msg = '🎤 麥克風權限沒有開啟，請允許網站使用麥克風後再試。';
+                if (e && e.error === 'no-speech') msg = '👂 沒有聽到聲音，再靠近麥克風試一次。';
+                setSpeakingListeningUI(false, msg);
+            };
+
+            recognition.onend = () => {
+                const status = document.getElementById('speaking-status');
+                setSpeakingListeningUI(false, status ? status.textContent : '');
+                speakingRecognition = null;
+            };
+
+            recognition.onresult = (e) => {
+                const alternatives = [];
+                if (e.results && e.results[0]) {
+                    for (let i = 0; i < e.results[0].length; i++) {
+                        const t = (e.results[0][i].transcript || '').trim();
+                        if (t) alternatives.push(t);
+                    }
+                }
+                if (!alternatives.length) {
+                    setSpeakingListeningUI(false, '👂 沒有取得辨識文字，請再試一次。');
+                    return;
+                }
+
+                let bestTranscript = alternatives[0];
+                let bestScore = scoreSpeakingTranscript(currentSpeakingSentence.jp, bestTranscript);
+                alternatives.slice(1).forEach(t => {
+                    const s = scoreSpeakingTranscript(currentSpeakingSentence.jp, t);
+                    if (s > bestScore) {
+                        bestScore = s;
+                        bestTranscript = t;
+                    }
+                });
+                renderSpeakingResult(bestTranscript, bestScore);
+            };
+
+            recognition.start();
+        } catch (e) {
+            setSpeakingListeningUI(false, '⚠️ 麥克風啟動失敗，請稍後再試。');
+        }
+    }
+
+    function renderSpeakingResult(transcript, score) {
+        const result = document.getElementById('speaking-result');
+        const scoreEl = document.getElementById('speaking-score');
+        const gradeEl = document.getElementById('speaking-grade');
+        const targetEl = document.getElementById('speaking-result-target');
+        const transcriptEl = document.getElementById('speaking-transcript');
+        const feedbackEl = document.getElementById('speaking-feedback');
+        const statusEl = document.getElementById('speaking-status');
+        if (!result || !currentSpeakingSentence) return;
+
+        scoreEl.textContent = `${score} 分`;
+        targetEl.textContent = currentSpeakingSentence.jp;
+        transcriptEl.textContent = transcript || '—';
+        gradeEl.className = 'speaking-grade';
+
+        let feedback = '';
+        if (score >= 90) {
+            gradeEl.classList.add('pass'); gradeEl.textContent = '🌟 很完整！';
+            feedback = '✅ 語音辨識結果和目標句非常接近，可以換下一句挑戰。';
+            try { playCorrectSound(); } catch (e) {}
+        } else if (score >= 80) {
+            gradeEl.classList.add('pass'); gradeEl.textContent = '✅ 過關';
+            feedback = '👍 大致完整說出來了。可以再聽一次，模仿節奏後挑戰更高分。';
+            try { playCorrectSound(); } catch (e) {}
+        } else if (score >= 65) {
+            gradeEl.classList.add('retry'); gradeEl.textContent = '🟡 再練一次';
+            feedback = '💡 已經抓到不少內容，再聽標準音一次，注意是否有漏字或助詞。';
+        } else {
+            gradeEl.classList.add('again'); gradeEl.textContent = '🔁 再聽一次';
+            feedback = '👂 目前辨識結果和目標句差距較大。先按「聽標準音」，分小段跟著念會比較容易。';
+            try { playWrongSound(); } catch (e) {}
+        }
+
+        feedbackEl.innerHTML = `<span class="speaking-result-label">💬 建議：</span>${feedback}`;
+        result.style.display = 'block';
+        if (statusEl) statusEl.textContent = `完成辨識：跟讀完成度 ${score} 分`;
+        setSpeakingListeningUI(false, statusEl ? statusEl.textContent : '');
+    }
+
     function setMode(mode) {
         playClickSound();
         currentMode = mode;
         document.getElementById('mode-review').classList.toggle('active', mode === 'review');
         document.getElementById('mode-quiz').classList.toggle('active', mode === 'quiz');
         document.getElementById('mode-kana').classList.toggle('active', mode === 'kana');
+        document.getElementById('mode-speaking').classList.toggle('active', mode === 'speaking');
         document.getElementById('mode-stats').classList.toggle('active', mode === 'stats');
         
         document.getElementById('review-section').style.display = (mode === 'review') ? 'block' : 'none';
         document.getElementById('quiz-section').style.display = (mode === 'quiz') ? 'block' : 'none';
         document.getElementById('kana-section').style.display = (mode === 'kana') ? 'block' : 'none';
+        document.getElementById('speaking-section').style.display = (mode === 'speaking') ? 'block' : 'none';
         document.getElementById('stats-section').style.display = (mode === 'stats') ? 'block' : 'none';
 
         if (mode === 'review') {
@@ -8158,6 +8507,8 @@
         } else if (mode === 'kana') {
             currentKanaView = 'grid';
             initKanaSection();
+        } else if (mode === 'speaking') {
+            initSpeakingMode();
         } else if (mode === 'stats') {
             renderStatsDashboard();
         }
@@ -8172,6 +8523,8 @@
         } else if (currentMode === 'kana') {
             currentKanaView = 'grid';
             initKanaSection();
+        } else if (currentMode === 'speaking') {
+            initSpeakingMode();
         } else if (currentMode === 'stats') {
             renderStatsDashboard();
         }
