@@ -3918,6 +3918,122 @@
 
 
 
+
+<!-- 🧭 格助詞使用指南 -->
+<div class="modal-overlay" id="caseGuideModal" onclick="closeCaseGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🧭 格助詞使用指南</h3>
+            <button class="btn-modal-close" onclick="closeCaseGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="case-guide-hero">
+                <div class="case-guide-hero-top">
+                    <div>
+                        <div class="case-guide-badge">🧭 看句子角色，比死背翻譯更重要</div>
+                        <div class="case-guide-main">格助詞</div>
+                        <div class="case-guide-reading">かくじょし</div>
+                    </div>
+                    <button type="button" class="case-guide-pronounce-btn"
+                        onclick="speakWordDirectly(event, 'かくじょし')">🔊 聽發音</button>
+                </div>
+                <div class="case-guide-desc">
+                    格助詞主要標記句子裡「誰、做什麼、對誰、在哪裡、往哪裡、用什麼方式」等關係。真正容易錯的地方，通常不是單獨記一個助詞，而是要在相似助詞之間做選擇。
+                </div>
+            </div>
+
+            <div class="case-guide-grid">
+                <div class="case-guide-card theme-green">
+                    <div class="case-guide-title">⚡ 功能速查</div>
+                    <div class="case-chip-wrap">
+                        <span class="case-chip">は｜🎯 主題／對比</span>
+                        <span class="case-chip">が｜👤 主語／新資訊</span>
+                        <span class="case-chip">を｜🎯 動作對象</span>
+                        <span class="case-chip">に｜📍 地點／時間／對象／到達點</span>
+                        <span class="case-chip">へ｜➡️ 方向</span>
+                        <span class="case-chip">で｜🛠️ 場所／方式／原因</span>
+                    </div>
+                </div>
+
+                <div class="case-guide-card theme-blue">
+                    <div class="case-guide-title">⚖️ 易混淆比較</div>
+
+                    <div class="case-compare-wrap">
+                        <details class="case-compare">
+                            <summary>
+                                <span>は vs が</span>
+                                <span class="case-compare-arrow">▾</span>
+                            </summary>
+                            <div class="case-compare-body">
+                                <div class="case-compare-grid">
+                                    <div class="case-side">
+                                        <div class="case-side-title">🎯 は｜主題・對比</div>
+                                        <div class="case-side-desc">「這句話是在講誰／什麼？」<br><br>私は学生です。<br>我是學生。</div>
+                                    </div>
+                                    <div class="case-side">
+                                        <div class="case-side-title">👤 が｜主語・新資訊</div>
+                                        <div class="case-side-desc">「到底是誰／什麼做這件事？」<br><br>誰が来ましたか。<br>田中さんが来ました。</div>
+                                    </div>
+                                </div>
+                                <div class="case-memory">💡 一句記憶：は＝拿出來當話題；が＝指出真正的主角。</div>
+                            </div>
+                        </details>
+
+                        <details class="case-compare">
+                            <summary>
+                                <span>に vs へ</span>
+                                <span class="case-compare-arrow">▾</span>
+                            </summary>
+                            <div class="case-compare-body">
+                                <div class="case-compare-grid">
+                                    <div class="case-side">
+                                        <div class="case-side-title">📍 に｜到達點</div>
+                                        <div class="case-side-desc">比較像「到哪裡」。<br><br>学校に行きます。<br>去學校。</div>
+                                    </div>
+                                    <div class="case-side">
+                                        <div class="case-side-title">➡️ へ｜方向</div>
+                                        <div class="case-side-desc">比較像「往哪個方向」。<br><br>学校へ行きます。<br>往學校去。</div>
+                                    </div>
+                                </div>
+                                <div class="case-memory">💡 一句記憶：に＝到「哪裡」；へ＝往「哪個方向」。</div>
+                            </div>
+                        </details>
+
+                        <details class="case-compare">
+                            <summary>
+                                <span>に vs で</span>
+                                <span class="case-compare-arrow">▾</span>
+                            </summary>
+                            <div class="case-compare-body">
+                                <div class="case-compare-grid">
+                                    <div class="case-side">
+                                        <div class="case-side-title">📍 に｜存在／到達的位置</div>
+                                        <div class="case-side-desc">表示東西「在那裡」。<br><br>部屋に猫がいます。<br>房間裡有貓。</div>
+                                    </div>
+                                    <div class="case-side">
+                                        <div class="case-side-title">🛠️ で｜動作場所</div>
+                                        <div class="case-side-desc">表示事情「在那裡發生」。<br><br>部屋で勉強します。<br>在房間讀書。</div>
+                                    </div>
+                                </div>
+                                <div class="case-memory">💡 一句記憶：に＝東西「在那裡」；で＝事情「在那裡發生」。</div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="case-guide-card theme-orange">
+                    <div class="case-guide-title">📚 建議學習順序</div>
+                    <div class="case-guide-text">① 先看助詞本身的核心功能
+② 再看「用法」確認句型位置
+③ 最後做相似助詞比較
+
+格助詞最需要的是「比較」，不是單獨背中文。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- <span class="aux-emoji">✨</span> 助動詞使用指南 -->
 <div class="modal-overlay" id="auxGuideModal" onclick="closeAuxGuideModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -4673,8 +4789,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.16.2';
-    const APP_UPDATE_NOTE = '修復分類切換與格助詞翻卡｜回到 v10.16 穩定基底，僅修正格助詞名稱辨識與翻面容錯';
+    const APP_VERSION = 'v10.16.3';
+    const APP_UPDATE_NOTE = '修復格助詞指南按鈕｜補回遺失的格助詞 Modal 與三組易混淆比較';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
