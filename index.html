@@ -4549,6 +4549,72 @@
     </div>
 </div>
 
+
+<!-- 💬 片語＆慣用表現使用指南 -->
+<div class="modal-overlay" id="phraseGuideModal" onclick="closePhraseGuideModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">💬 片語＆慣用表現使用指南</h3>
+            <button class="btn-modal-close" onclick="closePhraseGuideModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="phrase-guide-hero">
+                <div class="phrase-guide-hero-top">
+                    <div>
+                        <div class="phrase-guide-badge">💬 整組記，比逐字翻更實用</div>
+                        <div class="phrase-guide-main">片語＆慣用表現</div>
+                        <div class="phrase-guide-reading">フレーズ・かんようひょうげん</div>
+                    </div>
+                    <button type="button" class="phrase-guide-pronounce-btn"
+                        onclick="speakWordDirectly(event, 'フレーズ かんようひょうげん')">🔊 聽發音</button>
+                </div>
+                <div class="phrase-guide-desc">
+                    這一區很多內容不是單靠逐字翻譯就能理解，而是整組拿來用。學習時優先記「使用情境＋完整說法＋例句」。
+                </div>
+            </div>
+
+            <div class="phrase-guide-grid">
+                <div class="phrase-guide-card theme-cyan">
+                    <div class="phrase-guide-title">🧭 常見使用情境</div>
+                    <div class="phrase-chip-wrap">
+                        <span class="phrase-chip">👋 招呼／寒暄</span>
+                        <span class="phrase-chip">❓ 詢問</span>
+                        <span class="phrase-chip">🙏 禮貌／道歉</span>
+                        <span class="phrase-chip">💬 回應</span>
+                        <span class="phrase-chip">💝 關懷</span>
+                        <span class="phrase-chip">🎍 節慶招呼</span>
+                        <span class="phrase-chip">🔁 泛指／不定</span>
+                    </div>
+                </div>
+
+                <div class="phrase-guide-card theme-blue">
+                    <div class="phrase-guide-title">💡 不要只背中文</div>
+                    <div class="phrase-guide-text">
+                        例如「申し訳ありません」如果只記「對不起」，會漏掉它比「すみません」更正式、更鄭重的語感。這類表現最好連使用場合一起記。
+                    </div>
+                </div>
+
+                <div class="phrase-guide-card theme-green">
+                    <div class="phrase-guide-title">🧩 用法欄怎麼看？</div>
+                    <div class="phrase-guide-text">
+                        「用法」會補充句型結構、接續方式或適合的使用場合。正面先看核心意思，翻面再確認怎麼用。
+                    </div>
+                </div>
+
+                <div class="phrase-guide-card theme-orange">
+                    <div class="phrase-guide-title">📚 建議學習順序</div>
+                    <div class="phrase-guide-text">① 先看表現本身
+② 看中文核心意思
+③ 用例句感受情境
+④ 再看用法與備註
+
+這一頁比起「考詞性」，更重要的是「遇到這個場景時，我會不會說出來」。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 🧭 格助詞使用指南 -->
 <div class="modal-overlay" id="caseGuideModal" onclick="closeCaseGuideModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -5316,7 +5382,7 @@
                     <span style="color:#38bdf8;" id="modal-sync-rate-text">0%</span>
                 </div>
                 <div style="font-size: 11px; color: #cbd5e1; margin-top: 6px; line-height: 1.4;">
-                    💡 <b>終極大魔王就是作者本人！</b> 只要作者在筆記中收錄新知識，天花板就會自動提升！想要維持大魔王稱號就要持續跟上作者的腳步喔！🔥
+                    💡 <b>終極目標就是目前詞庫的完整進度！</b> 詞庫新增內容時，100% 的目標也會同步提高。想維持大魔王稱號，就要持續把新內容學起來！🔥
                 </div>
             </div>
 
@@ -5419,8 +5485,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.21.1';
-    const APP_UPDATE_NOTE = '優化つけます情境判斷表｜將 N/A 統一顯示為 ×，閱讀更直覺';
+    const APP_VERSION = 'v10.22';
+    const APP_UPDATE_NOTE = '全站穩定性檢查｜補回片語指南視窗、統一無資料顯示並修正介面文字';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -5816,7 +5882,7 @@
                 await auth.signInWithPopup(provider);
             } catch (err) {
                 console.error(err);
-                alert('登入失敗，請確認是否已在 Firebase 授權 candlekang.github.io 網域！');
+                alert('登入失敗，請稍後再試；若持續發生，請使用「回報問題」告訴我們。');
             }
         }
     }
@@ -6101,7 +6167,7 @@
         { threshold: 0.70, title: "Lv.6 假名魔法使 🧙‍♀️", desc: "掌握進階文法與細膩語感 (70% 達成)" },
         { threshold: 0.85, title: "Lv.7 日語狂戰士 🐉", desc: "全方位制霸日語詞彙庫 (85% 達成)" },
         { threshold: 0.95, title: "Lv.8 準・魔王領主 👑", desc: "即將登頂的頂級強者 (95% 達成)" },
-        { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "追平作者！抵達 100% 終極境界！" }
+        { threshold: 1.00, title: "Lv.MAX 日文大魔王 👾🔥", desc: "全詞庫制霸！抵達 100% 終極境界！" }
     ];
 
     // 🐣 五十音資料表
@@ -7440,7 +7506,7 @@
             stackEl.innerHTML = `
                 <div class="rentai-guide-card theme-blue">
                     <div class="rentai-guide-title">目前沒有可顯示的導讀資料</div>
-                    <div class="rentai-guide-text">請確認連體詞工作表 A2:G3 是否有填入導讀內容。</div>
+                    <div class="rentai-guide-text">指南內容暫時無法載入，請稍後再試。</div>
                 </div>`;
             return;
         }
@@ -7864,7 +7930,7 @@
             stackEl.innerHTML = `
                 <div class="conj-guide-card theme-blue">
                     <div class="conj-guide-title">目前沒有可顯示的導讀資料</div>
-                    <div class="conj-guide-text">請確認接續詞工作表 A2:G3 是否有填入導讀內容。</div>
+                    <div class="conj-guide-text">指南內容暫時無法載入，請稍後再試。</div>
                 </div>
             `;
             return;
@@ -7948,7 +8014,7 @@
         stackEl.innerHTML = cards.length ? cards.join('') : `
             <div class="conj-guide-card theme-blue">
                 <div class="conj-guide-title">目前沒有可顯示的導讀資料</div>
-                <div class="conj-guide-text">請確認接續詞工作表 A2:G3 是否有填入導讀內容。</div>
+                <div class="conj-guide-text">指南內容暫時無法載入，請稍後再試。</div>
             </div>
         `;
     }
@@ -8951,11 +9017,11 @@
 
         if (!scenarioRows.length) {
             scenarioRows = [
-                { situation:'穿戴／配件', tsukeruWear:'眼鏡を着ける', tsukeruAttach:'N/A' },
-                { situation:'啟動／點火', tsukeruWear:'電気を着ける', tsukeruAttach:'N/A' },
-                { situation:'黏貼／貼上', tsukeruWear:'N/A', tsukeruAttach:'メモを付ける' },
-                { situation:'添加味道', tsukeruWear:'N/A', tsukeruAttach:'塩を付ける' },
-                { situation:'取名字', tsukeruWear:'名前を着ける', tsukeruAttach:'N/A' }
+                { situation:'穿戴／配件', tsukeruWear:'眼鏡を着ける', tsukeruAttach:'×' },
+                { situation:'啟動／點火', tsukeruWear:'電気を着ける', tsukeruAttach:'×' },
+                { situation:'黏貼／貼上', tsukeruWear:'×', tsukeruAttach:'メモを付ける' },
+                { situation:'添加味道', tsukeruWear:'×', tsukeruAttach:'塩を付ける' },
+                { situation:'取名字', tsukeruWear:'名前を着ける', tsukeruAttach:'×' }
             ];
         }
 
