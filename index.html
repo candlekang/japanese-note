@@ -3480,6 +3480,40 @@
             .grammar-front-formula{font-size:11px}
         }
 
+
+        /* 💬 片語＆慣用表現使用指南 */
+        .phrase-guide-launch{display:none;width:100%;margin-top:8px;border:1px solid #67e8f9;background:linear-gradient(135deg,#ecfeff,#eff6ff);color:#0e7490;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;cursor:pointer;box-sizing:border-box}
+        .phrase-guide-hero{border-radius:16px;border:1px solid #a5f3fc;background:linear-gradient(135deg,#ecfeff,#f8fafc);padding:14px;margin-bottom:12px}
+        .phrase-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+        .phrase-guide-badge{display:inline-flex;border-radius:999px;padding:6px 10px;background:#cffafe;color:#0e7490;font-size:11px;font-weight:900;margin-bottom:8px}
+        .phrase-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+        .phrase-guide-reading{margin-top:4px;color:#0891b2;font-size:14px;font-weight:800}
+        .phrase-guide-pronounce-btn{border:1px solid #67e8f9;background:#fff;color:#0e7490;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+        .phrase-guide-desc{margin-top:10px;padding-top:9px;border-top:1px dashed #a5f3fc;color:#475569;font-size:13px;line-height:1.7}
+        .phrase-guide-grid{display:flex;flex-direction:column;gap:10px}
+        .phrase-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+        .phrase-guide-card.theme-blue{background:#eff6ff;border-color:#bfdbfe}
+        .phrase-guide-card.theme-cyan{background:#ecfeff;border-color:#a5f3fc}
+        .phrase-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+        .phrase-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+        .phrase-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+        .phrase-guide-card.theme-blue .phrase-guide-title{color:#1d4ed8}
+        .phrase-guide-card.theme-cyan .phrase-guide-title{color:#0e7490}
+        .phrase-guide-card.theme-green .phrase-guide-title{color:#15803d}
+        .phrase-guide-card.theme-orange .phrase-guide-title{color:#c2410c}
+        .phrase-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+        .phrase-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+        .phrase-chip{display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;border:1px solid #67e8f9;color:#0e7490;font-size:12px;font-weight:800}
+        .phrase-type-badge{background:#cffafe !important;border-color:#67e8f9 !important;color:#0e7490 !important}
+        .phrase-front-meaning{width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;border:1px solid #a5f3fc;border-left:4px solid #06b6d4;background:#ecfeff;color:#164e63;font-size:13px;font-weight:700;line-height:1.6;text-align:left;box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+        .phrase-detail-card{border-radius:11px;padding:10px 12px;margin-bottom:12px;border:1px solid #e2e8f0;background:#f8fafc}
+        .phrase-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+        .phrase-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+        .phrase-usage-card{border-radius:12px;padding:11px 12px;margin-bottom:12px;background:#f0f9ff;border:1px solid #7dd3fc}
+        .phrase-usage-title{font-size:12px;font-weight:900;color:#0369a1;margin-bottom:7px}
+        .phrase-usage-text{font-size:13px;line-height:1.75;font-weight:800;color:#0c4a6e;white-space:pre-wrap;word-break:break-word}
+        @media(max-width:640px){.phrase-guide-hero-top{flex-direction:column}.phrase-guide-pronounce-btn{width:100%}.phrase-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}}
+
 </style>
 </head>
 <body>
@@ -3561,7 +3595,7 @@
             <option value="sheet15">副助詞</option>
             <option value="sheet16">助動詞</option>
             <option value="sheet17">文法</option> 
-            <option value="sheet18">片語&慣用語</option>
+            <option value="sheet18">片語&慣用表現</option>
             <option value="sheet19">格助詞</option>
             <option value="sheet20">終助詞</option>
             <option value="sheet21">「因為」的用法比較</option>
@@ -3579,6 +3613,7 @@
         <button type="button" id="adv-guide-launch" class="adv-guide-launch" onclick="openAdvGuideModal()">🧭 副詞＆疑問表現使用指南</button>
         <button type="button" id="fuku-guide-launch" class="fuku-guide-launch" onclick="openFukuGuideModal()">🧩 副助詞使用指南</button>
         <button type="button" id="aux-guide-launch" class="aux-guide-launch" onclick="openAuxGuideModal()"><span class="aux-emoji">✨</span> 助動詞使用指南</button>
+        <button type="button" id="phrase-guide-launch" class="phrase-guide-launch" onclick="openPhraseGuideModal()">💬 片語＆慣用表現使用指南</button>
         <button type="button" id="boss-test-btn" class="boss-test-btn" onclick="triggerSurpriseBossQuest(true)">👹 測試大魔王關卡</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
@@ -4534,8 +4569,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.14';
-    const APP_UPDATE_NOTE = '文法字卡精簡版｜正面只留文法、短意思與句型，完整功用移到背面';
+    const APP_VERSION = 'v10.15';
+    const APP_UPDATE_NOTE = '片語＆慣用表現專屬頁｜新增會話情境指南與自動類型字卡';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6309,6 +6344,36 @@
 
 
 
+
+    function updatePhraseGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('phrase-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet18') ? 'block' : 'none';
+    }
+
+    function openPhraseGuideModal() {
+        playClickSound();
+        document.getElementById('phraseGuideModal').style.display = 'flex';
+    }
+
+    function closePhraseGuideModal(e) {
+        if (e && e.target !== document.getElementById('phraseGuideModal') && !e.target.classList.contains('btn-modal-close')) return;
+        playClickSound();
+        document.getElementById('phraseGuideModal').style.display = 'none';
+    }
+
+    function getPhraseTypeLabel(word, meaningText, usageText, noteText) {
+        const t = `${word || ''} ${meaningText || ''} ${usageText || ''} ${noteText || ''}`;
+        if (/あけまして|おめでとう|新年|節慶/.test(t)) return '🎍 節慶招呼';
+        if (/申し訳|すみません|ごめん|道歉|謝罪/.test(t)) return '🙏 禮貌／道歉';
+        if (/お大事|保重|關懷/.test(t)) return '💝 關懷';
+        if (/久しぶり|ようこそ|歡迎|寒暄|招呼/.test(t)) return '👋 招呼／寒暄';
+        if (/どうしました|どういう意味|どのぐらい|何と言いますか|疑問|詢問|怎麼|多少/.test(t)) return '❓ 詢問表現';
+        if (/誰でも|いつでも|何でも|泛指|不定/.test(t)) return '🔁 泛指／不定';
+        if (/いえいえ|やった|なるほど|回應|反應/.test(t)) return '💬 會話反應';
+        return '🧩 慣用表現';
+    }
+
     function updateAuxGuideVisibility() {
         const selected = document.getElementById('sheetSelect').value;
         const btn = document.getElementById('aux-guide-launch');
@@ -6992,6 +7057,7 @@
         updateAdvGuideVisibility();
         updateFukuGuideVisibility();
         updateAuxGuideVisibility();
+        updatePhraseGuideVisibility();
         loadSheetData(selected);
     }
 
@@ -8073,7 +8139,7 @@
         }
 
         const badgeEl = document.getElementById('card-badge-front');
-        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge', 'fuku-type-badge', 'aux-type-badge', 'grammar-type-badge');
+        badgeEl.classList.remove('noun-priority-badge', 'iadj-priority-badge', 'nadj-priority-badge', 'verb-priority-badge', 'conj-type-badge', 'suffix-type-badge', 'prefix-type-badge', 'rentai-type-badge', 'adv-type-badge', 'fuku-type-badge', 'aux-type-badge', 'grammar-type-badge', 'phrase-type-badge');
         const mainTitleEl = document.getElementById('card-main-front');
         const subTitleEl = document.getElementById('card-sub-front');
         const meanBoxEl = document.getElementById('card-mean-front');
@@ -9841,7 +9907,87 @@
             return;
         }
 
-        // 💡 17. 一般分類標準版型
+
+        // 💡 17. 片語＆慣用表現（sheet18）專屬版型
+        if (current.catKey === 'sheet18') {
+            const getPhraseCol = (keywords) => {
+                const idx = current.rawHeaders.findIndex(h => {
+                    const header = (h || '').trim();
+                    return keywords.some(k => header.includes(k));
+                });
+                return (idx !== -1 && current.rawCols[idx]) ? current.rawCols[idx].trim() : '';
+            };
+
+            const altVal = getPhraseCol(['我有漢字', '漢字']);
+            const meaningVal = getPhraseCol(['意思', '中文']);
+            const exampleVal = getPhraseCol(['例句寶寶', '例句']);
+            const usageVal = getPhraseCol(['用法', '接續', '接法']);
+            const noteVal = getPhraseCol(['備註', '注意事項', '注意']);
+            const phraseType = getPhraseTypeLabel(current.jp, meaningVal, usageVal, noteVal);
+
+            badgeEl.style.display = 'inline-block';
+            badgeEl.classList.add('phrase-type-badge');
+            badgeEl.textContent = phraseType;
+
+            mainTitleEl.textContent = current.jp;
+            mainTitleEl.style.display = 'block';
+
+            if (altVal && altVal !== current.jp) {
+                subTitleEl.textContent = altVal;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.textContent = '';
+                subTitleEl.style.display = 'none';
+            }
+
+            if (meaningVal) {
+                meanBoxEl.className = 'phrase-front-meaning';
+                meanBoxEl.textContent = `💡 ${meaningVal}`;
+                meanBoxEl.style.display = '-webkit-box';
+            } else {
+                meanBoxEl.style.display = 'none';
+            }
+
+            ttsBtnEl.style.display = 'inline-flex';
+
+            let fullBackTitle = current.jp;
+            if (altVal && altVal !== current.jp) fullBackTitle = `${current.jp}（${altVal}）`;
+
+            let backHTML = `<div class="kanji-title">${fullBackTitle}</div>`;
+            backHTML += `<div class="section-type-badge">${phraseType}</div>`;
+
+            if (meaningVal) {
+                backHTML += `<div class="phrase-detail-card" style="background:#ecfeff;border-color:#a5f3fc;"><div class="phrase-detail-title" style="color:#0e7490;">💡 意思</div><div class="phrase-detail-text">${meaningVal}</div></div>`;
+            }
+
+            if (usageVal) {
+                backHTML += `<div class="phrase-usage-card"><div class="phrase-usage-title">🧩 用法／使用情境</div><div class="phrase-usage-text">${usageVal.replace(/\n/g, '<br>')}</div></div>`;
+            }
+
+            if (exampleVal) {
+                const exBlocks = exampleVal.split(/\n\s*\n/).filter(Boolean);
+                const listToRender = exBlocks.length ? exBlocks : [exampleVal];
+                listToRender.forEach(exText => {
+                    const lines = exText.split('\n').map(s => s.trim()).filter(Boolean);
+                    const jpLine = lines[0] || exText.trim();
+                    const zhLine = lines.slice(1).join('\n');
+                    const escapedJp = encodeURIComponent(jpLine);
+                    backHTML += `<div class="example-block"><div class="example-jp-line"><span>💬 ${jpLine}</span><button type="button" class="btn-tts-small" onclick="speakExampleJP(event, decodeURIComponent('${escapedJp}'))">🔊 朗讀</button></div>${zhLine ? `<div class="example-zh-line">📖 ${zhLine.replace(/\n/g, '<br>')}</div>` : ''}</div>`;
+                });
+            }
+
+            if (noteVal) {
+                backHTML += `<div class="phrase-detail-card" style="background:#fff7ed;border-color:#fed7aa;"><div class="phrase-detail-title" style="color:#c2410c;">📝 備註</div><div class="phrase-detail-text">${noteVal.replace(/\n/g, '<br>')}</div></div>`;
+            }
+
+            backHTML += `<div class="hint" style="position:relative; margin-top:16px;">✨ 點擊空白處翻回正面 ✨</div>`;
+            backContainer.innerHTML = backHTML;
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            return;
+        }
+
+        // 💡 18. 一般分類標準版型
+
 
 
 
