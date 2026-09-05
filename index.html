@@ -3937,6 +3937,107 @@
             font-weight:800;
         }
 
+
+        /* 🧷 つけます用法擴充 */
+        .tsukeru-expand-wrap{
+            margin-top:12px;
+            border-radius:12px;
+            border:1px solid #bfdbfe;
+            background:#eff6ff;
+            overflow:hidden;
+        }
+        .tsukeru-expand-summary{
+            list-style:none;
+            cursor:pointer;
+            padding:11px 12px;
+            font-size:13px;
+            font-weight:900;
+            color:#1d4ed8;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+        }
+        .tsukeru-expand-summary::-webkit-details-marker{display:none}
+        .tsukeru-expand-body{padding:0 12px 12px}
+        .tsukeru-compare-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:9px;
+            margin-bottom:10px;
+        }
+        .tsukeru-word-card{
+            border-radius:11px;
+            border:1px solid #dbeafe;
+            background:#fff;
+            padding:10px;
+        }
+        .tsukeru-word-title{
+            font-size:15px;
+            font-weight:950;
+            color:#0f172a;
+            margin-bottom:4px;
+        }
+        .tsukeru-word-core{
+            font-size:12px;
+            font-weight:900;
+            color:#1d4ed8;
+            margin-bottom:5px;
+        }
+        .tsukeru-word-text{
+            font-size:12px;
+            line-height:1.65;
+            color:#475569;
+            white-space:pre-wrap;
+        }
+        .tsukeru-situation-title{
+            font-size:12px;
+            font-weight:900;
+            color:#475569;
+            margin:10px 0 7px;
+        }
+        .tsukeru-situation-table{
+            display:grid;
+            grid-template-columns:minmax(78px,.7fr) 1fr 1fr;
+            border:1px solid #e2e8f0;
+            border-radius:10px;
+            overflow:hidden;
+            background:#fff;
+        }
+        .tsukeru-cell{
+            padding:8px 7px;
+            border-right:1px solid #e2e8f0;
+            border-bottom:1px solid #e2e8f0;
+            font-size:11px;
+            line-height:1.55;
+            color:#334155;
+            word-break:break-word;
+        }
+        .tsukeru-cell:nth-child(3n){border-right:none}
+        .tsukeru-head{
+            font-weight:900;
+            background:#f8fafc;
+            color:#0f172a;
+        }
+        .tsukeru-note{
+            margin-top:10px;
+            padding:8px 10px;
+            border-radius:9px;
+            background:#fff7ed;
+            border-left:4px solid #f59e0b;
+            color:#7c2d12;
+            font-size:12px;
+            line-height:1.6;
+            font-weight:800;
+        }
+        @media(max-width:640px){
+            .tsukeru-compare-grid{grid-template-columns:1fr}
+            .tsukeru-situation-table{
+                grid-template-columns:minmax(70px,.75fr) 1fr 1fr;
+            }
+            .tsukeru-cell{font-size:10px;padding:7px 5px}
+        }
+
 </style>
 </head>
 <body>
@@ -4024,7 +4125,7 @@
             <option value="sheet21" style="display:none;">原因・理由・目的表現比較</option>
             <option value="sheet22">て形大魔王</option>
             <option value="sheet24" style="display:none;">します敬語擴充</option>
-            <option value="sheet25">つけます的擴充包</option>
+            <option value="sheet25" style="display:none;">つけます用法擴充</option>
         </select>
         <button type="button" id="verb-guide-launch" class="verb-guide-launch" onclick="openVerbGuideModal()">📘 動詞變化規則指南</button>
         <button type="button" id="adj-guide-launch" class="adj-guide-launch" onclick="openAdjGuideModal()">🌸 形容詞變化規則指南</button>
@@ -4210,7 +4311,7 @@
             </div>
         </div>
 
-        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 19 分類快速導覽：</div>
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 18 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
         <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
@@ -5318,8 +5419,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.20.2';
-    const APP_UPDATE_NOTE = '優化智慧搜尋排序｜中文核心意思完全符合或開頭符合時優先，搜尋「做」可優先找到します';
+    const APP_VERSION = 'v10.21';
+    const APP_UPDATE_NOTE = '整合つけます擴充包｜sheet25 隱藏，着ける／付ける情境比較改放進「つけます」動詞字卡背面';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6601,7 +6702,7 @@
 
                                 // sheet21 已整合成「文法頁專題指南」：
                                 // 保留 sheetDataCache 供指南讀取，但不再混入綜合大亂鬥／搜尋／測驗。
-                                if (sheetKey !== 'sheet21' && sheetKey !== 'sheet24') {
+                                if (sheetKey !== 'sheet21' && sheetKey !== 'sheet24' && sheetKey !== 'sheet25') {
                                     globalWordCategoryMap[item.jp] = catName;
                                     globalWordDataMap[item.jp] = item;
                                     allSearchableWords.push(item);
@@ -8559,7 +8660,7 @@
         let categoryMap = {};
         for (let i = 0; i < selectElement.options.length; i++) {
             const opt = selectElement.options[i];
-            if (opt.value !== 'all' && opt.value !== 'sheet7' && opt.value !== 'sheet8' && opt.value !== 'sheet9' && opt.value !== 'sheet21' && opt.value !== 'sheet24') {
+            if (opt.value !== 'all' && opt.value !== 'sheet7' && opt.value !== 'sheet8' && opt.value !== 'sheet9' && opt.value !== 'sheet21' && opt.value !== 'sheet24' && opt.value !== 'sheet25') {
                 categoryMap[opt.text] = [];
             }
         }
@@ -8591,7 +8692,7 @@
 
         let gridHtml = '';
         for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
-            if (catKey === 'sheet7' || catKey === 'sheet8' || catKey === 'sheet9' || catKey === 'sheet21' || catKey === 'sheet24') continue;
+            if (catKey === 'sheet7' || catKey === 'sheet8' || catKey === 'sheet9' || catKey === 'sheet21' || catKey === 'sheet24' || catKey === 'sheet25') continue;
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
             const catName = optElement ? optElement.text : catKey;
             
@@ -8753,6 +8854,142 @@
     }
 
 
+
+
+    function isTsukemasuCard(wordObj) {
+        if (!wordObj) return false;
+
+        const compact = (s) => String(s || '')
+            .replace(/[（(].*?[）)]/g, '')
+            .replace(/\s+/g, '')
+            .trim();
+
+        const jp = compact(wordObj.jp);
+        const headers = wordObj.rawHeaders || [];
+        const cols = wordObj.rawCols || [];
+
+        const getCol = (keys) => {
+            const idx = headers.findIndex(h => {
+                const header = (h || '').trim();
+                return keys.some(k => header.includes(k));
+            });
+            return (idx !== -1 && cols[idx]) ? compact(cols[idx]) : '';
+        };
+
+        const kana = getCol(['我的平假名', '平假名', '假名']);
+        const dict = getCol(['普通型／辭書形', '普通形', '辭書形', '辞書形']);
+
+        return (
+            jp === 'つけます' ||
+            kana === 'つけます' ||
+            ['つける', '付ける', '着ける'].includes(dict)
+        );
+    }
+
+    function renderTsukemasuExpansion() {
+        const rows = (sheetDataCache['sheet25'] || []).filter(w => !w.isIntroCard);
+
+        const esc = (s) => String(s || '')
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+
+        const getByHeader = (row, keys) => {
+            if (!row || !row.rawHeaders || !row.rawCols) return '';
+            const idx = row.rawHeaders.findIndex(h => {
+                const header = (h || '').trim();
+                return keys.some(k => header.includes(k));
+            });
+            return (idx !== -1 && row.rawCols[idx]) ? row.rawCols[idx].trim() : '';
+        };
+
+        const lexicalRows = rows.filter(r => ['着ける', '付ける'].includes(String(r.jp || '').trim()));
+
+        const fallbackLexical = [
+            {
+                jp:'着ける',
+                core:'附著、穿戴、佩戴',
+                usage:'強調將某物置於身體或某個位置上。',
+                targets:'眼鏡、領帶、燈、電源、傷口、名字'
+            },
+            {
+                jp:'付ける',
+                core:'附加、添加、貼上',
+                usage:'強調將某物附加、增加或黏貼到另一物體上。',
+                targets:'醬料、標籤、筆記、記號、利息'
+            }
+        ];
+
+        const lexical = lexicalRows.length ? lexicalRows.map(row => ({
+            jp: row.jp,
+            core: getByHeader(row, ['核心意義', '核心意思', '意思']) || row.level || '',
+            usage: getByHeader(row, ['主要用法', '用法']) || row.type || '',
+            targets: getByHeader(row, ['搭配的對象', '搭配對象', '搭配']) || (row.rawCols ? row.rawCols[4] || '' : '')
+        })) : fallbackLexical;
+
+        const wordCards = lexical.map(item => `
+            <div class="tsukeru-word-card">
+                <div class="tsukeru-word-title">${esc(item.jp)}</div>
+                <div class="tsukeru-word-core">💡 ${esc(item.core)}</div>
+                <div class="tsukeru-word-text">
+                    ${item.usage ? `🧩 ${esc(item.usage)}<br>` : ''}
+                    ${item.targets ? `🎯 常搭配：${esc(item.targets)}` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        // 下方「情境判斷表」在同一張工作表內，雖然表頭不同，
+        // CSV 載入後仍可直接由 A/B/C 位置讀取。
+        let scenarioRows = rows.filter(r => {
+            const key = String(r.jp || '').trim();
+            return key && !['着ける', '付ける', '情境', '詞彙'].includes(key)
+                && r.rawCols && (r.rawCols[1] || r.rawCols[2]);
+        }).map(r => ({
+            situation: String(r.jp || '').trim(),
+            tsukeruWear: String(r.rawCols[1] || '').trim(),
+            tsukeruAttach: String(r.rawCols[2] || '').trim()
+        }));
+
+        if (!scenarioRows.length) {
+            scenarioRows = [
+                { situation:'穿戴／配件', tsukeruWear:'眼鏡を着ける', tsukeruAttach:'N/A' },
+                { situation:'啟動／點火', tsukeruWear:'電気を着ける', tsukeruAttach:'N/A' },
+                { situation:'黏貼／貼上', tsukeruWear:'N/A', tsukeruAttach:'メモを付ける' },
+                { situation:'添加味道', tsukeruWear:'N/A', tsukeruAttach:'塩を付ける' },
+                { situation:'取名字', tsukeruWear:'名前を着ける', tsukeruAttach:'N/A' }
+            ];
+        }
+
+        const scenarioHtml = scenarioRows.map(r => `
+            <div class="tsukeru-cell tsukeru-head">${esc(r.situation)}</div>
+            <div class="tsukeru-cell">${esc(r.tsukeruWear || '—')}</div>
+            <div class="tsukeru-cell">${esc(r.tsukeruAttach || '—')}</div>
+        `).join('');
+
+        return `
+            <details class="tsukeru-expand-wrap" onclick="event.stopPropagation()">
+                <summary class="tsukeru-expand-summary" onclick="event.stopPropagation()">
+                    <span>🧷 つけます用法擴充</span>
+                    <span>▾</span>
+                </summary>
+                <div class="tsukeru-expand-body" onclick="event.stopPropagation()">
+                    <div class="tsukeru-compare-grid">
+                        ${wordCards}
+                    </div>
+
+                    <div class="tsukeru-situation-title">🧭 情境快速判斷</div>
+                    <div class="tsukeru-situation-table">
+                        <div class="tsukeru-cell tsukeru-head">情境</div>
+                        <div class="tsukeru-cell tsukeru-head">着ける</div>
+                        <div class="tsukeru-cell tsukeru-head">付ける</div>
+                        ${scenarioHtml}
+                    </div>
+
+                    <div class="tsukeru-note">
+                        💡 「つける」有很多不同漢字寫法。先看「要表達的語意」，再決定要寫成 着ける、付ける，或其他漢字。
+                    </div>
+                </div>
+            </details>`;
+    }
 
     function isSuruMasuCard(wordObj) {
         if (!wordObj) return false;
@@ -10066,6 +10303,10 @@
 
             if (isSuruMasuCard(current)) {
                 backHTML += renderSuruKeigoExpansion();
+            }
+
+            if (isTsukemasuCard(current)) {
+                backHTML += renderTsukemasuExpansion();
             }
 
             if (exampleVal) {
