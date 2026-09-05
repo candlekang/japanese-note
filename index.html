@@ -5104,8 +5104,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.18.3';
-    const APP_UPDATE_NOTE = '修正原因・目的比較按鈕顯示｜不再依賴分類 renderer，四個指定表現的字卡都會顯示入口';
+    const APP_VERSION = 'v10.18.4';
+    const APP_UPDATE_NOTE = '修正 よう（に） 比較入口｜保留括號內的 に，讓助動詞頁的 よう（に） 也能正確辨識';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -8721,6 +8721,13 @@
     function normalizeReasonPurposeWord(word) {
         return String(word || '')
             .trim()
+            // 「よう（に）」不能把括號連同「に」一起刪掉；
+            // 先把這類寫法還原成「ように」。
+            .replace(/よう\s*[（(]\s*に\s*[）)]/g, 'ように')
+            .replace(/ため\s*[（(].*?[）)]/g, 'ため')
+            .replace(/から\s*[（(].*?[）)]/g, 'から')
+            .replace(/ので\s*[（(].*?[）)]/g, 'ので')
+            // 其餘補充註解才移除。
             .replace(/[（(].*?[）)]/g, '')
             .replace(/[～〜~]/g, '')
             .replace(/\s+/g, '')
