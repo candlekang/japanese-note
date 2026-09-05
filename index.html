@@ -4673,8 +4673,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.16.1';
-    const APP_UPDATE_NOTE = '修正格助詞翻卡｜翻面優先執行並容錯進度寫入，同步辨識帶註解的 は／が 等名稱';
+    const APP_VERSION = 'v10.16.2';
+    const APP_UPDATE_NOTE = '修復分類切換與格助詞翻卡｜回到 v10.16 穩定基底，僅修正格助詞名稱辨識與翻面容錯';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6483,6 +6483,12 @@
             'で': '🛠️ 場所／方式／原因'
         };
         return map[normalized] || '🧭 格助詞';
+    }
+
+    function updatePhraseGuideVisibility() {
+        const selected = document.getElementById('sheetSelect').value;
+        const btn = document.getElementById('phrase-guide-launch');
+        if (btn) btn.style.display = (selected === 'sheet18') ? 'block' : 'none';
     }
 
     function openPhraseGuideModal() {
@@ -10308,14 +10314,13 @@
         document.getElementById('flashcard').classList.remove('is-flipped');
     }
 
-    function flipCard() {
+    function flipCard() { 
         const flashcard = document.getElementById('flashcard');
         if (!flashcard) return;
 
         const isFlipped = flashcard.classList.contains('is-flipped');
 
-        // 先翻卡。即使音效、localStorage 或 Firebase 進度寫入失敗，
-        // 都不能阻止使用者看到背面。
+        // 先翻面，避免進度或音效錯誤阻止使用者看背面。
         flashcard.classList.toggle('is-flipped');
 
         try { playPageFlipSound(); } catch (e) {}
@@ -10333,7 +10338,7 @@
                     }
                 }
             } catch (e) {
-                console.warn('翻卡進度寫入失敗，但翻卡功能繼續：', e);
+                console.warn('翻卡進度寫入失敗，但翻卡仍正常：', e);
             }
         }
     }
