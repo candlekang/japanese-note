@@ -3872,6 +3872,71 @@
             .te-front-box{width:96%;font-size:12px}
         }
 
+
+        /* 🎩 します敬語擴充 */
+        .suru-keigo-wrap{
+            margin-top:12px;
+            border-radius:12px;
+            border:1px solid #ddd6fe;
+            background:#faf5ff;
+            overflow:hidden;
+        }
+        .suru-keigo-summary{
+            list-style:none;
+            cursor:pointer;
+            padding:11px 12px;
+            font-size:13px;
+            font-weight:900;
+            color:#6d28d9;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+        }
+        .suru-keigo-summary::-webkit-details-marker{display:none}
+        .suru-keigo-body{padding:0 12px 12px}
+        .suru-keigo-ladder{
+            display:flex;
+            flex-direction:column;
+            gap:7px;
+            margin-bottom:10px;
+        }
+        .suru-keigo-step{
+            border-radius:10px;
+            border:1px solid #e2e8f0;
+            background:#fff;
+            padding:9px 10px;
+        }
+        .suru-keigo-step-title{
+            font-size:13px;
+            font-weight:900;
+            color:#0f172a;
+            margin-bottom:3px;
+        }
+        .suru-keigo-step-meta{
+            font-size:11px;
+            font-weight:800;
+            color:#7c3aed;
+            margin-bottom:4px;
+        }
+        .suru-keigo-step-text{
+            font-size:12px;
+            line-height:1.65;
+            color:#475569;
+            white-space:pre-wrap;
+        }
+        .suru-keigo-note{
+            margin-top:8px;
+            padding:8px 10px;
+            border-radius:9px;
+            background:#fff7ed;
+            border-left:4px solid #f59e0b;
+            color:#7c2d12;
+            font-size:12px;
+            line-height:1.6;
+            font-weight:800;
+        }
+
 </style>
 </head>
 <body>
@@ -3958,7 +4023,7 @@
             <option value="sheet20">終助詞＆句尾表現</option>
             <option value="sheet21" style="display:none;">原因・理由・目的表現比較</option>
             <option value="sheet22">て形大魔王</option>
-            <option value="sheet24">します的擴充包</option>
+            <option value="sheet24" style="display:none;">します敬語擴充</option>
             <option value="sheet25">つけます的擴充包</option>
         </select>
         <button type="button" id="verb-guide-launch" class="verb-guide-launch" onclick="openVerbGuideModal()">📘 動詞變化規則指南</button>
@@ -4145,7 +4210,7 @@
             </div>
         </div>
 
-        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 20 分類快速導覽：</div>
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text-sub);">🕹️ 19 分類快速導覽：</div>
         <div class="category-grid" id="stats-category-grid"></div>
 
         <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
@@ -5253,8 +5318,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.19';
-    const APP_UPDATE_NOTE = 'て形大魔王專題化｜新增攻略指南、四大功能分類、ないで vs なくて比較與專屬字卡';
+    const APP_VERSION = 'v10.20';
+    const APP_UPDATE_NOTE = '整合します擴充包｜sheet24 隱藏，敬語延伸改放到「します」動詞字卡背面';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6536,7 +6601,7 @@
 
                                 // sheet21 已整合成「文法頁專題指南」：
                                 // 保留 sheetDataCache 供指南讀取，但不再混入綜合大亂鬥／搜尋／測驗。
-                                if (sheetKey !== 'sheet21') {
+                                if (sheetKey !== 'sheet21' && sheetKey !== 'sheet24') {
                                     globalWordCategoryMap[item.jp] = catName;
                                     globalWordDataMap[item.jp] = item;
                                     allSearchableWords.push(item);
@@ -8474,7 +8539,7 @@
         let categoryMap = {};
         for (let i = 0; i < selectElement.options.length; i++) {
             const opt = selectElement.options[i];
-            if (opt.value !== 'all' && opt.value !== 'sheet7' && opt.value !== 'sheet8' && opt.value !== 'sheet9' && opt.value !== 'sheet21') {
+            if (opt.value !== 'all' && opt.value !== 'sheet7' && opt.value !== 'sheet8' && opt.value !== 'sheet9' && opt.value !== 'sheet21' && opt.value !== 'sheet24') {
                 categoryMap[opt.text] = [];
             }
         }
@@ -8506,7 +8571,7 @@
 
         let gridHtml = '';
         for (const [catKey, url] of Object.entries(SHEETS_CONFIG)) {
-            if (catKey === 'sheet7' || catKey === 'sheet8' || catKey === 'sheet9' || catKey === 'sheet21') continue;
+            if (catKey === 'sheet7' || catKey === 'sheet8' || catKey === 'sheet9' || catKey === 'sheet21' || catKey === 'sheet24') continue;
             const optElement = Array.from(selectElement.options).find(o => o.value === catKey);
             const catName = optElement ? optElement.text : catKey;
             
@@ -8667,6 +8732,90 @@
         return '';
     }
 
+
+
+    function isSuruMasuCard(wordObj) {
+        if (!wordObj) return false;
+
+        const jp = String(wordObj.jp || '').replace(/\s+/g,'').trim();
+        const headers = wordObj.rawHeaders || [];
+        const cols = wordObj.rawCols || [];
+
+        const getCol = (keys) => {
+            const idx = headers.findIndex(h => {
+                const header = (h || '').trim();
+                return keys.some(k => header.includes(k));
+            });
+            return (idx !== -1 && cols[idx]) ? String(cols[idx]).replace(/\s+/g,'').trim() : '';
+        };
+
+        const dict = getCol(['普通型／辭書形', '普通形', '辭書形']);
+        return jp === 'します' || dict === 'する';
+    }
+
+    function renderSuruKeigoExpansion() {
+        const rows = (sheetDataCache['sheet24'] || []).filter(w => !w.isIntroCard);
+
+        const fallbackRows = [
+            { jp:'します', level:'標準禮貌', type:'做、會做', note:'日常對話最基本的禮貌形式。' },
+            { jp:'いたします', level:'非常禮貌／謙讓語', type:'我來做／將會做', note:'降低自己的動作，用於對上位者或正式場合。' },
+            { jp:'させていただきます', level:'極度謙遜', type:'承蒙允許我做～', note:'帶有「得到對方允許後再做」的語感。' }
+        ];
+
+        const source = rows.length ? rows : fallbackRows;
+
+        const esc = (s) => String(s || '')
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+
+        const getByHeader = (row, keys) => {
+            if (!row.rawHeaders || !row.rawCols) return '';
+            const idx = row.rawHeaders.findIndex(h => {
+                const header = (h || '').trim();
+                return keys.some(k => header.includes(k));
+            });
+            return (idx !== -1 && row.rawCols[idx]) ? row.rawCols[idx].trim() : '';
+        };
+
+        const steps = source.map(row => {
+            const word = row.jp || '';
+            const honor = getByHeader(row, ['敬語類型']) || row.level || '';
+            const meaning = getByHeader(row, ['意思']) || row.type || '';
+            const level = getByHeader(row, ['語氣強度']) || '';
+            const usage = getByHeader(row, ['用法與情境', '用法']) || '';
+            const example = getByHeader(row, ['例句']) || '';
+            const note = getByHeader(row, ['備註']) || row.note || '';
+
+            return `
+                <div class="suru-keigo-step">
+                    <div class="suru-keigo-step-title">${esc(word)}</div>
+                    <div class="suru-keigo-step-meta">${esc([honor, level].filter(Boolean).join('｜'))}</div>
+                    <div class="suru-keigo-step-text">
+                        ${meaning ? `💡 ${esc(meaning)}<br>` : ''}
+                        ${usage ? `🧩 ${esc(usage)}<br>` : ''}
+                        ${example ? `💬 ${esc(example).replace(/\n/g,'<br>')}<br>` : ''}
+                        ${note ? `📝 ${esc(note)}` : ''}
+                    </div>
+                </div>`;
+        }).join('');
+
+        return `
+            <details class="suru-keigo-wrap">
+                <summary class="suru-keigo-summary">
+                    <span>🎩 します敬語擴充</span>
+                    <span>▾</span>
+                </summary>
+                <div class="suru-keigo-body">
+                    <div class="suru-keigo-ladder">
+                        ${steps}
+                    </div>
+                    <div class="suru-keigo-note">
+                        語氣階梯：する → します → いたします → させていただきます<br>
+                        越往後越正式、越謙遜；但「させていただきます」通常還帶有「承蒙允許」的語感。
+                    </div>
+                </div>
+            </details>`;
+    }
 
     function normalizeVerbGroup(groupVal) {
         const g = (groupVal || '').replace(/\s+/g, '').toUpperCase();
@@ -9892,6 +10041,11 @@
                         <div class="grammar-rule-content" style="color:#4c1d95;">${collocationVal.replace(/\n/g, '<br>')}</div>
                     </div>
                 `;
+            }
+
+
+            if (isSuruMasuCard(current)) {
+                backHTML += renderSuruKeigoExpansion();
             }
 
             if (exampleVal) {
