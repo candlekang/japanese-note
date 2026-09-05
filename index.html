@@ -4166,13 +4166,6 @@
                 <div class="reason-memory">💡 一句記憶：ため＝為了做某件事；ように＝為了達到某種狀態。</div>
             </div>
 
-            <div class="reason-section purple">
-                <div class="reason-section-title">📖 試算表完整內容</div>
-                <div style="font-size:12px;color:#64748b;line-height:1.6;margin-bottom:8px;">
-                    下方內容會直接讀取原本 sheet21，因此你之後修改試算表，這裡也會跟著更新。
-                </div>
-                <div id="reason-guide-sheet-content"></div>
-            </div>
         </div>
     </div>
 </div>
@@ -5111,8 +5104,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.18.1';
-    const APP_UPDATE_NOTE = '原因・目的比較入口移入相關字卡｜僅在 から／ので／ため／ように 四張文法卡顯示比較按鈕';
+    const APP_VERSION = 'v10.18.3';
+    const APP_UPDATE_NOTE = '修正原因・目的比較按鈕顯示｜不再依賴分類 renderer，四個指定表現的字卡都會顯示入口';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6900,54 +6893,9 @@
         // 不再於文法分類上方顯示獨立按鈕。
     }
 
-    function fillReasonGuideFromCache() {
-        const host = document.getElementById('reason-guide-sheet-content');
-        if (!host) return;
-
-        const rows = (sheetDataCache['sheet21'] || []).filter(w => !w.isIntroCard);
-        if (!rows.length) {
-            host.innerHTML = '<div class="reason-field"><div class="reason-field-text">目前尚未載入比較資料，請稍後再開一次。</div></div>';
-            return;
-        }
-
-        const escapeHtml = (s) => String(s || '')
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-
-        const getCol = (row, keys) => {
-            const idx = row.rawHeaders.findIndex(h => {
-                const header = (h || '').trim();
-                return keys.some(k => header.includes(k));
-            });
-            return (idx !== -1 && row.rawCols[idx]) ? row.rawCols[idx].trim() : '';
-        };
-
-        host.innerHTML = rows.map(row => {
-            const mainUse = getCol(row, ['主要用途', '功用', '功能', '意思']);
-            const usage = getCol(row, ['用法', '接續', '句型']);
-            const examples = getCol(row, ['例句寶寶', '例句']);
-            const note = getCol(row, ['備註', '注意']);
-
-            return `
-                <details class="reason-detail">
-                    <summary>
-                        <span>${escapeHtml(row.jp)}</span>
-                        <span>▾</span>
-                    </summary>
-                    <div class="reason-detail-body">
-                        ${mainUse ? `<div class="reason-field"><div class="reason-field-title">💡 主要用途</div><div class="reason-field-text">${escapeHtml(mainUse).replace(/\n/g,'<br>')}</div></div>` : ''}
-                        ${usage ? `<div class="reason-field"><div class="reason-field-title">🧩 用法</div><div class="reason-field-text">${escapeHtml(usage).replace(/\n/g,'<br>')}</div></div>` : ''}
-                        ${examples ? `<div class="reason-field"><div class="reason-field-title">💬 例句寶寶</div><div class="reason-field-text">${escapeHtml(examples).replace(/\n/g,'<br>')}</div></div>` : ''}
-                        ${note ? `<div class="reason-field"><div class="reason-field-title">📝 備註</div><div class="reason-field-text">${escapeHtml(note).replace(/\n/g,'<br>')}</div></div>` : ''}
-                    </div>
-                </details>`;
-        }).join('');
-    }
 
     function openReasonGuideModal() {
         playClickSound();
-        fillReasonGuideFromCache();
         const modal = document.getElementById('reasonGuideModal');
         if (modal) modal.style.display = 'flex';
     }
@@ -8770,14 +8718,53 @@
 
 
 
-    function isReasonPurposeCompareGrammar(word) {
-        const normalized = String(word || '')
+    function normalizeReasonPurposeWord(word) {
+        return String(word || '')
             .trim()
             .replace(/[（(].*?[）)]/g, '')
-            .replace(/^～+/, '')
+            .replace(/[～〜~]/g, '')
+            .replace(/\s+/g, '')
             .trim();
+    }
 
-        return ['から', 'ので', 'ため', 'ように'].includes(normalized);
+    function isReasonPurposeCompareGrammar(word) {
+        return ['から', 'ので', 'ため', 'ように'].includes(normalizeReasonPurposeWord(word));
+    }
+
+    function syncReasonPurposeCompareButtons(current) {
+        // 每次重繪先清掉舊按鈕，避免切卡殘留。
+        document.querySelectorAll('.grammar-related-compare-btn').forEach(el => el.remove());
+
+        if (!current || !isReasonPurposeCompareGrammar(current.jp)) return;
+
+        const makeBtn = () => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'grammar-related-compare-btn';
+            btn.innerHTML = '🧠 和其他原因／目的表現比較';
+            btn.onclick = (event) => {
+                event.stopPropagation();
+                openReasonGuideModal();
+            };
+            return btn;
+        };
+
+        // 正面：放在意思／句型區塊下方。
+        const meanBox = document.getElementById('card-mean-front');
+        if (meanBox && meanBox.parentElement) {
+            meanBox.insertAdjacentElement('afterend', makeBtn());
+        }
+
+        // 背面：等各分類 renderer 完成後，放在標題下方。
+        const back = document.getElementById('card-back-content');
+        if (back) {
+            const title = back.querySelector('.kanji-title');
+            if (title) {
+                title.insertAdjacentElement('afterend', makeBtn());
+            } else {
+                back.insertAdjacentElement('afterbegin', makeBtn());
+            }
+        }
     }
 
     function getGrammarTypeLabel(word, functionText, patternText, noteText) {
@@ -8810,6 +8797,11 @@
     function updateReviewUI() {
         if (currentList.length === 0) return;
         const current = currentList[currentIndex];
+
+        // 不論這張卡最後走哪一個 renderer，只要是 から／ので／ため／ように，
+        // 都在 DOM 更新完成後補上比較入口。
+        setTimeout(() => syncReasonPurposeCompareButtons(current), 0);
+
         current.hasReadThisTime = false;
         
         const progress = getProgress(current.jp);
@@ -8836,9 +8828,6 @@
         meanBoxEl.className = 'front-mean-box';
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
-
-        // 清除上一張字卡動態加入的比較按鈕
-        document.querySelectorAll('.grammar-related-compare-btn').forEach(el => el.remove());
 
         // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等）
         if (current.isIntroCard && current.isStructuredIntro) {
@@ -10543,31 +10532,10 @@
                 meanBoxEl.style.display = 'none';
             }
 
-            // 只有 から／ので／ため／ように 四張卡顯示比較入口
-            if (isReasonPurposeCompareGrammar(current.jp)) {
-                const compareBtn = document.createElement('button');
-                compareBtn.type = 'button';
-                compareBtn.className = 'grammar-related-compare-btn';
-                compareBtn.innerHTML = '🧠 和其他原因／目的表現比較';
-                compareBtn.onclick = (event) => {
-                    event.stopPropagation();
-                    openReasonGuideModal();
-                };
-                meanBoxEl.insertAdjacentElement('afterend', compareBtn);
-            }
-
             ttsBtnEl.style.display = 'inline-flex';
 
             let backHTML = `<div class="kanji-title">${current.jp}</div>`;
             backHTML += `<div class="section-type-badge">${grammarType}</div>`;
-
-            if (isReasonPurposeCompareGrammar(current.jp)) {
-                backHTML += `
-                    <button type="button" class="grammar-related-compare-btn"
-                        onclick="event.stopPropagation(); openReasonGuideModal();">
-                        🧠 和其他原因／目的表現比較
-                    </button>`;
-            }
 
             if (functionVal) {
                 backHTML += `
