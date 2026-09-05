@@ -3773,6 +3773,28 @@
             .reason-quick-grid,.reason-compare-grid{grid-template-columns:1fr}
         }
 
+
+        /* v10.18.1：原因／目的比較入口只放在相關文法字卡 */
+        .grammar-related-compare-btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:6px;
+            margin:8px auto 0;
+            padding:8px 12px;
+            border-radius:999px;
+            border:1px solid #fbbf24;
+            background:#fffbeb;
+            color:#92400e;
+            font-size:12px;
+            font-weight:900;
+            cursor:pointer;
+            box-sizing:border-box;
+        }
+        .grammar-related-compare-btn:hover{
+            background:#fef3c7;
+        }
+
 </style>
 </head>
 <body>
@@ -3875,7 +3897,7 @@
         <button type="button" id="phrase-guide-launch" class="phrase-guide-launch" onclick="openPhraseGuideModal()">💬 片語＆慣用表現使用指南</button>
         <button type="button" id="case-guide-launch" class="case-guide-launch" onclick="openCaseGuideModal()">🧭 格助詞使用指南</button>
         <button type="button" id="final-guide-launch" class="final-guide-launch" onclick="openFinalGuideModal()">💭 終助詞＆句尾表現使用指南</button>
-        <button type="button" id="reason-guide-launch" class="reason-guide-launch" onclick="openReasonGuideModal()">🧠 原因・理由・目的表現比較</button>
+        
         <button type="button" id="boss-test-btn" class="boss-test-btn" onclick="triggerSurpriseBossQuest(true)">👹 測試大魔王關卡</button>
 
         <!-- 💡 4 個核心模式按鈕 -->
@@ -5089,8 +5111,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.18';
-    const APP_UPDATE_NOTE = '整合原因・目的表現比較｜sheet21 從主分類隱藏，改掛在文法頁作為專題比較指南';
+    const APP_VERSION = 'v10.18.1';
+    const APP_UPDATE_NOTE = '原因・目的比較入口移入相關字卡｜僅在 から／ので／ため／ように 四張文法卡顯示比較按鈕';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6874,10 +6896,8 @@
 
 
     function updateReasonGuideVisibility() {
-        const selected = document.getElementById('sheetSelect').value;
-        const btn = document.getElementById('reason-guide-launch');
-        // sheet21 已整合到「文法」頁，不再作為獨立分類。
-        if (btn) btn.style.display = (selected === 'sheet17') ? 'block' : 'none';
+        // v10.18.1：比較入口移到 から／ので／ため／ように 四張字卡，
+        // 不再於文法分類上方顯示獨立按鈕。
     }
 
     function fillReasonGuideFromCache() {
@@ -8749,6 +8769,17 @@
     }
 
 
+
+    function isReasonPurposeCompareGrammar(word) {
+        const normalized = String(word || '')
+            .trim()
+            .replace(/[（(].*?[）)]/g, '')
+            .replace(/^～+/, '')
+            .trim();
+
+        return ['から', 'ので', 'ため', 'ように'].includes(normalized);
+    }
+
     function getGrammarTypeLabel(word, functionText, patternText, noteText) {
         const text = `${word || ''} ${functionText || ''} ${patternText || ''} ${noteText || ''}`;
 
@@ -8805,6 +8836,9 @@
         meanBoxEl.className = 'front-mean-box';
         const ttsBtnEl = document.getElementById('btn-card-tts');
         const backContainer = document.getElementById('card-back-content');
+
+        // 清除上一張字卡動態加入的比較按鈕
+        document.querySelectorAll('.grammar-related-compare-btn').forEach(el => el.remove());
 
         // 💡 1. 雙列結構化導讀特卡（數詞、接續詞、連體詞、接尾詞等）
         if (current.isIntroCard && current.isStructuredIntro) {
@@ -10509,10 +10543,31 @@
                 meanBoxEl.style.display = 'none';
             }
 
+            // 只有 から／ので／ため／ように 四張卡顯示比較入口
+            if (isReasonPurposeCompareGrammar(current.jp)) {
+                const compareBtn = document.createElement('button');
+                compareBtn.type = 'button';
+                compareBtn.className = 'grammar-related-compare-btn';
+                compareBtn.innerHTML = '🧠 和其他原因／目的表現比較';
+                compareBtn.onclick = (event) => {
+                    event.stopPropagation();
+                    openReasonGuideModal();
+                };
+                meanBoxEl.insertAdjacentElement('afterend', compareBtn);
+            }
+
             ttsBtnEl.style.display = 'inline-flex';
 
             let backHTML = `<div class="kanji-title">${current.jp}</div>`;
             backHTML += `<div class="section-type-badge">${grammarType}</div>`;
+
+            if (isReasonPurposeCompareGrammar(current.jp)) {
+                backHTML += `
+                    <button type="button" class="grammar-related-compare-btn"
+                        onclick="event.stopPropagation(); openReasonGuideModal();">
+                        🧠 和其他原因／目的表現比較
+                    </button>`;
+            }
 
             if (functionVal) {
                 backHTML += `
