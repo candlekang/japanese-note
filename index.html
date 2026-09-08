@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
     <title>康康日文</title>
-    <link rel="icon" type="image/png" href="./icon-nyako2.png?v=10.24.2">
-    <link rel="apple-touch-icon" href="./icon-nyako2.png?v=10.24.2">
+    <link rel="icon" type="image/png" href="./icon-nyako2.png?v=10.25">
+    <link rel="apple-touch-icon" href="./icon-nyako2.png?v=10.25">
     <link rel="manifest" href="./manifest.webmanifest">
     <meta name="theme-color" content="#1e2d4a">
     <meta name="mobile-web-app-capable" content="yes">
@@ -2977,6 +2977,127 @@
         .quiz-btn.show-translation .boss-option-zh{ display:inline-flex; align-items:center; }
 
 
+        /* v10.25：手機版大魔王選項自適應，避免中文 pill 把日文擠成直排 */
+        #boss-quiz-options {
+            width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        #boss-quiz-options .quiz-btn {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .boss-option-row {
+            min-width: 0;
+            box-sizing: border-box;
+        }
+        .boss-option-left {
+            min-width: 0;
+        }
+        .boss-option-jp,
+        .boss-option-zh {
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        @media (max-width: 600px) {
+            #surpriseBossModal {
+                padding: 10px;
+            }
+            #surpriseBossModal .boss-modal-box {
+                width: 100%;
+                max-width: 100%;
+                max-height: 92vh;
+                border-radius: 16px;
+            }
+            #surpriseBossModal .modal-header {
+                padding: 12px 14px;
+            }
+            #surpriseBossModal .modal-title {
+                font-size: 15px;
+                line-height: 1.45;
+            }
+            #surpriseBossModal .modal-body {
+                padding: 12px;
+                gap: 10px;
+                overflow-x: hidden;
+            }
+            #boss-question-text {
+                font-size: 16px !important;
+                line-height: 1.65;
+                overflow-wrap: anywhere;
+                word-break: normal;
+            }
+            #boss-quiz-options {
+                gap: 10px;
+                margin-top: 4px !important;
+            }
+            #boss-quiz-options .quiz-btn {
+                padding: 12px;
+                border-radius: 12px;
+            }
+            .boss-option-row {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: flex-start;
+                gap: 8px;
+            }
+            .boss-option-left {
+                width: 100%;
+                flex: none;
+            }
+            .boss-option-jp {
+                width: 100%;
+                font-size: 15px;
+                line-height: 1.55;
+                text-align: left;
+                white-space: normal;
+            }
+            .boss-option-zh,
+            .quiz-btn.show-translation .boss-option-zh {
+                width: 100%;
+                display: none;
+                white-space: normal;
+                border-radius: 10px;
+                padding: 7px 9px;
+                font-size: 12px;
+                line-height: 1.55;
+                text-align: left;
+                align-items: flex-start;
+            }
+            .quiz-btn.show-translation .boss-option-zh {
+                display: block;
+            }
+            .boss-question-zh {
+                font-size: 13px;
+                line-height: 1.6;
+                padding: 9px 10px;
+            }
+            .boss-review-answer {
+                font-size: 15px;
+                line-height: 1.55;
+                overflow-wrap: anywhere;
+            }
+            .boss-review-zh,
+            .boss-review-note {
+                font-size: 12px;
+                line-height: 1.6;
+                overflow-wrap: anywhere;
+            }
+            #btn-boss-submit,
+            #btn-boss-close {
+                white-space: normal;
+            }
+        }
+
+
 
         /* 📚 學習進度：字卡快覽 */
         .progress-item.stats-card-clickable {
@@ -5601,8 +5722,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.24.2';
-    const APP_UPDATE_NOTE = '更新手機主畫面圖示｜改用 icon-nyako2.png';
+    const APP_VERSION = 'v10.25';
+    const APP_UPDATE_NOTE = '修正手機版大魔王題目跑版｜選項與中文解析改為自適應排版，不再橫向溢出';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
