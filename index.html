@@ -4279,6 +4279,104 @@
             .meow-teacher-roamer{transition:none}
         }
 
+
+        /* 🐱 v10.28 喵喵老師即時反應 */
+        .meow-teacher-roamer.meow-jump .meow-teacher-sprite{
+            animation: meowJump .62s cubic-bezier(.2,.8,.2,1);
+        }
+        .meow-teacher-roamer.meow-shake .meow-teacher-sprite{
+            animation: meowShake .48s ease;
+        }
+        .meow-teacher-roamer.meow-bounce .meow-teacher-sprite{
+            animation: meowBounce .7s ease;
+        }
+        .meow-teacher-roamer.meow-party .meow-teacher-sprite{
+            animation: meowParty .85s ease;
+            filter: drop-shadow(0 0 9px rgba(250,204,21,.9));
+        }
+        .meow-teacher-roamer.meow-sleepy .meow-teacher-sprite{
+            animation: meowSleepy 1.9s ease-in-out infinite;
+            opacity:.86;
+        }
+        .meow-teacher-roamer.meow-fast{
+            transition: left .45s cubic-bezier(.2,.85,.3,1) !important;
+        }
+        .meow-teacher-exp-pop{
+            position:absolute;
+            left:50%;
+            bottom:94px;
+            transform:translateX(-50%);
+            pointer-events:none;
+            z-index:5;
+            padding:5px 9px;
+            border-radius:999px;
+            background:#fef3c7;
+            border:1px solid #fbbf24;
+            color:#92400e;
+            font-size:12px;
+            font-weight:950;
+            white-space:nowrap;
+            opacity:0;
+        }
+        .meow-teacher-exp-pop.show{
+            animation: meowExpPop 1.45s ease forwards;
+        }
+        .meow-teacher-spark{
+            position:absolute;
+            pointer-events:none;
+            z-index:4;
+            font-size:18px;
+            animation: meowSpark .95s ease forwards;
+        }
+        @keyframes meowJump{
+            0%,100%{transform:translateY(0) scale(1)}
+            35%{transform:translateY(-24px) scale(1.07)}
+            65%{transform:translateY(-7px) scale(.98)}
+        }
+        @keyframes meowShake{
+            0%,100%{transform:translateX(0) rotate(0)}
+            20%{transform:translateX(-7px) rotate(-5deg)}
+            40%{transform:translateX(7px) rotate(5deg)}
+            60%{transform:translateX(-5px) rotate(-3deg)}
+            80%{transform:translateX(4px) rotate(2deg)}
+        }
+        @keyframes meowBounce{
+            0%,100%{transform:scale(1)}
+            30%{transform:scale(1.12,.9)}
+            55%{transform:scale(.94,1.1)}
+            75%{transform:scale(1.04,.97)}
+        }
+        @keyframes meowParty{
+            0%,100%{transform:translateY(0) rotate(0) scale(1)}
+            25%{transform:translateY(-20px) rotate(-8deg) scale(1.1)}
+            50%{transform:translateY(-7px) rotate(8deg) scale(1.04)}
+            75%{transform:translateY(-18px) rotate(-5deg) scale(1.1)}
+        }
+        @keyframes meowSleepy{
+            0%,100%{transform:translateY(0) scale(1)}
+            50%{transform:translateY(3px) scale(.98)}
+        }
+        @keyframes meowExpPop{
+            0%{opacity:0;transform:translate(-50%,8px) scale(.8)}
+            18%{opacity:1;transform:translate(-50%,0) scale(1.08)}
+            72%{opacity:1;transform:translate(-50%,-10px) scale(1)}
+            100%{opacity:0;transform:translate(-50%,-24px) scale(.95)}
+        }
+        @keyframes meowSpark{
+            0%{opacity:0;transform:translate(0,0) scale(.4) rotate(0)}
+            20%{opacity:1}
+            100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(1.15) rotate(40deg)}
+        }
+        @media (prefers-reduced-motion: reduce){
+            .meow-teacher-roamer.meow-jump .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-shake .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-bounce .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-party .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-sleepy .meow-teacher-sprite{
+                animation:none !important;
+            }
+        }
+
 </style>
 </head>
 <body>
@@ -4608,8 +4706,9 @@
 
 <!-- 🐾 喵喵老師：畫面漫遊精靈 -->
 <div id="meow-teacher-roamer" class="meow-teacher-roamer" aria-label="喵喵老師">
+    <div id="meow-teacher-exp-pop" class="meow-teacher-exp-pop">+0 EXP</div>
     <div id="meow-teacher-bubble" class="meow-teacher-bubble">你今天有認真嗎？</div>
-    <img id="meow-teacher-sprite" class="meow-teacher-sprite" src="./meow-teacher-idle.png?v=10.27" alt="喵喵老師" onclick="openMeowTeacherModal(event)">
+    <img id="meow-teacher-sprite" class="meow-teacher-sprite" src="./meow-teacher-idle.png?v=10.28" alt="喵喵老師" onclick="openMeowTeacherModal(event)">
 </div>
 
 <div class="modal-overlay" id="meowTeacherModal" onclick="closeMeowTeacherModal(event)">
@@ -4620,7 +4719,7 @@
         </div>
         <div class="modal-body">
             <div class="meow-pet-hero">
-                <img src="./meow-teacher-idle.png?v=10.27" alt="喵喵老師">
+                <img src="./meow-teacher-idle.png?v=10.28" alt="喵喵老師">
                 <div class="meow-pet-name">喵喵老師</div>
                 <div class="meow-pet-stage" id="meow-pet-stage">監督修煉中</div>
             </div>
@@ -5802,8 +5901,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.27';
-    const APP_UPDATE_NOTE = '新增喵喵老師養成 Beta｜角色會在畫面漫遊、切換走路動畫，點擊可查看目前 EXP 與成長階段';
+    const APP_VERSION = 'v10.28';
+    const APP_UPDATE_NOTE = '喵喵老師即時反應系統｜學習獲得 EXP、答題、大魔王、手寫與口說時會即時吐槽與做動作';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -6567,13 +6666,19 @@
     }
 
     function addEXP(points) {
-        let currentExp = getTotalEXP() + points;
+        const previousExp = getTotalEXP();
+        let currentExp = previousExp + points;
         localStorage.setItem('jp_rpg_exp', currentExp);
 
         if (currentUser) {
             db.collection('user_progress').doc(currentUser.uid).set({ progress: { jp_rpg_exp: currentExp } }, { merge: true });
         }
         updateHUDLevel();
+
+        // v10.28：讓喵喵老師知道使用者剛獲得 EXP。
+        window.dispatchEvent(new CustomEvent('meowTeacherExp', {
+            detail: { points, previousExp, currentExp }
+        }));
     }
 
     function getLevelAndTitle(exp, totalWords) {
@@ -7330,6 +7435,9 @@
                 feedbackEl.textContent = '🧪 測試擊破成功！測試模式不增加 EXP，也不更新三天觸發日期。';
             } else {
                 addEXP(200);
+                if (typeof window.meowTeacherReact === 'function') {
+                    window.meowTeacherReact('boss-win');
+                }
                 feedbackEl.textContent = '🎉 擊破成功！獲得 +200 EXP 狂暴大獎勵！🔥';
                 localStorage.setItem('jp_surprise_last_date', getTodayKey());
                 if (currentUser) {
@@ -7345,6 +7453,9 @@
                 ? `🧪 測試挑戰失敗！正解是：${currentBossWord.jp}`
                 : `💀 挑戰失敗！正解是：${currentBossWord.jp}`;
             feedbackEl.className = 'quiz-feedback error';
+            if (!currentBossIsTestMode && typeof window.meowTeacherReact === 'function') {
+                window.meowTeacherReact('boss-lose');
+            }
         }
 
         const questionZhEl = document.getElementById('boss-question-zh');
@@ -8841,6 +8952,10 @@
         result.style.display = 'block';
         if (statusEl) statusEl.textContent = `這次完成度 ${score} 分`;
         setSpeakingListeningUI(false, statusEl ? statusEl.textContent : '');
+
+        if (typeof window.meowTeacherReact === 'function') {
+            window.meowTeacherReact(score >= 80 ? 'speaking-good' : 'speaking-retry', { score });
+        }
     }
 
     function setMode(mode) {
@@ -9253,6 +9368,9 @@
             box.style.display = 'block';
             main.textContent = `${score} 分・再挑戰`;
             note.textContent = `${comment}　完成度 ${Math.round(coverage * 100)}%｜精準度 ${Math.round(precision * 100)}%｜大小 ${Math.round(sizeSimilarity * 100)}%｜位置 ${Math.round(centerSimilarity * 100)}%　未達 ${WRITING_PASS_SCORE} 分，再練一次就能挑戰 EXP！　※ 此分數為臨摹相似度，不代表正式筆順正誤。`;
+            if (typeof window.meowTeacherReact === 'function') {
+                window.meowTeacherReact('writing-fail');
+            }
         }
     }
 
@@ -12770,6 +12888,9 @@
             
             feedbackEl.textContent = `💀 答錯囉！正解：${correctAnswerText}`;
             feedbackEl.classList.add('error');
+            if (typeof window.meowTeacherReact === 'function') {
+                window.meowTeacherReact('quiz-wrong');
+            }
             
             allBtns.forEach(btn => {
                 if (btn.textContent.includes(currentCorrectAnswer.jp)) {
@@ -12798,8 +12919,9 @@
 
 <script>
 (function(){
-    const idleSrc='./meow-teacher-idle.png?v=10.27';
-    const walkFrames=['./meow-teacher-walk1.png?v=10.27','./meow-teacher-walk2.png?v=10.27'];
+    const idleSrc='./meow-teacher-idle.png?v=10.28';
+    const walkFrames=['./meow-teacher-walk1.png?v=10.28','./meow-teacher-walk2.png?v=10.28'];
+
     const cheekyLines=[
         '你今天才這點 EXP？😏',
         '我都有在看喔。',
@@ -12808,25 +12930,148 @@
         '嗯？今天有比較認真。',
         '再摸魚我就盯著你。',
         '口說練習做了沒？',
-        '我只是路過，順便監工。'
+        '我只是路過，順便監工。',
+        '打開網站不是叫你發呆。',
+        '學完再跑，懂？😼'
     ];
-    let roamTimer=null, frameTimer=null, bubbleTimer=null;
-    let frameIndex=0;
 
-    function getStage(exp){
-        if(exp>=300) return {name:'Lv.4 喵喵老師', next:300, start:300, pct:100, stage:'臭屁監督官'};
-        if(exp>=150) return {name:'Lv.3 得意喵', next:300, start:150, pct:(exp-150)/150*100, stage:'得意監督中'};
-        if(exp>=50) return {name:'Lv.2 學習喵', next:150, start:50, pct:(exp-50)/100*100, stage:'開始有點像老師了'};
-        return {name:'Lv.1 幼幼喵', next:50, start:0, pct:exp/50*100, stage:'菜雞監督中'};
+    const reactionLines={
+        expSmall:[
+            '喔？有在動耶。',
+            '勉強算你有學。',
+            'EXP 收到，本喵看到了。',
+            '一點一點爬吧。😏'
+        ],
+        expMedium:[
+            '嗯，這次有點東西。',
+            '可以喔，沒有完全摸魚。',
+            '本喵勉強給你一個讚。',
+            '繼續，不准停。'
+        ],
+        expBig:[
+            '蛤？！你突然這麼認真？',
+            '大量 EXP！本喵滿意。',
+            '今天是吃錯藥了嗎？😼',
+            '這波可以，賞你星星。'
+        ],
+        quizWrong:[
+            '蛤？這題？',
+            '我剛剛是不是白教了。',
+            '再看一次啦。😑',
+            '嗯……很有勇氣的答案。'
+        ],
+        bossWin:[
+            '還真的贏了耶？！',
+            '大魔王：卒。😼',
+            '這次算你帥。',
+            '好啦，本喵承認你有料。'
+        ],
+        bossLose:[
+            '被大魔王扁了齁。',
+            '回去修煉再來啦。',
+            '本喵先假裝沒看到。',
+            '輸一次而已，快去復仇。'
+        ],
+        writingFail:[
+            '這個字還在呼救。',
+            '再描一次啦。',
+            '嗯……它目前有自己的想法。',
+            '差一點，手不要飄。'
+        ],
+        speakingGood:[
+            '喔？真的有念出來。',
+            '發音可以，本喵准了。',
+            '有進步喔，不要得意。',
+            '這句算你過。😼'
+        ],
+        speakingRetry:[
+            '再念一次，我有在聽。',
+            '不要吞字啦。',
+            '慢一點，重新來。',
+            '這句還可以救。'
+        ],
+        idle:[
+            '你是開網站來陪我發呆的嗎？',
+            '……人呢？',
+            '我都快睡著了。',
+            '喂，還在嗎？'
+        ],
+        wake:[
+            '喔，你還在喔。',
+            '終於動了。',
+            '好，繼續上課。',
+            '醒了？那就學。'
+        ]
+    };
+
+    let roamTimer=null, frameTimer=null, bubbleTimer=null, idleTimer=null, expPopTimer=null;
+    let frameIndex=0;
+    let reactionLockUntil=0;
+    let isSleeping=false;
+    let lastKnownStage=null;
+
+    function pick(arr){
+        return arr[Math.floor(Math.random()*arr.length)];
     }
 
-    function showMeowBubble(line){
+    function getStage(exp){
+        if(exp>=300) return {name:'Lv.4 喵喵老師', next:300, start:300, pct:100, stage:'臭屁監督官', level:4};
+        if(exp>=150) return {name:'Lv.3 得意喵', next:300, start:150, pct:(exp-150)/150*100, stage:'得意監督中', level:3};
+        if(exp>=50) return {name:'Lv.2 學習喵', next:150, start:50, pct:(exp-50)/100*100, stage:'開始有點像老師了', level:2};
+        return {name:'Lv.1 幼幼喵', next:50, start:0, pct:exp/50*100, stage:'菜雞監督中', level:1};
+    }
+
+    function showMeowBubble(line, ms=3000){
         const bubble=document.getElementById('meow-teacher-bubble');
         if(!bubble) return;
-        bubble.textContent=line||cheekyLines[Math.floor(Math.random()*cheekyLines.length)];
+        bubble.textContent=line||pick(cheekyLines);
         bubble.classList.add('show');
         clearTimeout(bubbleTimer);
-        bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),3200);
+        bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),ms);
+    }
+
+    function showExpPop(points){
+        const el=document.getElementById('meow-teacher-exp-pop');
+        if(!el) return;
+        el.textContent=`+${points} EXP`;
+        el.classList.remove('show');
+        void el.offsetWidth;
+        el.classList.add('show');
+        clearTimeout(expPopTimer);
+        expPopTimer=setTimeout(()=>el.classList.remove('show'),1500);
+    }
+
+    function makeSparks(count=6){
+        const roamer=document.getElementById('meow-teacher-roamer');
+        if(!roamer) return;
+        const icons=['✨','⭐','✦','💛'];
+        for(let i=0;i<count;i++){
+            const s=document.createElement('span');
+            s.className='meow-teacher-spark';
+            s.textContent=pick(icons);
+            s.style.left=(35+Math.random()*30)+'%';
+            s.style.top=(30+Math.random()*35)+'%';
+            s.style.setProperty('--sx',`${(Math.random()-.5)*100}px`);
+            s.style.setProperty('--sy',`${-35-Math.random()*70}px`);
+            roamer.appendChild(s);
+            setTimeout(()=>s.remove(),1050);
+        }
+    }
+
+    function clearReactionClasses(){
+        const roamer=document.getElementById('meow-teacher-roamer');
+        if(!roamer) return;
+        roamer.classList.remove('meow-jump','meow-shake','meow-bounce','meow-party','meow-sleepy','meow-fast');
+    }
+
+    function animateReaction(cls, duration=800){
+        const roamer=document.getElementById('meow-teacher-roamer');
+        if(!roamer) return;
+        roamer.classList.remove('meow-sleepy');
+        void roamer.offsetWidth;
+        clearReactionClasses();
+        roamer.classList.add(cls);
+        setTimeout(()=>roamer.classList.remove(cls),duration);
     }
 
     function stopWalkAnimation(){
@@ -12842,28 +13087,131 @@
         frameTimer=setInterval(()=>{
             sprite.src=walkFrames[frameIndex%walkFrames.length];
             frameIndex++;
-        },260);
+        },240);
+    }
+
+    function freezeForReaction(ms=1000){
+        reactionLockUntil=Date.now()+ms;
+        stopWalkAnimation();
     }
 
     function roamOnce(){
         const roamer=document.getElementById('meow-teacher-roamer');
         if(!roamer) return;
+
+        if(Date.now()<reactionLockUntil || isSleeping){
+            clearTimeout(roamTimer);
+            roamTimer=setTimeout(roamOnce,800);
+            return;
+        }
+
         const maxLeft=Math.max(12, window.innerWidth-roamer.offsetWidth-12);
         const current=parseFloat(getComputedStyle(roamer).left)||18;
-        const pause=Math.random()<0.27;
+        const pause=Math.random()<0.28;
+
         if(pause){
             stopWalkAnimation();
-            if(Math.random()<0.38) showMeowBubble();
+            if(Math.random()<0.34) showMeowBubble();
         }else{
-            const target=12+Math.random()*(maxLeft-12);
+            const target=12+Math.random()*Math.max(0,maxLeft-12);
             roamer.classList.toggle('is-facing-left',target<current);
+
+            if(Math.random()<0.10){
+                roamer.classList.add('meow-fast');
+                showMeowBubble('借過！本喵巡堂。',1500);
+                setTimeout(()=>roamer.classList.remove('meow-fast'),650);
+            }
+
             startWalkAnimation();
             roamer.style.left=target+'px';
             setTimeout(stopWalkAnimation,950);
         }
+
         clearTimeout(roamTimer);
-        roamTimer=setTimeout(roamOnce,1800+Math.random()*2600);
+        roamTimer=setTimeout(roamOnce,1800+Math.random()*2500);
     }
+
+    function resetIdleTimer(){
+        const roamer=document.getElementById('meow-teacher-roamer');
+        if(isSleeping){
+            isSleeping=false;
+            if(roamer) roamer.classList.remove('meow-sleepy');
+            showMeowBubble(pick(reactionLines.wake),1800);
+            animateReaction('meow-bounce',650);
+        }
+
+        clearTimeout(idleTimer);
+        idleTimer=setTimeout(()=>{
+            isSleeping=true;
+            stopWalkAnimation();
+            if(roamer) roamer.classList.add('meow-sleepy');
+            showMeowBubble(pick(reactionLines.idle),3500);
+        },75000);
+    }
+
+    function react(type, detail={}){
+        freezeForReaction(type==='boss-win'?1500:950);
+
+        if(type==='quiz-wrong'){
+            showMeowBubble(pick(reactionLines.quizWrong));
+            animateReaction('meow-shake',520);
+        }else if(type==='boss-win'){
+            showMeowBubble(pick(reactionLines.bossWin),3600);
+            animateReaction('meow-party',900);
+            makeSparks(10);
+        }else if(type==='boss-lose'){
+            showMeowBubble(pick(reactionLines.bossLose));
+            animateReaction('meow-shake',560);
+        }else if(type==='writing-fail'){
+            showMeowBubble(pick(reactionLines.writingFail));
+            animateReaction('meow-shake',500);
+        }else if(type==='speaking-good'){
+            showMeowBubble(pick(reactionLines.speakingGood));
+            animateReaction('meow-jump',650);
+            makeSparks(4);
+        }else if(type==='speaking-retry'){
+            showMeowBubble(pick(reactionLines.speakingRetry));
+            animateReaction('meow-bounce',680);
+        }
+        resetIdleTimer();
+    }
+
+    function reactToExp(detail){
+        const points=Number(detail?.points||0);
+        const prev=Number(detail?.previousExp||0);
+        const current=Number(detail?.currentExp||0);
+        if(points<=0) return;
+
+        showExpPop(points);
+
+        const prevStage=getStage(prev);
+        const curStage=getStage(current);
+        if(curStage.level>prevStage.level){
+            lastKnownStage=curStage.level;
+            freezeForReaction(1800);
+            showMeowBubble(`欸？！本喵升到 ${curStage.name} 了！✨`,4200);
+            animateReaction('meow-party',950);
+            makeSparks(14);
+            return;
+        }
+
+        if(points>=100){
+            showMeowBubble(pick(reactionLines.expBig));
+            animateReaction('meow-party',900);
+            makeSparks(8);
+        }else if(points>=20){
+            showMeowBubble(pick(reactionLines.expMedium));
+            animateReaction('meow-jump',650);
+            makeSparks(4);
+        }else{
+            showMeowBubble(pick(reactionLines.expSmall),2200);
+            animateReaction('meow-bounce',620);
+        }
+        resetIdleTimer();
+    }
+
+    window.meowTeacherReact=react;
+    window.addEventListener('meowTeacherExp',e=>reactToExp(e.detail||{}));
 
     window.openMeowTeacherModal=function(event){
         if(event) event.stopPropagation();
@@ -12879,9 +13227,11 @@
         if(expText) expText.textContent=exp>=300?`${exp} EXP｜已達目前最高階`:`${exp} / ${stage.next} EXP`;
         if(fill) fill.style.width=Math.max(0,Math.min(100,stage.pct))+'%';
         if(stageEl) stageEl.textContent=stage.stage;
-        if(quote) quote.textContent='「'+cheekyLines[Math.floor(Math.random()*cheekyLines.length)]+'」';
+        if(quote) quote.textContent='「'+pick(cheekyLines)+'」';
         if(modal) modal.style.display='flex';
+        freezeForReaction(1200);
         showMeowBubble('幹嘛？想看我？😼');
+        resetIdleTimer();
     };
 
     window.closeMeowTeacherModal=function(event){
@@ -12898,9 +13248,16 @@
         if(current>maxLeft) roamer.style.left=maxLeft+'px';
     });
 
+    ['pointerdown','keydown','touchstart','scroll'].forEach(evt=>{
+        window.addEventListener(evt,resetIdleTimer,{passive:true});
+    });
+
     window.addEventListener('load',()=>{
+        const exp=(typeof getTotalEXP==='function')?getTotalEXP():parseInt(localStorage.getItem('jp_rpg_exp')||'0',10);
+        lastKnownStage=getStage(exp).level;
         setTimeout(roamOnce,900);
-        setTimeout(()=>showMeowBubble('喵喵老師來監工了 😼'),1300);
+        setTimeout(()=>showMeowBubble('喵喵老師來巡堂了 😼'),1300);
+        resetIdleTimer();
     });
 })();
 </script>
