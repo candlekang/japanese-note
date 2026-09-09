@@ -4231,6 +4231,54 @@
             font-weight:950;
         }
 
+
+
+        /* 🐾 v10.27 喵喵老師養成 Beta：畫面漫遊精靈 */
+        .meow-teacher-roamer{
+            position:fixed;left:18px;bottom:max(18px, env(safe-area-inset-bottom));
+            width:96px;height:112px;z-index:920;pointer-events:none;
+            transition:left .9s ease-in-out, bottom .35s ease;
+            filter:drop-shadow(0 8px 10px rgba(0,0,0,.28));
+        }
+        .meow-teacher-sprite{
+            width:100%;height:100%;object-fit:contain;image-rendering:auto;
+            pointer-events:auto;cursor:pointer;user-select:none;-webkit-user-drag:none;
+            transform-origin:50% 100%;transition:transform .18s ease;
+        }
+        .meow-teacher-sprite:hover{transform:translateY(-3px) scale(1.04)}
+        .meow-teacher-roamer.is-facing-left .meow-teacher-sprite{transform:scaleX(-1)}
+        .meow-teacher-roamer.is-facing-left .meow-teacher-sprite:hover{transform:scaleX(-1) translateY(-3px) scale(1.04)}
+        .meow-teacher-bubble{
+            position:absolute;left:50%;bottom:102px;transform:translateX(-50%);
+            min-width:132px;max-width:210px;padding:8px 10px;border-radius:12px;
+            background:#fff;border:2px solid #f9a8d4;color:#831843;
+            font-size:12px;font-weight:850;line-height:1.45;text-align:center;
+            box-shadow:0 6px 18px rgba(15,23,42,.18);opacity:0;visibility:hidden;
+            transition:opacity .18s ease, transform .18s ease;pointer-events:none;
+        }
+        .meow-teacher-bubble.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(-4px)}
+        .meow-teacher-bubble::after{
+            content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);
+            border:7px solid transparent;border-top-color:#f9a8d4;border-bottom:0;
+        }
+        .meow-pet-box{max-width:420px}
+        .meow-pet-hero{text-align:center;padding:8px 4px 4px}
+        .meow-pet-hero img{width:150px;max-width:58vw;filter:drop-shadow(0 8px 12px rgba(0,0,0,.25))}
+        .meow-pet-name{font-family:'DotGothic16',sans-serif;font-size:22px;color:#f9a8d4;font-weight:900;margin-top:4px}
+        .meow-pet-stage{font-size:12px;color:#cbd5e1;margin-top:2px}
+        .meow-pet-exp-card{background:#1e293b;border:1px solid #475569;border-radius:12px;padding:12px}
+        .meow-pet-exp-top{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:900;color:#f8fafc;margin-bottom:7px}
+        .meow-pet-exp-bg{height:11px;background:#0f172a;border:1px solid #475569;border-radius:999px;overflow:hidden}
+        .meow-pet-exp-fill{height:100%;width:0;background:linear-gradient(90deg,#f472b6,#fde047,#38bdf8);transition:width .3s ease}
+        .meow-pet-quote{margin-top:10px;padding:10px 12px;border-radius:10px;background:#fff7ed;border-left:4px solid #f59e0b;color:#7c2d12;font-size:13px;font-weight:800;line-height:1.6}
+        @media(max-width:600px){
+            .meow-teacher-roamer{width:78px;height:92px;bottom:max(12px, env(safe-area-inset-bottom));}
+            .meow-teacher-bubble{bottom:86px;min-width:118px;max-width:170px;font-size:11px}
+        }
+        @media(prefers-reduced-motion:reduce){
+            .meow-teacher-roamer{transition:none}
+        }
+
 </style>
 </head>
 <body>
@@ -4553,6 +4601,38 @@
 
         <div style="font-size: 14px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: var(--text-sub);">🗂️ 分類學習明細（點擊標題展開）：</div>
         <div class="progress-list" id="stats-progress-list"></div>
+    </div>
+</div>
+
+
+
+<!-- 🐾 喵喵老師：畫面漫遊精靈 -->
+<div id="meow-teacher-roamer" class="meow-teacher-roamer" aria-label="喵喵老師">
+    <div id="meow-teacher-bubble" class="meow-teacher-bubble">你今天有認真嗎？</div>
+    <img id="meow-teacher-sprite" class="meow-teacher-sprite" src="./meow-teacher-idle.png?v=10.27" alt="喵喵老師" onclick="openMeowTeacherModal(event)">
+</div>
+
+<div class="modal-overlay" id="meowTeacherModal" onclick="closeMeowTeacherModal(event)">
+    <div class="modal-box meow-pet-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🐾 喵喵老師</h3>
+            <button class="btn-modal-close" onclick="closeMeowTeacherModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="meow-pet-hero">
+                <img src="./meow-teacher-idle.png?v=10.27" alt="喵喵老師">
+                <div class="meow-pet-name">喵喵老師</div>
+                <div class="meow-pet-stage" id="meow-pet-stage">監督修煉中</div>
+            </div>
+            <div class="meow-pet-exp-card">
+                <div class="meow-pet-exp-top">
+                    <span id="meow-pet-level">Lv.1</span>
+                    <span id="meow-pet-exp-text">0 EXP</span>
+                </div>
+                <div class="meow-pet-exp-bg"><div id="meow-pet-exp-fill" class="meow-pet-exp-fill"></div></div>
+            </div>
+            <div class="meow-pet-quote" id="meow-pet-quote">「不要以為我沒看到你偷懶喔。」</div>
+        </div>
     </div>
 </div>
 
@@ -5722,8 +5802,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.26';
-    const APP_UPDATE_NOTE = '補強 Android 主畫面圖示支援｜新增 192、512 與 Maskable icon 規格';
+    const APP_VERSION = 'v10.27';
+    const APP_UPDATE_NOTE = '新增喵喵老師養成 Beta｜角色會在畫面漫遊、切換走路動畫，點擊可查看目前 EXP 與成長階段';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -12712,6 +12792,117 @@
         
         updateCounterGuideVisibility();initDailyFortuneBadge();
     preloadAllCategories();
+</script>
+
+
+
+<script>
+(function(){
+    const idleSrc='./meow-teacher-idle.png?v=10.27';
+    const walkFrames=['./meow-teacher-walk1.png?v=10.27','./meow-teacher-walk2.png?v=10.27'];
+    const cheekyLines=[
+        '你今天才這點 EXP？😏',
+        '我都有在看喔。',
+        '不要裝忙，去翻卡。',
+        '大魔王還沒打吧？',
+        '嗯？今天有比較認真。',
+        '再摸魚我就盯著你。',
+        '口說練習做了沒？',
+        '我只是路過，順便監工。'
+    ];
+    let roamTimer=null, frameTimer=null, bubbleTimer=null;
+    let frameIndex=0;
+
+    function getStage(exp){
+        if(exp>=300) return {name:'Lv.4 喵喵老師', next:300, start:300, pct:100, stage:'臭屁監督官'};
+        if(exp>=150) return {name:'Lv.3 得意喵', next:300, start:150, pct:(exp-150)/150*100, stage:'得意監督中'};
+        if(exp>=50) return {name:'Lv.2 學習喵', next:150, start:50, pct:(exp-50)/100*100, stage:'開始有點像老師了'};
+        return {name:'Lv.1 幼幼喵', next:50, start:0, pct:exp/50*100, stage:'菜雞監督中'};
+    }
+
+    function showMeowBubble(line){
+        const bubble=document.getElementById('meow-teacher-bubble');
+        if(!bubble) return;
+        bubble.textContent=line||cheekyLines[Math.floor(Math.random()*cheekyLines.length)];
+        bubble.classList.add('show');
+        clearTimeout(bubbleTimer);
+        bubbleTimer=setTimeout(()=>bubble.classList.remove('show'),3200);
+    }
+
+    function stopWalkAnimation(){
+        clearInterval(frameTimer); frameTimer=null;
+        const sprite=document.getElementById('meow-teacher-sprite');
+        if(sprite) sprite.src=idleSrc;
+    }
+
+    function startWalkAnimation(){
+        const sprite=document.getElementById('meow-teacher-sprite');
+        if(!sprite) return;
+        clearInterval(frameTimer);
+        frameTimer=setInterval(()=>{
+            sprite.src=walkFrames[frameIndex%walkFrames.length];
+            frameIndex++;
+        },260);
+    }
+
+    function roamOnce(){
+        const roamer=document.getElementById('meow-teacher-roamer');
+        if(!roamer) return;
+        const maxLeft=Math.max(12, window.innerWidth-roamer.offsetWidth-12);
+        const current=parseFloat(getComputedStyle(roamer).left)||18;
+        const pause=Math.random()<0.27;
+        if(pause){
+            stopWalkAnimation();
+            if(Math.random()<0.38) showMeowBubble();
+        }else{
+            const target=12+Math.random()*(maxLeft-12);
+            roamer.classList.toggle('is-facing-left',target<current);
+            startWalkAnimation();
+            roamer.style.left=target+'px';
+            setTimeout(stopWalkAnimation,950);
+        }
+        clearTimeout(roamTimer);
+        roamTimer=setTimeout(roamOnce,1800+Math.random()*2600);
+    }
+
+    window.openMeowTeacherModal=function(event){
+        if(event) event.stopPropagation();
+        const exp=(typeof getTotalEXP==='function')?getTotalEXP():parseInt(localStorage.getItem('jp_rpg_exp')||'0',10);
+        const stage=getStage(exp);
+        const modal=document.getElementById('meowTeacherModal');
+        const level=document.getElementById('meow-pet-level');
+        const expText=document.getElementById('meow-pet-exp-text');
+        const fill=document.getElementById('meow-pet-exp-fill');
+        const stageEl=document.getElementById('meow-pet-stage');
+        const quote=document.getElementById('meow-pet-quote');
+        if(level) level.textContent=stage.name;
+        if(expText) expText.textContent=exp>=300?`${exp} EXP｜已達目前最高階`:`${exp} / ${stage.next} EXP`;
+        if(fill) fill.style.width=Math.max(0,Math.min(100,stage.pct))+'%';
+        if(stageEl) stageEl.textContent=stage.stage;
+        if(quote) quote.textContent='「'+cheekyLines[Math.floor(Math.random()*cheekyLines.length)]+'」';
+        if(modal) modal.style.display='flex';
+        showMeowBubble('幹嘛？想看我？😼');
+    };
+
+    window.closeMeowTeacherModal=function(event){
+        if(event && event.target!==document.getElementById('meowTeacherModal')) return;
+        const modal=document.getElementById('meowTeacherModal');
+        if(modal) modal.style.display='none';
+    };
+
+    window.addEventListener('resize',()=>{
+        const roamer=document.getElementById('meow-teacher-roamer');
+        if(!roamer) return;
+        const maxLeft=Math.max(12,window.innerWidth-roamer.offsetWidth-12);
+        const current=parseFloat(getComputedStyle(roamer).left)||12;
+        if(current>maxLeft) roamer.style.left=maxLeft+'px';
+    });
+
+    window.addEventListener('load',()=>{
+        setTimeout(roamOnce,900);
+        setTimeout(()=>showMeowBubble('喵喵老師來監工了 😼'),1300);
+    });
+})();
 </script>
 
 </body>
