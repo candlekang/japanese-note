@@ -4845,7 +4845,7 @@
         </div>
         <div class="modal-body">
             <div class="meow-pet-hero">
-                <img id="meow-pet-hero-img" src="./meow-teacher-smug-v2.png?v=10.30" alt="喵喵老師">
+                <img id="meow-pet-hero-img" src="./meow-lv1-basic.png?v=10.31" alt="喵喵老師">
                 <div class="meow-pet-name">喵喵老師</div>
                 <div class="meow-pet-stage" id="meow-pet-stage">監督修煉中</div>
             </div>
@@ -6055,8 +6055,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.30';
-    const APP_UPDATE_NOTE = '喵喵老師完整養成擴充｜拉高升級門檻、連續學習獎勵、餵食鼓勵摸摸、心情表情與任務反應';
+    const APP_VERSION = 'v10.31';
+    const APP_UPDATE_NOTE = '喵喵老師十階進化｜大幅拉高 EXP 門檻，每階解鎖不同外型，新增抱胸與更多賤賤反應';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -13081,433 +13081,320 @@
 
 <script>
 (function(){
-    const idleSrc='./meow-teacher-idle-v2.png?v=10.30';
-    const walkFrames=['./meow-teacher-walk1-v2.png?v=10.30','./meow-teacher-walk2-v2.png?v=10.30'];
-    const happySrc='./meow-teacher-happy-v2.png?v=10.30';
-    const smugSrc='./meow-teacher-smug-v2.png?v=10.30';
     const PET_KEY='jp_rpg_pet_state';
-    const LEVEL_STEP=500;
 
-    // 進化門檻刻意拉高：3000 EXP 只會在中前期，不會立刻滿級。
-    const EVOLUTION_STAGES=[
-        {min:0,     title:'幼幼喵',       next:1500,  desc:'菜雞監督中'},
-        {min:1500,  title:'見習助教喵',   next:4000,  desc:'開始很愛管'},
-        {min:4000,  title:'臭屁講師喵',   next:8000,  desc:'嘴很壞但有在教'},
-        {min:8000,  title:'喵喵老師',     next:15000, desc:'正式巡堂監督'},
-        {min:15000, title:'金牌喵師',     next:25000, desc:'開始有名師架勢'},
-        {min:25000, title:'日文教授喵',   next:40000, desc:'教授級碎念'},
-        {min:40000, title:'傳說喵王',     next:null,  desc:'目前最高進化'}
-    ];
+    const walkFrames=['./meow-walk-1.png?v=10.31','./meow-walk-2.png?v=10.31'];
+    const reactionImages={
+        happy:'./meow-reaction-happy.png?v=10.31',
+        smug:'./meow-reaction-smug.png?v=10.31',
+        arms:'./meow-reaction-arms-crossed.png?v=10.31',
+        mischief:'./meow-reaction-mischief.png?v=10.31',
+        wave:'./meow-reaction-wave.png?v=10.31',
+        teaching:'./meow-reaction-teaching.png?v=10.31'
+    };
 
-    const cheekyLines=[
-        '你今天才這點 EXP？😏','我都有在看喔。','不要裝忙，去翻卡。',
-        '大魔王還沒打吧？','嗯？今天有比較認真。','再摸魚我就盯著你。',
-        '口說練習做了沒？','我只是路過，順便監工。','打開網站不是叫你發呆。',
-        '學完再跑，懂？😼','本喵的薪水就是看你受苦。','你學日文，我負責嫌棄。'
+    // v10.31：改成真正「長期養成」的十階進化。
+    // 目前約 3000 EXP 只會在 Lv.2，不會一下就滿。
+    const LEVELS=[
+        {level:1,min:0,      title:'幼幼監工喵',       desc:'什麼都沒有，只有一張欠揍的臉。', img:'./meow-lv1-basic.png?v=10.31'},
+        {level:2,min:3000,   title:'單字卡助教喵',     desc:'開始拿單字卡到處巡堂。',           img:'./meow-lv2-flashcard.png?v=10.31'},
+        {level:3,min:7000,   title:'勤學書包喵',       desc:'掛上小包包，假裝很有學生氣。',     img:'./meow-lv3-student-bag.png?v=10.31'},
+        {level:4,min:12000,  title:'眼鏡講師喵',       desc:'戴上圓眼鏡，嫌棄感增加 30%。',     img:'./meow-lv4-glasses.png?v=10.31'},
+        {level:5,min:20000,  title:'教鞭講師喵',       desc:'正式拿起教鞭與課本監督你。',       img:'./meow-lv5-pointer-book.png?v=10.31'},
+        {level:6,min:32000,  title:'學霸喵師',         desc:'開始有學霸光環，講話更臭屁。',     img:'./meow-lv6-scholar.png?v=10.31'},
+        {level:7,min:48000,  title:'學術導師喵',       desc:'學術氣場上線，已經很會指使人。',   img:'./meow-lv7-academic.png?v=10.31'},
+        {level:8,min:70000,  title:'畢業名師喵',       desc:'戴上學士帽，準備對你說教。',       img:'./meow-lv8-graduate.png?v=10.31'},
+        {level:9,min:100000, title:'星光教授喵',       desc:'教授級監工，眼神已經看透一切。',   img:'./meow-lv9-star-teacher.png?v=10.31'},
+        {level:10,min:150000,title:'傳說喵喵教授',     desc:'目前最高階。你竟然真的讀到這裡。', img:'./meow-lv10-professor.png?v=10.31'}
     ];
 
     const reactionLines={
-        expSmall:['喔？有在動耶。','勉強算你有學。','EXP 收到，本喵看到了。','一點一點爬吧。😏'],
+        expSmall:['喔？有在動耶。','勉強算你有學。','這點 EXP 也敢開心？😏','好啦，有進度。'],
         expMedium:['嗯，這次有點東西。','可以喔，沒有完全摸魚。','本喵勉強給你一個讚。','繼續，不准停。'],
-        expBig:['蛤？！你突然這麼認真？','大量 EXP！本喵滿意。','今天是吃錯藥了嗎？😼','這波可以，賞你星星。'],
-        quizWrong:['蛤？這題？','我剛剛是不是白教了。','再看一次啦。😑','嗯……很有勇氣的答案。'],
+        expBig:['蛤？！你突然這麼認真？','大量 EXP！本喵滿意。','今天是吃錯藥了嗎？😼','這波可以。'],
+        quizWrong:['蛤？這題？','我剛剛是不是白教了。','嗯……很有勇氣的答案。','你確定？你再看一次。'],
         bossWin:['還真的贏了耶？！','大魔王：卒。😼','這次算你帥。','好啦，本喵承認你有料。'],
-        bossLose:['被大魔王扁了齁。','回去修煉再來啦。','本喵先假裝沒看到。','輸一次而已，快去復仇。'],
-        writingFail:['這個字還在呼救。','再描一次啦。','嗯……它目前有自己的想法。','差一點，手不要飄。'],
+        bossLose:['被大魔王扁了齁。','本喵先假裝沒看到。','回去修煉再來啦。','輸一次而已，快去復仇。'],
+        writingFail:['這個字還在呼救。','嗯……它目前有自己的想法。','再描一次啦。','手不要飄。'],
         speakingGood:['喔？真的有念出來。','發音可以，本喵准了。','有進步喔，不要得意。','這句算你過。😼'],
         speakingRetry:['再念一次，我有在聽。','不要吞字啦。','慢一點，重新來。','這句還可以救。'],
-        task:['任務清掉了？今天有點像樣。','居然有把委託做完。','好啦，任務完成算你一功。','本喵宣布：今天不是廢物。😼'],
-        idle:['你是開網站來陪我發呆的嗎？','……人呢？','我都快睡著了。','喂，還在嗎？'],
-        wake:['喔，你還在喔。','終於動了。','好，繼續上課。','醒了？那就學。']
+        task:['今天居然不是來混的。','任務清掉了？有點東西。','本喵宣布：今天不是廢物。😼','好啦，今天算你有交作業。'],
+        idle:['你是開網站來陪我發呆的嗎？','……人呢？','我都快睡著了。','喂，還在嗎？']
     };
 
-    let roamTimer=null, frameTimer=null, bubbleTimer=null, idleTimer=null, expPopTimer=null, heroTimer=null;
-    let frameIndex=0, reactionLockUntil=0, isSleeping=false, streakRewardLock=false;
+    const stateLines={
+        great:['今天本喵狀態超好，准你多學一點。','看到沒，這就是名師氣場。✨','心情好，今天少酸你兩句。'],
+        smug:['你學日文，我負責嫌棄。','不要看我，看字卡。','本喵都有在監督。'],
+        grumpy:['今天不想理你。除非摸一下。','心情很差，原因可能是你。','現在講話請先看本喵臉色。'],
+        sleepy:['本喵沒電了……你還要卷？','先讓我睡五分鐘。','活力不足，拒絕加班。'],
+        hungry:['我的腦袋空空，快去餵幾張字卡。','本喵需要知識，不是藉口。','學習能量太低，你是不是在混。']
+    };
 
-    function clamp(v,min=0,max=100){ return Math.max(min,Math.min(max,Number(v)||0)); }
-    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+    let roamTimer=null,frameTimer=null,bubbleTimer=null,idleTimer=null,expPopTimer=null,reactionTimer=null;
+    let frameIndex=0,reactionLockUntil=0,isSleeping=false,streakRewardLock=false;
+
+    function clamp(v,min=0,max=100){return Math.max(min,Math.min(max,Number(v)||0));}
+    function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
     function todayKey(){
         const d=new Date();
         return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
+    function getExp(){return (typeof getTotalEXP==='function')?getTotalEXP():parseInt(localStorage.getItem('jp_rpg_exp')||'0',10);}
+    function getLevel(exp=getExp()){
+        let result=LEVELS[0];
+        for(const lv of LEVELS){if(exp>=lv.min) result=lv;}
+        return result;
+    }
+    function getNextLevel(exp=getExp()){
+        const current=getLevel(exp);
+        return LEVELS.find(x=>x.level===current.level+1)||null;
+    }
+    function getLevelProgress(exp=getExp()){
+        const cur=getLevel(exp),next=getNextLevel(exp);
+        if(!next)return 100;
+        return ((exp-cur.min)/(next.min-cur.min))*100;
+    }
     function dayDiff(a,b){
-        if(!a||!b) return 999;
-        const d1=new Date(a+'T00:00:00'), d2=new Date(b+'T00:00:00');
-        return Math.round((d2-d1)/86400000);
+        if(!a||!b)return 999;
+        return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);
     }
 
     function getPetState(){
-        let state=null;
-        try{ state=JSON.parse(localStorage.getItem(PET_KEY)||'null'); }catch(e){}
-        if(!state || typeof state!=='object'){
-            state={
-                mood:72,energy:72,learning:68,updatedAt:Date.now(),
-                studyStreak:0,lastStudyDate:'',lastStreakRewardDate:'',
-                interactionDate:'',interactionCounts:{snack:0,cheer:0,pet:0}
-            };
+        let s=null;
+        try{s=JSON.parse(localStorage.getItem(PET_KEY)||'null');}catch(e){}
+        if(!s||typeof s!=='object'){
+            s={mood:72,energy:72,learning:68,updatedAt:Date.now(),studyStreak:0,lastStudyDate:'',
+               interactionDate:'',interactionCounts:{snack:0,cheer:0,pet:0}};
         }
-        if(!state.interactionCounts) state.interactionCounts={snack:0,cheer:0,pet:0};
-        return applyPetDecay(state);
+        if(!s.interactionCounts)s.interactionCounts={snack:0,cheer:0,pet:0};
+        return applyPetDecay(s);
     }
-
-    function applyPetDecay(state){
-        const now=Date.now(), last=Number(state.updatedAt||now);
-        const hours=Math.min(48,Math.max(0,(now-last)/3600000));
+    function applyPetDecay(s){
+        const now=Date.now(),hours=Math.min(48,Math.max(0,(now-Number(s.updatedAt||now))/3600000));
         if(hours>0.05){
-            state.mood=clamp(Number(state.mood||70)-hours*0.50,15,100);
-            state.energy=clamp(Number(state.energy||70)-hours*0.95,15,100);
-            state.learning=clamp(Number(state.learning||70)-hours*0.72,15,100);
-            state.updatedAt=now;
-            savePetState(state,false);
+            s.mood=clamp((s.mood||70)-hours*.50,15,100);
+            s.energy=clamp((s.energy||70)-hours*.95,15,100);
+            s.learning=clamp((s.learning||70)-hours*.72,15,100);
+            savePetState(s,false);
         }
-        return state;
+        return s;
     }
-
-    function savePetState(state,cloud=true){
-        state.mood=Math.round(clamp(state.mood)*10)/10;
-        state.energy=Math.round(clamp(state.energy)*10)/10;
-        state.learning=Math.round(clamp(state.learning)*10)/10;
-        state.updatedAt=Date.now();
-        localStorage.setItem(PET_KEY,JSON.stringify(state));
-        if(cloud && typeof currentUser!=='undefined' && currentUser && typeof db!=='undefined'){
-            db.collection('user_progress').doc(currentUser.uid)
-              .set({progress:{[PET_KEY]:state}},{merge:true}).catch(()=>{});
+    function savePetState(s,cloud=true){
+        s.mood=Math.round(clamp(s.mood)*10)/10;
+        s.energy=Math.round(clamp(s.energy)*10)/10;
+        s.learning=Math.round(clamp(s.learning)*10)/10;
+        s.updatedAt=Date.now();
+        localStorage.setItem(PET_KEY,JSON.stringify(s));
+        if(cloud&&typeof currentUser!=='undefined'&&currentUser&&typeof db!=='undefined'){
+            db.collection('user_progress').doc(currentUser.uid).set({progress:{[PET_KEY]:s}},{merge:true}).catch(()=>{});
         }
-        renderPetVitals(state);
+        renderPetVitals(s);
     }
-
-    function changePet(delta={}){
+    function changePet(d={}){
         const s=getPetState();
-        s.mood=clamp(s.mood+(delta.mood||0),15,100);
-        s.energy=clamp(s.energy+(delta.energy||0),15,100);
-        s.learning=clamp(s.learning+(delta.learning||0),15,100);
+        s.mood=clamp(s.mood+(d.mood||0),15,100);
+        s.energy=clamp(s.energy+(d.energy||0),15,100);
+        s.learning=clamp(s.learning+(d.learning||0),15,100);
         savePetState(s,true);
         return s;
     }
-
-    function getEvolutionStage(exp){
-        let found=EVOLUTION_STAGES[0];
-        for(const st of EVOLUTION_STAGES){
-            if(exp>=st.min) found=st;
-        }
-        return found;
-    }
-
-    function getLevelInfo(exp){
-        const level=Math.floor(Math.max(0,exp)/LEVEL_STEP)+1;
-        const start=(level-1)*LEVEL_STEP, next=level*LEVEL_STEP;
-        return {level,start,next,pct:((exp-start)/LEVEL_STEP)*100};
-    }
-
-    function getPetCondition(s){
+    function getCondition(s){
         const avg=(s.mood+s.energy+s.learning)/3;
-        if(s.energy<30) return {key:'sleepy',text:'狀態：沒電想睡 😴',src:idleSrc};
-        if(s.learning<32) return {key:'hungry',text:'狀態：腦袋空空，快餵知識 📚',src:smugSrc};
-        if(s.mood<32) return {key:'grumpy',text:'狀態：臭臉監工中 😑',src:smugSrc};
-        if(avg>=86) return {key:'great',text:'狀態：超級得意 ✨',src:happySrc};
-        if(avg>=68) return {key:'smug',text:'狀態：得意巡堂中 😼',src:smugSrc};
-        return {key:'normal',text:'狀態：普通監工中 🐾',src:idleSrc};
+        if(s.energy<30)return 'sleepy';
+        if(s.learning<32)return 'hungry';
+        if(s.mood<32)return 'grumpy';
+        if(avg>=86)return 'great';
+        return 'smug';
+    }
+    function defaultSprite(){
+        return getLevel().img;
+    }
+    function conditionSprite(s){
+        const c=getCondition(s);
+        if(c==='great')return reactionImages.happy;
+        if(c==='grumpy')return reactionImages.arms;
+        if(c==='sleepy')return defaultSprite();
+        if(c==='hungry')return reactionImages.teaching;
+        return defaultSprite();
+    }
+    function conditionLine(s){
+        const c=getCondition(s);
+        return pick(stateLines[c]||stateLines.smug);
     }
 
-    function conditionDialogue(s){
-        const c=getPetCondition(s);
-        if(c.key==='sleepy') return pick(['本喵沒電了……你還要卷？','先讓我睡五分鐘。五分鐘喔。','活力不足，拒絕加班。']);
-        if(c.key==='hungry') return pick(['我的腦袋空空，快去餵幾張字卡。','學習能量太低，你是不是在混。','本喵需要知識，不是藉口。']);
-        if(c.key==='grumpy') return pick(['今天不想理你。除非摸一下。','心情很差，原因可能是你。','現在講話請先看本喵臉色。']);
-        if(c.key==='great') return pick(['今天本喵狀態超好，准你多學一點。','看到沒，這就是名師氣場。✨','心情好，今天少酸你兩句。']);
-        return pick(cheekyLines);
+    function renderPetVitals(s){
+        s=s||getPetState();
+        [['meow-mood-fill','meow-mood-text',s.mood],['meow-energy-fill','meow-energy-text',s.energy],['meow-learning-fill','meow-learning-text',s.learning]]
+          .forEach(([f,t,v])=>{const fe=document.getElementById(f),te=document.getElementById(t);if(fe)fe.style.width=clamp(v)+'%';if(te)te.textContent=Math.round(v);});
+        const c=getCondition(s);
+        const cond=document.getElementById('meow-pet-condition');
+        if(cond)cond.textContent='狀態：'+({great:'超級得意 ✨',smug:'得意巡堂中 😼',grumpy:'抱胸臭臉中 🙄',sleepy:'沒電想睡 😴',hungry:'腦袋空空 📚'}[c]);
+        const hero=document.getElementById('meow-pet-hero-img');
+        if(hero)hero.src=conditionSprite(s);
+        const streak=document.getElementById('meow-pet-streak');
+        if(streak)streak.textContent=`${Number(s.studyStreak||0)} 天`;
+        const next=document.getElementById('meow-pet-streak-next');
+        if(next)next.textContent=s.lastStudyDate===todayKey()?'今日已累積 🔥':'今天第一次學習會續上連勝';
+        renderInteractionUI(s);
     }
 
     function renderInteractionUI(s){
-        const t=todayKey();
-        if(s.interactionDate!==t){
-            s.interactionDate=t;
-            s.interactionCounts={snack:0,cheer:0,pet:0};
-            savePetState(s,false);
-        }
+        const today=todayKey();
+        if(s.interactionDate!==today){s.interactionDate=today;s.interactionCounts={snack:0,cheer:0,pet:0};savePetState(s,false);}
         const limits={snack:3,cheer:5,pet:10};
         Object.keys(limits).forEach(k=>{
-            const used=Number(s.interactionCounts?.[k]||0);
-            const left=Math.max(0,limits[k]-used);
+            const used=Number(s.interactionCounts[k]||0),left=Math.max(0,limits[k]-used);
             const id=k==='snack'?'meow-snack-left':k==='cheer'?'meow-cheer-left':'meow-pet-left';
             const el=document.getElementById(id);
-            if(el) el.textContent=`${left}/${limits[k]}`;
-            const btn=el?.closest('button');
-            if(btn) btn.disabled=left<=0;
+            if(el)el.textContent=`${left}/${limits[k]}`;
+            if(el?.closest('button'))el.closest('button').disabled=left<=0;
         });
     }
 
-    function renderPetVitals(state){
-        const s=state||getPetState();
-        [['meow-mood-fill','meow-mood-text',s.mood],
-         ['meow-energy-fill','meow-energy-text',s.energy],
-         ['meow-learning-fill','meow-learning-text',s.learning]].forEach(([fid,tid,val])=>{
-            const f=document.getElementById(fid), t=document.getElementById(tid);
-            if(f) f.style.width=clamp(val)+'%';
-            if(t) t.textContent=Math.round(val);
-        });
-        const cond=getPetCondition(s);
-        const c=document.getElementById('meow-pet-condition'); if(c) c.textContent=cond.text;
-        const hero=document.getElementById('meow-pet-hero-img'); if(hero) hero.src=cond.src;
-        const streak=document.getElementById('meow-pet-streak'); if(streak) streak.textContent=`${Number(s.studyStreak||0)} 天`;
-        const streakNext=document.getElementById('meow-pet-streak-next');
-        if(streakNext) streakNext.textContent=s.lastStudyDate===todayKey()?'今日已累積 🔥':'今天第一次學習會續上連勝';
-        renderInteractionUI(s);
+    function setSprite(src,ms=0){
+        const el=document.getElementById('meow-teacher-sprite');if(!el)return;
+        el.src=src;
+        clearTimeout(reactionTimer);
+        if(ms)reactionTimer=setTimeout(()=>el.src=defaultSprite(),ms);
+    }
+    function showBubble(line,ms=3000){
+        const b=document.getElementById('meow-teacher-bubble');if(!b)return;
+        b.textContent=line;b.classList.add('show');clearTimeout(bubbleTimer);
+        bubbleTimer=setTimeout(()=>b.classList.remove('show'),ms);
+    }
+    function showExp(points){
+        const el=document.getElementById('meow-teacher-exp-pop');if(!el)return;
+        el.textContent=`+${points} EXP`;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+        clearTimeout(expPopTimer);expPopTimer=setTimeout(()=>el.classList.remove('show'),1500);
+    }
+    function animate(cls,ms=800){
+        const r=document.getElementById('meow-teacher-roamer');if(!r)return;
+        ['meow-jump','meow-shake','meow-bounce','meow-party','meow-sleepy','meow-fast'].forEach(x=>r.classList.remove(x));
+        void r.offsetWidth;r.classList.add(cls);setTimeout(()=>r.classList.remove(cls),ms);
+    }
+    function makeSparks(n=6){
+        const r=document.getElementById('meow-teacher-roamer');if(!r)return;
+        for(let i=0;i<n;i++){
+            const s=document.createElement('span');s.className='meow-teacher-spark';s.textContent=pick(['✨','⭐','✦','💛']);
+            s.style.left=(35+Math.random()*30)+'%';s.style.top=(30+Math.random()*35)+'%';
+            s.style.setProperty('--sx',`${(Math.random()-.5)*100}px`);s.style.setProperty('--sy',`${-35-Math.random()*70}px`);
+            r.appendChild(s);setTimeout(()=>s.remove(),1050);
+        }
+    }
+    function stopWalk(){clearInterval(frameTimer);frameTimer=null;setSprite(defaultSprite());}
+    function startWalk(){
+        const el=document.getElementById('meow-teacher-sprite');if(!el)return;
+        clearInterval(frameTimer);frameTimer=setInterval(()=>{el.src=walkFrames[frameIndex++%walkFrames.length];},240);
+    }
+    function freeze(ms=1000){reactionLockUntil=Date.now()+ms;stopWalk();}
+
+    function roam(){
+        const r=document.getElementById('meow-teacher-roamer');if(!r)return;
+        if(Date.now()<reactionLockUntil||isSleeping){roamTimer=setTimeout(roam,800);return;}
+        const max=Math.max(12,innerWidth-r.offsetWidth-12),cur=parseFloat(getComputedStyle(r).left)||18;
+        if(Math.random()<.32){
+            stopWalk();
+            if(Math.random()<.4)showBubble(conditionLine(getPetState()));
+        }else{
+            const target=12+Math.random()*Math.max(0,max-12);
+            r.classList.toggle('is-facing-left',target<cur);
+            startWalk();r.style.left=target+'px';setTimeout(stopWalk,950);
+        }
+        roamTimer=setTimeout(roam,1800+Math.random()*2600);
     }
 
-    function showStreakPop(text){
-        const r=document.getElementById('meow-teacher-roamer'); if(!r) return;
-        const el=document.createElement('div');
-        el.className='meow-streak-pop'; el.textContent=text; r.appendChild(el);
-        setTimeout(()=>el.remove(),2300);
+    function resetIdle(){
+        const r=document.getElementById('meow-teacher-roamer');
+        if(isSleeping){isSleeping=false;if(r)r.classList.remove('meow-sleepy');showBubble('喔，你還在喔。',1800);animate('meow-bounce',600);}
+        clearTimeout(idleTimer);
+        idleTimer=setTimeout(()=>{isSleeping=true;stopWalk();if(r)r.classList.add('meow-sleepy');showBubble(pick(reactionLines.idle),3500);},75000);
     }
 
-    function recordStudyDay(source){
-        if(source==='streakReward' || streakRewardLock) return;
-        const s=getPetState(), today=todayKey();
-        if(s.lastStudyDate===today) return;
-
+    function recordStudy(source){
+        if(source==='streakReward'||streakRewardLock)return;
+        const s=getPetState(),today=todayKey();
+        if(s.lastStudyDate===today)return;
         const diff=dayDiff(s.lastStudyDate,today);
-        s.studyStreak=(diff===1)?Number(s.studyStreak||0)+1:1;
-        s.lastStudyDate=today;
-
-        let reward=Math.min(60,10+s.studyStreak*2);
-        if(s.studyStreak===3) reward+=20;
-        if(s.studyStreak===7) reward+=50;
-        if(s.studyStreak===14) reward+=100;
-        if(s.studyStreak===30) reward+=200;
-
-        s.lastStreakRewardDate=today;
-        s.mood=clamp(s.mood+4);
-        s.learning=clamp(s.learning+5);
-        savePetState(s,true);
-
-        streakRewardLock=true;
-        if(typeof addEXP==='function') addEXP(reward,{source:'streakReward'});
-        streakRewardLock=false;
-
-        showStreakPop(`🔥 連續 ${s.studyStreak} 天！+${reward} EXP`);
-        showMeowBubble(`連續 ${s.studyStreak} 天喔？還行啦。😼`,3200);
-        animateReaction('meow-party',850);
-        makeSparks(7);
+        s.studyStreak=diff===1?Number(s.studyStreak||0)+1:1;s.lastStudyDate=today;
+        const reward=Math.min(100,15+s.studyStreak*3);
+        s.mood=clamp(s.mood+4);s.learning=clamp(s.learning+5);savePetState(s,true);
+        streakRewardLock=true;if(typeof addEXP==='function')addEXP(reward,{source:'streakReward'});streakRewardLock=false;
+        showBubble(`連續 ${s.studyStreak} 天。居然撐住了？😏`,3200);animate('meow-party',850);makeSparks(7);
     }
 
     window.interactMeowTeacher=function(type){
-        const s=getPetState(), today=todayKey();
-        if(s.interactionDate!==today){
-            s.interactionDate=today; s.interactionCounts={snack:0,cheer:0,pet:0};
-        }
-        const limits={snack:3,cheer:5,pet:10};
+        const s=getPetState(),today=todayKey(),limits={snack:3,cheer:5,pet:10};
+        if(s.interactionDate!==today){s.interactionDate=today;s.interactionCounts={snack:0,cheer:0,pet:0};}
         const used=Number(s.interactionCounts[type]||0);
-        if(used>=limits[type]){
-            showMeowBubble(type==='snack'?'吃不下了啦。':'今天額度用完了，別黏。',2200);
-            return;
-        }
+        if(used>=limits[type]){showBubble('今天夠了，別黏。',2000);return;}
         s.interactionCounts[type]=used+1;
-
-        if(type==='snack'){
-            s.energy=clamp(s.energy+9); s.mood=clamp(s.mood+3);
-            showMeowBubble(pick(['這個可以，再來……明天。','嗯，勉強好吃。','餵食成功，本喵批准。']));
-            setSprite(happySrc,1300); animateReaction('meow-bounce',700);
-        }else if(type==='cheer'){
-            s.mood=clamp(s.mood+6); s.learning=clamp(s.learning+4);
-            showMeowBubble(pick(['你突然這麼會講話？','嗯……有被鼓勵到一點。','再誇兩句也不是不行。']));
-            setSprite(happySrc,1300); animateReaction('meow-jump',650);
-        }else{
-            s.mood=clamp(s.mood+5); s.energy=clamp(s.energy+1);
-            showMeowBubble(pick(['只能摸一下喔。','……再一下也可以。','手法普通，本喵勉強接受。']));
-            setSprite(smugSrc,1300); animateReaction('meow-bounce',620);
-        }
-        savePetState(s,true);
-        renderInteractionUI(s);
+        if(type==='snack'){s.energy=clamp(s.energy+9);s.mood=clamp(s.mood+3);setSprite(reactionImages.happy,1200);showBubble('嗯，勉強好吃。');}
+        if(type==='cheer'){s.mood=clamp(s.mood+6);s.learning=clamp(s.learning+4);setSprite(reactionImages.wave,1200);showBubble('再誇兩句也不是不行。');}
+        if(type==='pet'){s.mood=clamp(s.mood+5);setSprite(reactionImages.arms,1200);showBubble('只能摸一下喔。');}
+        savePetState(s,true);animate('meow-bounce',620);
     };
 
-    function setSprite(src,ms=0){
-        const sprite=document.getElementById('meow-teacher-sprite'); if(!sprite) return;
-        sprite.src=src; clearTimeout(heroTimer);
-        if(ms>0) heroTimer=setTimeout(()=>sprite.src=getPetCondition(getPetState()).src,ms);
-    }
-    function showMeowBubble(line,ms=3000){
-        const b=document.getElementById('meow-teacher-bubble'); if(!b) return;
-        b.textContent=line||conditionDialogue(getPetState()); b.classList.add('show');
-        clearTimeout(bubbleTimer); bubbleTimer=setTimeout(()=>b.classList.remove('show'),ms);
-    }
-    function showExpPop(points){
-        const el=document.getElementById('meow-teacher-exp-pop'); if(!el) return;
-        el.textContent=`+${points} EXP`; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-        clearTimeout(expPopTimer); expPopTimer=setTimeout(()=>el.classList.remove('show'),1500);
-    }
-    function makeSparks(count=6){
-        const r=document.getElementById('meow-teacher-roamer'); if(!r) return;
-        const icons=['✨','⭐','✦','💛'];
-        for(let i=0;i<count;i++){
-            const s=document.createElement('span'); s.className='meow-teacher-spark'; s.textContent=pick(icons);
-            s.style.left=(35+Math.random()*30)+'%'; s.style.top=(30+Math.random()*35)+'%';
-            s.style.setProperty('--sx',`${(Math.random()-.5)*100}px`);
-            s.style.setProperty('--sy',`${-35-Math.random()*70}px`);
-            r.appendChild(s); setTimeout(()=>s.remove(),1050);
-        }
-    }
-    function clearReactionClasses(){
-        const r=document.getElementById('meow-teacher-roamer');
-        if(r) r.classList.remove('meow-jump','meow-shake','meow-bounce','meow-party','meow-sleepy','meow-fast');
-    }
-    function animateReaction(cls,duration=800){
-        const r=document.getElementById('meow-teacher-roamer'); if(!r) return;
-        r.classList.remove('meow-sleepy'); void r.offsetWidth; clearReactionClasses(); r.classList.add(cls);
-        setTimeout(()=>r.classList.remove(cls),duration);
-    }
-    function stopWalkAnimation(){
-        clearInterval(frameTimer); frameTimer=null; setSprite(getPetCondition(getPetState()).src);
-    }
-    function startWalkAnimation(){
-        const sprite=document.getElementById('meow-teacher-sprite'); if(!sprite) return;
-        clearInterval(frameTimer);
-        frameTimer=setInterval(()=>{sprite.src=walkFrames[frameIndex++%walkFrames.length];},240);
-    }
-    function freezeForReaction(ms=1000){ reactionLockUntil=Date.now()+ms; stopWalkAnimation(); }
-
-    function roamOnce(){
-        const r=document.getElementById('meow-teacher-roamer'); if(!r) return;
-        if(Date.now()<reactionLockUntil || isSleeping){ roamTimer=setTimeout(roamOnce,800); return; }
-
-        const maxLeft=Math.max(12,innerWidth-r.offsetWidth-12);
-        const current=parseFloat(getComputedStyle(r).left)||18;
-        if(Math.random()<0.30){
-            stopWalkAnimation();
-            if(Math.random()<0.38) showMeowBubble(conditionDialogue(getPetState()));
-        }else{
-            const target=12+Math.random()*Math.max(0,maxLeft-12);
-            r.classList.toggle('is-facing-left',target<current);
-            if(Math.random()<0.12){
-                r.classList.add('meow-fast');
-                showMeowBubble(pick(['巡堂巡堂，借過。','本喵去抓偷懶的人。','緊急巡視！']),1400);
-                setTimeout(()=>r.classList.remove('meow-fast'),700);
-            }
-            startWalkAnimation(); r.style.left=target+'px'; setTimeout(stopWalkAnimation,950);
-        }
-        roamTimer=setTimeout(roamOnce,1700+Math.random()*2700);
-    }
-
-    function resetIdleTimer(){
-        const r=document.getElementById('meow-teacher-roamer');
-        if(isSleeping){
-            isSleeping=false; if(r) r.classList.remove('meow-sleepy');
-            showMeowBubble(pick(reactionLines.wake),1800); animateReaction('meow-bounce',650);
-        }
-        clearTimeout(idleTimer);
-        idleTimer=setTimeout(()=>{
-            isSleeping=true; stopWalkAnimation(); if(r) r.classList.add('meow-sleepy');
-            showMeowBubble(pick(reactionLines.idle),3500);
-        },75000);
-    }
-
     function react(type,detail={}){
-        freezeForReaction(type==='boss-win'?1500:950);
-        if(type==='quiz-wrong'){
-            showMeowBubble(pick(reactionLines.quizWrong)); animateReaction('meow-shake',520); setSprite(smugSrc,1300);
-        }else if(type==='boss-win'){
-            changePet({mood:6,energy:4,learning:6});
-            showMeowBubble(pick(reactionLines.bossWin),3600); animateReaction('meow-party',900); makeSparks(10); setSprite(happySrc,1700);
-        }else if(type==='boss-lose'){
-            showMeowBubble(pick(reactionLines.bossLose)); animateReaction('meow-shake',560); setSprite(smugSrc,1400);
-        }else if(type==='writing-fail'){
-            showMeowBubble(pick(reactionLines.writingFail)); animateReaction('meow-shake',500); setSprite(smugSrc,1200);
-        }else if(type==='speaking-good'){
-            changePet({mood:3,energy:2,learning:4});
-            showMeowBubble(pick(reactionLines.speakingGood)); animateReaction('meow-jump',650); makeSparks(4); setSprite(happySrc,1400);
-        }else if(type==='speaking-retry'){
-            changePet({learning:1}); showMeowBubble(pick(reactionLines.speakingRetry));
-            animateReaction('meow-bounce',680); setSprite(smugSrc,1200);
-        }else if(type==='task-complete'){
-            changePet({mood:5,learning:4});
-            showMeowBubble(pick(reactionLines.task),3400); animateReaction('meow-party',900); makeSparks(9); setSprite(happySrc,1600);
-        }
-        resetIdleTimer();
+        freeze(type==='boss-win'?1500:950);
+        if(type==='quiz-wrong'){setSprite(reactionImages.arms,1500);showBubble(pick(reactionLines.quizWrong));animate('meow-shake',520);}
+        else if(type==='boss-win'){changePet({mood:6,energy:4,learning:6});setSprite(reactionImages.happy,1800);showBubble(pick(reactionLines.bossWin));animate('meow-party',900);makeSparks(10);}
+        else if(type==='boss-lose'){setSprite(reactionImages.smug,1500);showBubble(pick(reactionLines.bossLose));animate('meow-shake',560);}
+        else if(type==='writing-fail'){setSprite(reactionImages.mischief,1300);showBubble(pick(reactionLines.writingFail));animate('meow-shake',500);}
+        else if(type==='speaking-good'){changePet({mood:3,energy:2,learning:4});setSprite(reactionImages.wave,1500);showBubble(pick(reactionLines.speakingGood));animate('meow-jump',650);makeSparks(4);}
+        else if(type==='speaking-retry'){setSprite(reactionImages.arms,1300);showBubble(pick(reactionLines.speakingRetry));animate('meow-bounce',680);}
+        else if(type==='task-complete'){changePet({mood:5,learning:4});setSprite(reactionImages.teaching,1700);showBubble(pick(reactionLines.task));animate('meow-party',900);makeSparks(9);}
+        resetIdle();
     }
 
-    function reactToExp(d){
-        const points=Number(d?.points||0), prev=Number(d?.previousExp||0), current=Number(d?.currentExp||0);
-        const source=d?.source||'general';
-        if(points<=0) return;
-
-        if(source!=='streakReward') recordStudyDay(source);
-
-        const boost=Math.min(8,Math.max(1,points/8));
-        changePet({mood:Math.min(5,boost*.6),energy:Math.min(4,boost*.4),learning:boost});
-        showExpPop(points);
-
-        const prevLevel=getLevelInfo(prev), curLevel=getLevelInfo(current);
-        const prevStage=getEvolutionStage(prev), curStage=getEvolutionStage(current);
-
-        if(curStage.title!==prevStage.title){
-            freezeForReaction(2100);
-            showMeowBubble(`進化啦！本喵現在是「${curStage.title}」✨`,4400);
-            animateReaction('meow-party',1000); makeSparks(16); setSprite(happySrc,2300); return;
+    function reactExp(d){
+        const p=Number(d?.points||0),prev=Number(d?.previousExp||0),cur=Number(d?.currentExp||0),source=d?.source||'general';
+        if(p<=0)return;
+        if(source!=='streakReward')recordStudy(source);
+        const boost=Math.min(8,Math.max(1,p/8));
+        changePet({mood:Math.min(5,boost*.6),energy:Math.min(4,boost*.4),learning:boost});showExp(p);
+        const oldLv=getLevel(prev),newLv=getLevel(cur);
+        if(newLv.level>oldLv.level){
+            freeze(2100);setSprite(newLv.img,2300);showBubble(`升級！Lv.${newLv.level}「${newLv.title}」解鎖 😼`,4300);animate('meow-party',1000);makeSparks(16);return;
         }
-        if(curLevel.level>prevLevel.level){
-            freezeForReaction(1600);
-            showMeowBubble(`升到 Lv.${curLevel.level}。勉強值得慶祝。😼`,3500);
-            animateReaction('meow-party',900); makeSparks(10); setSprite(happySrc,1700); return;
-        }
-        if(source==='streakReward'){
-            showExpPop(points); return;
-        }
-        if(points>=100){
-            showMeowBubble(pick(reactionLines.expBig)); animateReaction('meow-party',900); makeSparks(8); setSprite(happySrc,1600);
-        }else if(points>=20){
-            showMeowBubble(pick(reactionLines.expMedium)); animateReaction('meow-jump',650); makeSparks(4); setSprite(happySrc,1200);
-        }else{
-            showMeowBubble(pick(reactionLines.expSmall),2200); animateReaction('meow-bounce',620); setSprite(smugSrc,1000);
-        }
-        resetIdleTimer();
+        if(source==='streakReward')return;
+        if(p>=100){setSprite(reactionImages.happy,1500);showBubble(pick(reactionLines.expBig));animate('meow-party',900);makeSparks(8);}
+        else if(p>=20){setSprite(reactionImages.wave,1200);showBubble(pick(reactionLines.expMedium));animate('meow-jump',650);}
+        else{setSprite(reactionImages.mischief,1000);showBubble(pick(reactionLines.expSmall),2200);animate('meow-bounce',620);}
+        resetIdle();
     }
 
     window.meowTeacherReact=react;
-    window.addEventListener('meowTeacherExp',e=>reactToExp(e.detail||{}));
+    window.addEventListener('meowTeacherExp',e=>reactExp(e.detail||{}));
 
     window.openMeowTeacherModal=function(event){
-        if(event) event.stopPropagation();
-        const exp=(typeof getTotalEXP==='function')?getTotalEXP():parseInt(localStorage.getItem('jp_rpg_exp')||'0',10);
-        const lv=getLevelInfo(exp), evo=getEvolutionStage(exp);
-        const modal=document.getElementById('meowTeacherModal');
-        const level=document.getElementById('meow-pet-level'), expText=document.getElementById('meow-pet-exp-text');
-        const fill=document.getElementById('meow-pet-exp-fill'), stageEl=document.getElementById('meow-pet-stage');
-        const quote=document.getElementById('meow-pet-quote'), evoText=document.getElementById('meow-pet-evolution-text');
-
-        if(level) level.textContent=`Lv.${lv.level}｜${evo.title}`;
-        if(expText) expText.textContent=`${exp} / ${lv.next} EXP`;
-        if(fill) fill.style.width=Math.max(0,Math.min(100,lv.pct))+'%';
-        if(stageEl) stageEl.textContent=evo.desc;
-        if(evoText){
-            evoText.textContent=evo.next
-                ? `下一階進化「${getEvolutionStage(evo.next).title}」：還差 ${Math.max(0,evo.next-exp)} EXP`
-                : '✨ 已達目前最高進化階段';
-        }
-        const state=getPetState();
-        if(quote) quote.textContent='「'+conditionDialogue(state)+'」';
-        renderPetVitals(state);
-        if(modal) modal.style.display='flex';
-        freezeForReaction(1200); showMeowBubble('幹嘛？想看我？😼'); resetIdleTimer();
+        if(event)event.stopPropagation();
+        const exp=getExp(),lv=getLevel(exp),next=getNextLevel(exp),modal=document.getElementById('meowTeacherModal');
+        const level=document.getElementById('meow-pet-level'),expText=document.getElementById('meow-pet-exp-text');
+        const fill=document.getElementById('meow-pet-exp-fill'),stage=document.getElementById('meow-pet-stage');
+        const evo=document.getElementById('meow-pet-evolution-text'),quote=document.getElementById('meow-pet-quote');
+        if(level)level.textContent=`Lv.${lv.level}｜${lv.title}`;
+        if(expText)expText.textContent=next?`${exp} / ${next.min} EXP`:`${exp} EXP｜目前最高階`;
+        if(fill)fill.style.width=Math.max(0,Math.min(100,getLevelProgress(exp)))+'%';
+        if(stage)stage.textContent=lv.desc;
+        if(evo)evo.textContent=next?`下一級「${next.title}」：還差 ${next.min-exp} EXP`:'✨ 已達目前最高階';
+        const s=getPetState();if(quote)quote.textContent='「'+conditionLine(s)+'」';renderPetVitals(s);
+        if(modal)modal.style.display='flex';freeze(1200);showBubble('幹嘛？想看我？😼');resetIdle();
     };
-
     window.closeMeowTeacherModal=function(event){
-        if(event && event.target!==document.getElementById('meowTeacherModal')) return;
-        const modal=document.getElementById('meowTeacherModal'); if(modal) modal.style.display='none';
+        if(event&&event.target!==document.getElementById('meowTeacherModal'))return;
+        const m=document.getElementById('meowTeacherModal');if(m)m.style.display='none';
     };
 
     window.addEventListener('resize',()=>{
-        const r=document.getElementById('meow-teacher-roamer'); if(!r) return;
-        const maxLeft=Math.max(12,innerWidth-r.offsetWidth-12), cur=parseFloat(getComputedStyle(r).left)||12;
-        if(cur>maxLeft) r.style.left=maxLeft+'px';
+        const r=document.getElementById('meow-teacher-roamer');if(!r)return;
+        const max=Math.max(12,innerWidth-r.offsetWidth-12),cur=parseFloat(getComputedStyle(r).left)||12;
+        if(cur>max)r.style.left=max+'px';
     });
-    ['pointerdown','keydown','touchstart','scroll'].forEach(evt=>window.addEventListener(evt,resetIdleTimer,{passive:true}));
+    ['pointerdown','keydown','touchstart','scroll'].forEach(e=>window.addEventListener(e,resetIdle,{passive:true}));
 
     window.addEventListener('load',()=>{
-        renderPetVitals(getPetState());
-        setTimeout(roamOnce,900);
-        setTimeout(()=>showMeowBubble('喵喵老師來巡堂了 😼'),1300);
-        resetIdleTimer();
+        const sprite=document.getElementById('meow-teacher-sprite');if(sprite)sprite.src=defaultSprite();
+        renderPetVitals(getPetState());setTimeout(roam,900);setTimeout(()=>showBubble('喵喵老師來巡堂了 😼'),1300);resetIdle();
     });
 })();
 </script>
