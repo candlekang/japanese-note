@@ -4503,6 +4503,20 @@
             .meow-pet-streak-card{font-size:11px}
         }
 
+
+        /* 🐾 v10.33 常駐快速互動 */
+        .meow-quick-actions{position:absolute;left:50%;bottom:-34px;transform:translateX(-50%);display:flex;gap:5px;z-index:9;white-space:nowrap}
+        .meow-quick-btn{min-width:48px;height:30px;border-radius:999px;border:1px solid #cbd5e1;background:rgba(255,255,255,.96);box-shadow:0 4px 12px rgba(15,23,42,.18);padding:3px 7px;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:10px;font-weight:950;color:#334155;touch-action:manipulation}
+        .meow-quick-btn span{font-size:13px;line-height:1}
+        .meow-quick-btn.feed{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+        .meow-quick-btn.pet{border-color:#f472b6;background:#fdf2f8;color:#9d174d}
+        .meow-quick-btn.cheer{border-color:#38bdf8;background:#f0f9ff;color:#075985}
+        .meow-quick-btn:active{transform:scale(.94)}
+        .meow-quick-btn:disabled{opacity:.4;filter:grayscale(.45);cursor:not-allowed}
+        .meow-interaction-fx{position:absolute;left:50%;top:3px;transform:translateX(-50%);pointer-events:none;z-index:10;font-size:22px;animation:meowInteractFloat 1.15s ease forwards}
+        @keyframes meowInteractFloat{0%{opacity:0;transform:translate(-50%,12px) scale(.75)}18%{opacity:1;transform:translate(-50%,0) scale(1.12)}72%{opacity:1;transform:translate(-50%,-26px) scale(1)}100%{opacity:0;transform:translate(-50%,-50px) scale(.92)}}
+        @media(max-width:480px){.meow-quick-actions{bottom:-31px;gap:4px}.meow-quick-btn{min-width:43px;height:28px;padding:3px 6px;font-size:9px}.meow-quick-btn span{font-size:12px}}
+
 </style>
 </head>
 <body>
@@ -4834,7 +4848,12 @@
 <div id="meow-teacher-roamer" class="meow-teacher-roamer" aria-label="喵喵老師">
     <div id="meow-teacher-exp-pop" class="meow-teacher-exp-pop">+0 EXP</div>
     <div id="meow-teacher-bubble" class="meow-teacher-bubble">你今天有認真嗎？</div>
-    <img id="meow-teacher-sprite" class="meow-teacher-sprite" src="./assets/meow/meow-lv1-basic.png?v=10.32.2.1" alt="喵喵老師" onclick="openMeowTeacherModal(event)" onerror="this.onerror=null;this.src='./assets/meow/meow-reaction-smug.png?v=10.32.2.1';">
+    <div id="meow-quick-actions" class="meow-quick-actions" aria-label="喵喵老師快速互動">
+        <button type="button" class="meow-quick-btn feed" onclick="event.stopPropagation(); interactMeowTeacher('snack')"><span>🍙</span>餵食</button>
+        <button type="button" class="meow-quick-btn pet" onclick="event.stopPropagation(); interactMeowTeacher('pet')"><span>🐾</span>摸摸</button>
+        <button type="button" class="meow-quick-btn cheer" onclick="event.stopPropagation(); interactMeowTeacher('cheer')"><span>📣</span>鼓勵</button>
+    </div>
+    <img id="meow-teacher-sprite" class="meow-teacher-sprite" src="./assets/meow/meow-lv1-basic.png?v=10.33.1" alt="喵喵老師" onclick="openMeowTeacherModal(event)" onerror="this.onerror=null;this.src='./assets/meow/meow-reaction-smug.png?v=10.33.1';">
 </div>
 
 <div class="modal-overlay" id="meowTeacherModal" onclick="closeMeowTeacherModal(event)">
@@ -4845,7 +4864,7 @@
         </div>
         <div class="modal-body">
             <div class="meow-pet-hero">
-                <img id="meow-pet-hero-img" src="./assets/meow/meow-lv1-basic.png?v=10.32.2" alt="喵喵老師">
+                <img id="meow-pet-hero-img" src="./assets/meow/meow-lv1-basic.png?v=10.33" alt="喵喵老師">
                 <div class="meow-pet-name">喵喵老師</div>
                 <div class="meow-pet-stage" id="meow-pet-stage">監督修煉中</div>
             </div>
@@ -6055,8 +6074,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.32';
-    const APP_UPDATE_NOTE = '整理專案目錄｜喵喵老師素材統一移至 assets/meow，更新全部圖片路徑';
+    const APP_VERSION = 'v10.33';
+    const APP_UPDATE_NOTE = '喵喵老師快速互動｜餵食、摸摸、鼓勵改成常駐按鈕，點擊立即顯示專屬反應';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -13083,29 +13102,32 @@
 (function(){
     const PET_KEY='jp_rpg_pet_state';
 
-    const walkFrames=['./assets/meow/meow-walk-1.png?v=10.32.2','./assets/meow/meow-walk-2.png?v=10.32.2'];
+    const walkFrames=['./assets/meow/meow-walk-1.png?v=10.33','./assets/meow/meow-walk-2.png?v=10.33'];
     const reactionImages={
-        happy:'./assets/meow/meow-reaction-happy.png?v=10.32.2',
-        smug:'./assets/meow/meow-reaction-smug.png?v=10.32.2',
-        arms:'./assets/meow/meow-reaction-arms-crossed.png?v=10.32.2',
-        mischief:'./assets/meow/meow-reaction-mischief.png?v=10.32.2',
-        wave:'./assets/meow/meow-reaction-wave.png?v=10.32.2',
-        teaching:'./assets/meow/meow-reaction-teaching.png?v=10.32.2'
+        happy:'./assets/meow/meow-reaction-happy.png?v=10.33',
+        smug:'./assets/meow/meow-reaction-smug.png?v=10.33',
+        arms:'./assets/meow/meow-reaction-arms-crossed.png?v=10.33',
+        mischief:'./assets/meow/meow-reaction-mischief.png?v=10.33',
+        wave:'./assets/meow/meow-reaction-wave.png?v=10.33',
+        teaching:'./assets/meow/meow-reaction-teaching.png?v=10.33',
+        feed:'./assets/meow/meow-interact-feed.png?v=10.33',
+        pat:'./assets/meow/meow-interact-pat.png?v=10.33',
+        cheer:'./assets/meow/meow-interact-cheer.png?v=10.33'
     };
 
     // v10.31：改成真正「長期養成」的十階進化。
     // 目前約 3000 EXP 只會在 Lv.2，不會一下就滿。
     const LEVELS=[
-        {level:1,min:0,      title:'幼幼監工喵',       desc:'什麼都沒有，只有一張欠揍的臉。', img:'./assets/meow/meow-lv1-basic.png?v=10.32.2'},
-        {level:2,min:3000,   title:'單字卡助教喵',     desc:'開始拿單字卡到處巡堂。',           img:'./assets/meow/meow-lv2-flashcard.png?v=10.32.2'},
-        {level:3,min:7000,   title:'勤學書包喵',       desc:'掛上小包包，假裝很有學生氣。',     img:'./assets/meow/meow-lv3-student-bag.png?v=10.32.2'},
-        {level:4,min:12000,  title:'眼鏡講師喵',       desc:'戴上圓眼鏡，嫌棄感增加 30%。',     img:'./assets/meow/meow-lv4-glasses.png?v=10.32.2'},
-        {level:5,min:20000,  title:'教鞭講師喵',       desc:'正式拿起教鞭與課本監督你。',       img:'./assets/meow/meow-lv5-pointer-book.png?v=10.32.2'},
-        {level:6,min:32000,  title:'學霸喵師',         desc:'開始有學霸光環，講話更臭屁。',     img:'./assets/meow/meow-lv6-scholar.png?v=10.32.2'},
-        {level:7,min:48000,  title:'學術導師喵',       desc:'學術氣場上線，已經很會指使人。',   img:'./assets/meow/meow-lv7-academic.png?v=10.32.2'},
-        {level:8,min:70000,  title:'畢業名師喵',       desc:'戴上學士帽，準備對你說教。',       img:'./assets/meow/meow-lv8-graduate.png?v=10.32.2'},
-        {level:9,min:100000, title:'星光教授喵',       desc:'教授級監工，眼神已經看透一切。',   img:'./assets/meow/meow-lv9-star-teacher.png?v=10.32.2'},
-        {level:10,min:150000,title:'傳說喵喵教授',     desc:'目前最高階。你竟然真的讀到這裡。', img:'./assets/meow/meow-lv10-professor.png?v=10.32.2'}
+        {level:1,min:0,      title:'幼幼監工喵',       desc:'什麼都沒有，只有一張欠揍的臉。', img:'./assets/meow/meow-lv1-basic.png?v=10.33'},
+        {level:2,min:3000,   title:'單字卡助教喵',     desc:'開始拿單字卡到處巡堂。',           img:'./assets/meow/meow-lv2-flashcard.png?v=10.33'},
+        {level:3,min:7000,   title:'勤學書包喵',       desc:'掛上小包包，假裝很有學生氣。',     img:'./assets/meow/meow-lv3-student-bag.png?v=10.33'},
+        {level:4,min:12000,  title:'眼鏡講師喵',       desc:'戴上圓眼鏡，嫌棄感增加 30%。',     img:'./assets/meow/meow-lv4-glasses.png?v=10.33'},
+        {level:5,min:20000,  title:'教鞭講師喵',       desc:'正式拿起教鞭與課本監督你。',       img:'./assets/meow/meow-lv5-pointer-book.png?v=10.33'},
+        {level:6,min:32000,  title:'學霸喵師',         desc:'開始有學霸光環，講話更臭屁。',     img:'./assets/meow/meow-lv6-scholar.png?v=10.33'},
+        {level:7,min:48000,  title:'學術導師喵',       desc:'學術氣場上線，已經很會指使人。',   img:'./assets/meow/meow-lv7-academic.png?v=10.33'},
+        {level:8,min:70000,  title:'畢業名師喵',       desc:'戴上學士帽，準備對你說教。',       img:'./assets/meow/meow-lv8-graduate.png?v=10.33'},
+        {level:9,min:100000, title:'星光教授喵',       desc:'教授級監工，眼神已經看透一切。',   img:'./assets/meow/meow-lv9-star-teacher.png?v=10.33'},
+        {level:10,min:150000,title:'傳說喵喵教授',     desc:'目前最高階。你竟然真的讀到這裡。', img:'./assets/meow/meow-lv10-professor.png?v=10.33'}
     ];
 
     const reactionLines={
@@ -13248,6 +13270,11 @@
             const el=document.getElementById(id);
             if(el)el.textContent=`${left}/${limits[k]}`;
             if(el?.closest('button'))el.closest('button').disabled=left<=0;
+            const quickClass=k==='snack'?'feed':k;
+            document.querySelectorAll(`.meow-quick-btn.${quickClass}`).forEach(q=>{
+                q.disabled=left<=0;
+                q.title=(k==='snack'?'餵食':k==='pet'?'摸摸':'鼓勵')+`｜今日剩 ${left}/${limits[k]} 次`;
+            });
         });
     }
 
@@ -13322,16 +13349,41 @@
         showBubble(`連續 ${s.studyStreak} 天。居然撐住了？😏`,3200);animate('meow-party',850);makeSparks(7);
     }
 
+    function showInteractionFx(symbol){
+        const r=document.getElementById('meow-teacher-roamer');
+        if(!r)return;
+        const fx=document.createElement('div');
+        fx.className='meow-interaction-fx';
+        fx.textContent=symbol;
+        r.appendChild(fx);
+        setTimeout(()=>fx.remove(),1200);
+    }
+
     window.interactMeowTeacher=function(type){
         const s=getPetState(),today=todayKey(),limits={snack:3,cheer:5,pet:10};
         if(s.interactionDate!==today){s.interactionDate=today;s.interactionCounts={snack:0,cheer:0,pet:0};}
         const used=Number(s.interactionCounts[type]||0);
         if(used>=limits[type]){showBubble('今天夠了，別黏。',2000);return;}
         s.interactionCounts[type]=used+1;
-        if(type==='snack'){s.energy=clamp(s.energy+9);s.mood=clamp(s.mood+3);setSprite(reactionImages.happy,1200);showBubble('嗯，勉強好吃。');}
-        if(type==='cheer'){s.mood=clamp(s.mood+6);s.learning=clamp(s.learning+4);setSprite(reactionImages.wave,1200);showBubble('再誇兩句也不是不行。');}
-        if(type==='pet'){s.mood=clamp(s.mood+5);setSprite(reactionImages.arms,1200);showBubble('只能摸一下喔。');}
-        savePetState(s,true);animate('meow-bounce',620);
+        if(type==='snack'){
+            s.energy=clamp(s.energy+9);s.mood=clamp(s.mood+3);
+            setSprite(reactionImages.feed,1800);
+            showBubble(pick(['嗯～這個可以。','終於知道要進貢了？😼','再一口……明天再說。']),2200);
+            showInteractionFx('🍙💕');animate('meow-bounce',720);
+        }
+        if(type==='cheer'){
+            s.mood=clamp(s.mood+6);s.learning=clamp(s.learning+4);
+            setSprite(reactionImages.cheer,1800);
+            showBubble(pick(['這樣才對，繼續。','嗯？你今天很會講話嘛。','本喵收到鼓勵了，准你加油。']),2200);
+            showInteractionFx('✨📣');animate('meow-jump',720);
+        }
+        if(type==='pet'){
+            s.mood=clamp(s.mood+5);
+            setSprite(reactionImages.pat,1800);
+            showBubble(pick(['欸！誰准你摸……再一下。','手法普通，本喵勉強接受。','……好啦，不討厭。']),2200);
+            showInteractionFx('💗🐾');animate('meow-bounce',720);
+        }
+        savePetState(s,true);
     };
 
     function react(type,detail={}){
