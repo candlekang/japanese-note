@@ -13,32 +13,32 @@
         roamRandomDelayMs: 2600
     });
 
-    const walkFrames=['./assets/meow/meow-walk-1.png?v=10.36.3','./assets/meow/meow-walk-2.png?v=10.36.3'];
-    const lazyFrames=['./assets/meow/meow-lazy-1.png?v=10.36.3','./assets/meow/meow-lazy-2.png?v=10.36.3'];
-    const sleepFrames=['./assets/meow/meow-sleep-1.png?v=10.36.3','./assets/meow/meow-sleep-2.png?v=10.36.3'];
+    const walkFrames=['./assets/meow/meow-walk-1.png?v=10.37.0','./assets/meow/meow-walk-2.png?v=10.37.0'];
+    const lazyFrames=['./assets/meow/meow-lazy-1.png?v=10.37.0','./assets/meow/meow-lazy-2.png?v=10.37.0'];
+    const sleepFrames=['./assets/meow/meow-sleep-1.png?v=10.37.0','./assets/meow/meow-sleep-2.png?v=10.37.0'];
     const reactionImages={
-        happy:'./assets/meow/meow-reaction-happy.png?v=10.36.3',
-        smug:'./assets/meow/meow-reaction-smug.png?v=10.36.3',
-        arms:'./assets/meow/meow-reaction-arms-crossed.png?v=10.36.3',
-        mischief:'./assets/meow/meow-reaction-mischief.png?v=10.36.3',
-        wave:'./assets/meow/meow-reaction-wave.png?v=10.36.3',
-        teaching:'./assets/meow/meow-reaction-teaching.png?v=10.36.3',
-        feed:'./assets/meow/meow-interact-feed.png?v=10.36.3',
-        pat:'./assets/meow/meow-interact-pat.png?v=10.36.3',
-        cheer:'./assets/meow/meow-interact-cheer.png?v=10.36.3'
+        happy:'./assets/meow/meow-reaction-happy.png?v=10.37.0',
+        smug:'./assets/meow/meow-reaction-smug.png?v=10.37.0',
+        arms:'./assets/meow/meow-reaction-arms-crossed.png?v=10.37.0',
+        mischief:'./assets/meow/meow-reaction-mischief.png?v=10.37.0',
+        wave:'./assets/meow/meow-reaction-wave.png?v=10.37.0',
+        teaching:'./assets/meow/meow-reaction-teaching.png?v=10.37.0',
+        feed:'./assets/meow/meow-interact-feed.png?v=10.37.0',
+        pat:'./assets/meow/meow-interact-pat.png?v=10.37.0',
+        cheer:'./assets/meow/meow-interact-cheer.png?v=10.37.0'
     };
     const interactionFrames={
         snack:[
-            './assets/meow/meow-interact-feed.png?v=10.36.3',
-            './assets/meow/meow-interact-feed-2.png?v=10.36.3'
+            './assets/meow/meow-interact-feed.png?v=10.37.0',
+            './assets/meow/meow-interact-feed-2.png?v=10.37.0'
         ],
         pet:[
-            './assets/meow/meow-interact-pat.png?v=10.36.3',
-            './assets/meow/meow-interact-pat-2.png?v=10.36.3'
+            './assets/meow/meow-interact-pat.png?v=10.37.0',
+            './assets/meow/meow-interact-pat-2.png?v=10.37.0'
         ],
         cheer:[
-            './assets/meow/meow-interact-cheer.png?v=10.36.3',
-            './assets/meow/meow-interact-cheer-2.png?v=10.36.3'
+            './assets/meow/meow-interact-cheer.png?v=10.37.0',
+            './assets/meow/meow-interact-cheer-2.png?v=10.37.0'
         ]
     };
 
@@ -62,16 +62,16 @@
     // v10.31：改成真正「長期養成」的十階進化。
     // 目前約 3000 EXP 只會在 Lv.2，不會一下就滿。
     const LEVELS=[
-        {level:1,min:0,      title:'幼幼監工喵',       desc:'什麼都沒有，只有一張欠揍的臉。', img:'./assets/meow/meow-lv1-basic.png?v=10.36.3'},
-        {level:2,min:3000,   title:'單字卡助教喵',     desc:'開始拿單字卡到處巡堂。',           img:'./assets/meow/meow-lv2-flashcard.png?v=10.36.3'},
-        {level:3,min:7000,   title:'勤學書包喵',       desc:'掛上小包包，假裝很有學生氣。',     img:'./assets/meow/meow-lv3-student-bag.png?v=10.36.3'},
-        {level:4,min:12000,  title:'眼鏡講師喵',       desc:'戴上圓眼鏡，嫌棄感增加 30%。',     img:'./assets/meow/meow-lv4-glasses.png?v=10.36.3'},
-        {level:5,min:20000,  title:'教鞭講師喵',       desc:'正式拿起教鞭與課本監督你。',       img:'./assets/meow/meow-lv5-pointer-book.png?v=10.36.3'},
-        {level:6,min:32000,  title:'學霸喵師',         desc:'開始有學霸光環，講話更臭屁。',     img:'./assets/meow/meow-lv6-scholar.png?v=10.36.3'},
-        {level:7,min:48000,  title:'學術導師喵',       desc:'學術氣場上線，已經很會指使人。',   img:'./assets/meow/meow-lv7-academic.png?v=10.36.3'},
-        {level:8,min:70000,  title:'畢業名師喵',       desc:'戴上學士帽，準備對你說教。',       img:'./assets/meow/meow-lv8-graduate.png?v=10.36.3'},
-        {level:9,min:100000, title:'星光教授喵',       desc:'教授級監工，眼神已經看透一切。',   img:'./assets/meow/meow-lv9-star-teacher.png?v=10.36.3'},
-        {level:10,min:150000,title:'傳說喵喵教授',     desc:'目前最高階。你竟然真的讀到這裡。', img:'./assets/meow/meow-lv10-professor.png?v=10.36.3'}
+        {level:1,min:0,      title:'幼幼監工喵',       desc:'什麼都沒有，只有一張欠揍的臉。', img:'./assets/meow/meow-lv1-basic.png?v=10.37.0'},
+        {level:2,min:3000,   title:'單字卡助教喵',     desc:'開始拿單字卡到處巡堂。',           img:'./assets/meow/meow-lv2-flashcard.png?v=10.37.0'},
+        {level:3,min:7000,   title:'勤學書包喵',       desc:'掛上小包包，假裝很有學生氣。',     img:'./assets/meow/meow-lv3-student-bag.png?v=10.37.0'},
+        {level:4,min:12000,  title:'眼鏡講師喵',       desc:'戴上圓眼鏡，嫌棄感增加 30%。',     img:'./assets/meow/meow-lv4-glasses.png?v=10.37.0'},
+        {level:5,min:20000,  title:'教鞭講師喵',       desc:'正式拿起教鞭與課本監督你。',       img:'./assets/meow/meow-lv5-pointer-book.png?v=10.37.0'},
+        {level:6,min:32000,  title:'學霸喵師',         desc:'開始有學霸光環，講話更臭屁。',     img:'./assets/meow/meow-lv6-scholar.png?v=10.37.0'},
+        {level:7,min:48000,  title:'學術導師喵',       desc:'學術氣場上線，已經很會指使人。',   img:'./assets/meow/meow-lv7-academic.png?v=10.37.0'},
+        {level:8,min:70000,  title:'畢業名師喵',       desc:'戴上學士帽，準備對你說教。',       img:'./assets/meow/meow-lv8-graduate.png?v=10.37.0'},
+        {level:9,min:100000, title:'星光教授喵',       desc:'教授級監工，眼神已經看透一切。',   img:'./assets/meow/meow-lv9-star-teacher.png?v=10.37.0'},
+        {level:10,min:150000,title:'傳說喵喵教授',     desc:'目前最高階。你竟然真的讀到這裡。', img:'./assets/meow/meow-lv10-professor.png?v=10.37.0'}
     ];
 
     const reactionLines={
