@@ -1,0 +1,250 @@
+@media (max-width:420px) { .feedback-modal-grid { grid-template-columns:1fr; } }
+
+@media (max-width: 480px) {
+            .verb-guide-grid { grid-template-columns: 1fr; }
+        }
+
+@media (max-width: 640px) {
+            .conj-front-meaning {
+                width: 96%;
+                font-size: 12px;
+                -webkit-line-clamp: 4;
+                padding: 9px 10px;
+            }
+        }
+
+@media (max-width: 640px) {
+            .conj-guide-hero-top {
+                flex-direction: column;
+            }
+            .conj-guide-pronounce-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+@media(max-width:640px){.suffix-guide-hero-top{flex-direction:column}.suffix-guide-pronounce-btn{width:100%}}
+
+@media (max-width: 640px) {
+            .suffix-front-meaning {
+                width: 96%;
+                font-size: 12px;
+                -webkit-line-clamp: 4;
+            }
+        }
+
+@media(max-width:640px){
+            .prefix-guide-hero-top{flex-direction:column}
+            .prefix-guide-pronounce-btn{width:100%}
+            .prefix-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
+@media (max-width: 600px) {
+            #surpriseBossModal {
+                padding: 10px;
+            }
+            #surpriseBossModal .boss-modal-box {
+                width: 100%;
+                max-width: 100%;
+                max-height: 92vh;
+                border-radius: 16px;
+            }
+            #surpriseBossModal .modal-header {
+                padding: 12px 14px;
+            }
+            #surpriseBossModal .modal-title {
+                font-size: 15px;
+                line-height: 1.45;
+            }
+            #surpriseBossModal .modal-body {
+                padding: 12px;
+                gap: 10px;
+                overflow-x: hidden;
+            }
+            #boss-question-text {
+                font-size: 16px !important;
+                line-height: 1.65;
+                overflow-wrap: anywhere;
+                word-break: normal;
+            }
+            #boss-quiz-options {
+                gap: 10px;
+                margin-top: 4px !important;
+            }
+            #boss-quiz-options .quiz-btn {
+                padding: 12px;
+                border-radius: 12px;
+            }
+            .boss-option-row {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                justify-content: flex-start;
+                gap: 8px;
+            }
+            .boss-option-left {
+                width: 100%;
+                flex: none;
+            }
+            .boss-option-jp {
+                width: 100%;
+                font-size: 15px;
+                line-height: 1.55;
+                text-align: left;
+                white-space: normal;
+            }
+            .boss-option-zh,
+            .quiz-btn.show-translation .boss-option-zh {
+                width: 100%;
+                display: none;
+                white-space: normal;
+                border-radius: 10px;
+                padding: 7px 9px;
+                font-size: 12px;
+                line-height: 1.55;
+                text-align: left;
+                align-items: flex-start;
+            }
+            .quiz-btn.show-translation .boss-option-zh {
+                display: block;
+            }
+            .boss-question-zh {
+                font-size: 13px;
+                line-height: 1.6;
+                padding: 9px 10px;
+            }
+            .boss-review-answer {
+                font-size: 15px;
+                line-height: 1.55;
+                overflow-wrap: anywhere;
+            }
+            .boss-review-zh,
+            .boss-review-note {
+                font-size: 12px;
+                line-height: 1.6;
+                overflow-wrap: anywhere;
+            }
+            #btn-boss-submit,
+            #btn-boss-close {
+                white-space: normal;
+            }
+        }
+
+@media (max-width: 600px) {
+            .stats-card-popup-body { padding: 10px; }
+            #stats-card-popup-host .card-container { height: 460px; }
+        }
+
+@media (max-width: 380px) {
+            .card-container,
+            #stats-card-popup-host .card-container {
+                height: 630px;
+            }
+
+            .card-front .card-body-wrapper {
+                padding: 0 20px;
+            }
+
+            .front-main-title {
+                font-size: 27px;
+            }
+        }
+
+@media(max-width:640px){.rentai-guide-hero-top{flex-direction:column}.rentai-guide-pronounce-btn{width:100%}.rentai-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}}
+
+@media(max-width:640px){
+            .adv-guide-hero-top{flex-direction:column}
+            .adv-guide-pronounce-btn{width:100%}
+            .adv-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
+@media(max-width:640px){
+            .fuku-guide-hero-top{flex-direction:column}
+            .fuku-guide-pronounce-btn{width:100%}
+            .fuku-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
+@media(max-width:640px){
+            .aux-guide-hero-top{flex-direction:column}
+            .aux-guide-pronounce-btn{width:100%}
+            .aux-compare-grid{grid-template-columns:1fr}
+            .aux-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
+@media(max-width:640px){
+            .grammar-front-box{width:96%}
+            .grammar-front-summary{font-size:13px}
+            .grammar-front-formula{font-size:11px}
+        }
+
+@media(max-width:640px){.phrase-guide-hero-top{flex-direction:column}.phrase-guide-pronounce-btn{width:100%}.phrase-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}}
+
+@media(max-width:640px){
+            .case-guide-hero-top{flex-direction:column}
+            .case-guide-pronounce-btn{width:100%}
+            .case-compare-grid{grid-template-columns:1fr}
+            .case-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
+@media(max-width:640px){
+            .final-guide-hero-top{flex-direction:column}
+            .final-guide-pronounce-btn{width:100%}
+            .final-compare-grid{grid-template-columns:1fr}
+            .final-front-meaning{width:96%;font-size:12px;-webkit-line-clamp:4}
+        }
+
+@media(max-width:640px){
+            .reason-quick-grid,.reason-compare-grid{grid-template-columns:1fr}
+        }
+
+@media(max-width:640px){
+            .te-group-grid,.te-compare-grid{grid-template-columns:1fr}
+            .te-front-box{width:96%;font-size:12px}
+        }
+
+@media(max-width:640px){
+            .tsukeru-compare-grid{grid-template-columns:1fr}
+            .tsukeru-situation-table{
+                grid-template-columns:minmax(70px,.75fr) 1fr 1fr;
+            }
+            .tsukeru-cell{font-size:10px;padding:7px 5px}
+        }
+
+@media(max-width:640px){.speaking-target{font-size:20px}.speaking-actions,.speaking-actions-four{grid-template-columns:1fr 1fr}#speaking-section{padding:18px 12px}}
+
+@media(max-width:600px){
+            .meow-teacher-roamer{width:78px;height:92px;bottom:max(12px, env(safe-area-inset-bottom));}
+            .meow-teacher-bubble{bottom:86px;min-width:118px;max-width:170px;font-size:11px}
+        }
+
+@media(prefers-reduced-motion:reduce){
+            .meow-teacher-roamer{transition:none}
+        }
+
+@media (prefers-reduced-motion: reduce){
+            .meow-teacher-roamer.meow-jump .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-shake .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-bounce .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-party .meow-teacher-sprite,
+            .meow-teacher-roamer.meow-sleepy .meow-teacher-sprite{
+                animation:none !important;
+            }
+        }
+
+@media(max-width:480px){
+            .meow-pet-actions{grid-template-columns:1fr 1fr 1fr;gap:5px}
+            .meow-action-btn{font-size:10px;padding:8px 3px}
+            .meow-pet-streak-card{font-size:11px}
+        }
+
+@media(max-width:480px){
+            .meow-teacher-roamer{bottom:max(52px, calc(env(safe-area-inset-bottom) + 22px));}
+            .meow-quick-actions{top:10px;width:64px;height:86px}
+            .meow-quick-btn{width:30px;height:30px;font-size:14px}
+            .meow-quick-btn.feed{left:6px;top:2px}
+            .meow-quick-btn.pet{left:24px;top:28px}
+            .meow-quick-btn.cheer{left:6px;top:54px}
+            .meow-quick-actions.side-left .meow-quick-btn.feed{left:28px}
+            .meow-quick-actions.side-left .meow-quick-btn.pet{left:10px}
+            .meow-quick-actions.side-left .meow-quick-btn.cheer{left:28px}
+        }

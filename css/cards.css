@@ -1,0 +1,2587 @@
+.card-container { 
+            perspective: 1000px; 
+            width: 100%; 
+            height: 500px; 
+            margin-bottom: 20px; 
+            position: relative;
+        }
+
+.card-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+.card-container.is-flipped .card-inner { transform: rotateY(180deg); }
+
+.card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 20px; box-shadow: var(--shadow); background: var(--card-bg);
+            display: flex; flex-direction: column; 
+            padding: 24px 16px 20px 16px; 
+            box-sizing: border-box;
+            border: 2px solid #334155;
+        }
+
+.card-front { justify-content: center; align-items: center; }
+
+.card-back { 
+            transform: rotateY(180deg); background: #f8fafc; border: 2px solid #334155;
+            justify-content: flex-start; align-items: flex-start; overflow-y: auto; text-align: left;
+            padding-top: 48px; 
+        }
+
+.card-back::-webkit-scrollbar { width: 6px; }
+
+.card-back::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+.card-body-wrapper {
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+.card-counter-fixed {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 3px 12px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            z-index: 30;
+            pointer-events: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            white-space: nowrap;
+        }
+
+.card-counter-fixed.intro-mode {
+            color: #b45309;
+            background: #fef3c7;
+            border-color: #fde68a;
+        }
+
+.card-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            font-size: 10px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 25;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            user-select: none;
+        }
+
+.card-nav-arrow:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary);
+            transform: translateY(-50%) scale(1.15);
+        }
+
+.card-nav-arrow.left { left: 6px !important; }
+
+.card-nav-arrow.right { right: 6px !important; }
+
+.front-main-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            line-height: 1.2;
+            white-space: pre-wrap;
+        }
+
+.front-sub-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+        }
+
+.front-mean-box {
+            font-size: 13.5px;
+            color: #78350f;
+            background: #fffbeb;
+            border: 1.5px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            max-width: 95%;
+            word-break: break-word;
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+/* 9.7：名詞分頁專屬字卡 */
+        .noun-priority-badge {
+            background: rgba(245, 158, 11, 0.12) !important;
+            border-color: rgba(245, 158, 11, 0.38) !important;
+            color: #a16207 !important;
+            letter-spacing: 0.2px;
+        }
+
+.noun-front-meaning {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em;
+            width: 92%;
+            text-align: center;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #38bdf8;
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.55;
+            padding: 9px 12px;
+            border-radius: 10px;
+            margin: 2px auto 12px auto;
+            box-sizing: border-box;
+        }
+
+.noun-back-meaning {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid #0284c7;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+.noun-back-meaning-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0369a1;
+            margin-bottom: 4px;
+        }
+
+.noun-back-meaning-text {
+            font-size: 14px;
+            color: #0f172a;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+.grammar-rule-card {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1.5px solid var(--primary);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+.grammar-rule-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+.grammar-rule-content {
+            font-size: 13px;
+            font-weight: bold;
+            color: #0369a1;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+/* 🔢 數詞：特殊讀音／音變提示 */
+        .counter-reading-alert {
+            margin: 12px 0;
+            padding: 13px 14px;
+            border-radius: 12px;
+            border: 1px solid #f59e0b;
+            background: linear-gradient(135deg, #fff7ed, #fffbeb);
+            box-shadow: 0 4px 10px rgba(245, 158, 11, .10);
+        }
+
+.counter-reading-alert-title {
+            color: #b45309;
+            font-weight: 900;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+.counter-reading-alert-text {
+            color: #78350f;
+            font-size: 13px;
+            line-height: 1.75;
+            white-space: pre-line;
+        }
+
+.counter-quick-example-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+.counter-quick-example-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.62);
+        }
+
+.counter-quick-example-text {
+            flex: 1;
+            min-width: 0;
+            white-space: pre-wrap;
+            line-height: 1.65;
+        }
+
+/* 🌸 い形容詞專屬字卡 */
+        .iadj-priority-badge {
+            background: rgba(236, 72, 153, 0.10) !important;
+            border-color: rgba(236, 72, 153, 0.30) !important;
+            color: #be185d !important;
+            letter-spacing: 0.2px;
+        }
+
+.iadj-front-meaning {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em;
+            width: 92%;
+            text-align: center;
+            color: #475569;
+            background: #fff7fb;
+            border: 1px solid #fbcfe8;
+            border-left: 4px solid #ec4899;
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.55;
+            padding: 9px 12px;
+            border-radius: 10px;
+            margin: 2px auto 12px auto;
+            box-sizing: border-box;
+        }
+
+.iadj-back-meaning {
+            background: #fff7fb;
+            border: 1px solid #fbcfe8;
+            border-left: 4px solid #ec4899;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+.iadj-back-meaning-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #be185d;
+            margin-bottom: 4px;
+        }
+
+.iadj-back-meaning-text {
+            font-size: 14px;
+            color: #0f172a;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+.iadj-antonym-block {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-left: 4px solid #f97316;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+.iadj-antonym-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #c2410c;
+            margin-bottom: 4px;
+        }
+
+.iadj-antonym-text {
+            color: #7c2d12;
+            font-size: 14px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+/* 🌿 な形容詞專屬字卡 */
+        .nadj-priority-badge {
+            background: rgba(16, 185, 129, 0.10) !important;
+            border-color: rgba(16, 185, 129, 0.30) !important;
+            color: #047857 !important;
+            letter-spacing: 0.2px;
+        }
+
+.nadj-front-meaning {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em;
+            width: 92%;
+            text-align: center;
+            color: #475569;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #22c55e;
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.55;
+            padding: 9px 12px;
+            border-radius: 10px;
+            margin: 2px auto 12px auto;
+            box-sizing: border-box;
+        }
+
+.nadj-back-meaning {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #22c55e;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+.nadj-back-meaning-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #047857;
+            margin-bottom: 4px;
+        }
+
+.nadj-back-meaning-text {
+            font-size: 14px;
+            color: #0f172a;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+.nadj-antonym-block {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-left: 4px solid #f97316;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+.nadj-antonym-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #c2410c;
+            margin-bottom: 4px;
+        }
+
+.nadj-antonym-text {
+            color: #7c2d12;
+            font-size: 14px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+/* 🔥 動詞專屬字卡 */
+        .verb-priority-badge {
+            background: rgba(239, 68, 68, 0.10) !important;
+            border-color: rgba(239, 68, 68, 0.30) !important;
+            color: #b91c1c !important;
+        }
+
+.verb-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 4px 0 10px;
+        }
+
+.verb-meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+.verb-front-meaning {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em;
+            width: 92%;
+            text-align: center;
+            color: #475569;
+            background: #fff7f7;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.55;
+            padding: 9px 12px;
+            border-radius: 10px;
+            margin: 2px auto 12px auto;
+            box-sizing: border-box;
+        }
+
+.verb-info-card {
+            background: #fff7f7;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+
+.verb-family-card {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid #0ea5e9;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+
+.verb-section-title {
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+.verb-info-text,
+        .verb-family-text {
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+.verb-info-text { color: #7f1d1d; }
+
+.verb-family-text { color: #0c4a6e; }
+
+/* 📘 動詞變化規則指南 */
+        .verb-guide-launch {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #93c5fd;
+            background: linear-gradient(135deg, #eff6ff, #eef2ff);
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+.verb-guide-launch:hover {
+            border-color: #60a5fa;
+            background: #eff6ff;
+        }
+
+.verb-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+.verb-guide-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+.verb-guide-card {
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+.verb-guide-card-title {
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+.verb-guide-card-desc {
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+.verb-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+/* 🔄 動詞變化第二階段 */
+        .verb-conj-toggle {
+            width: 100%;
+            margin: 2px 0 12px;
+            border: 1px solid #93c5fd;
+            background: linear-gradient(135deg, #eff6ff, #eef2ff);
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+.verb-conj-panel {
+            display: none;
+            margin: -4px 0 12px;
+            padding: 10px;
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            border-radius: 10px;
+        }
+
+.verb-conj-panel.open {
+            display: block;
+        }
+
+.verb-conj-row {
+            display: grid;
+            grid-template-columns: 82px 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 7px 4px;
+            border-bottom: 1px dashed #dbeafe;
+        }
+
+.verb-conj-row:last-child {
+            border-bottom: none;
+        }
+
+.verb-conj-label {
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+.verb-conj-value {
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+.verb-conj-note {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+/* 📘 動詞變化規則指南 v10.0.2 */
+        .verb-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+.verb-guide-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+.verb-guide-card {
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+.verb-guide-card.i1 {
+            background: #fff7f7;
+            border-color: #fecaca;
+            box-shadow: inset 0 0 0 1px rgba(239,68,68,0.03);
+        }
+
+.verb-guide-card.i2 {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            box-shadow: inset 0 0 0 1px rgba(34,197,94,0.03);
+        }
+
+.verb-guide-card.i3 {
+            background: #fff7ed;
+            border-color: #fed7aa;
+            box-shadow: inset 0 0 0 1px rgba(249,115,22,0.03);
+        }
+
+.verb-guide-card.extra {
+            background: #f5f3ff;
+            border-color: #ddd6fe;
+        }
+
+.verb-guide-card-title {
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+.verb-guide-card.i1 .verb-guide-card-title { color: #dc2626; }
+
+.verb-guide-card.i2 .verb-guide-card-title { color: #16a34a; }
+
+.verb-guide-card.i3 .verb-guide-card-title { color: #ea580c; }
+
+.verb-guide-card.extra .verb-guide-card-title { color: #7c3aed; }
+
+.verb-guide-card-desc {
+            font-size: 13px;
+            line-height: 1.72;
+            color: #334155;
+        }
+
+.verb-form-chip {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-right: 6px;
+            margin-bottom: 5px;
+            letter-spacing: .2px;
+        }
+
+.verb-guide-mini-table {
+            margin-top: 10px;
+            border-top: 1px dashed rgba(148,163,184,.5);
+            padding-top: 9px;
+        }
+
+.verb-guide-rule-line {
+            margin: 4px 0;
+        }
+
+.verb-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            line-height: 1.68;
+        }
+
+.verb-guide-advanced {
+            margin-top: 12px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+.verb-guide-advanced b {
+            color: #0f172a;
+        }
+
+/* 📚 六大活用形實際變化 */
+        .verb-advanced-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+.verb-advanced-item {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 9px 10px;
+        }
+
+.verb-advanced-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+.verb-advanced-form {
+            font-weight: 900;
+            color: #6d28d9;
+            font-size: 13px;
+        }
+
+.verb-advanced-change {
+            font-weight: 900;
+            color: #0f172a;
+            font-size: 13px;
+        }
+
+.verb-advanced-desc {
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+.verb-advanced-example {
+            margin-top: 4px;
+            color: #1e293b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+/* ⏱️ 數詞：頻率導讀卡 */
+        .counter-frequency-card {
+            border: 1px solid #bae6fd;
+            background: linear-gradient(180deg, #f0f9ff, #f8fbff);
+            border-left: 4px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+
+.counter-frequency-title {
+            color: #0369a1;
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+.counter-frequency-rule {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 9px 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px dashed #7dd3fc;
+            color: #0c4a6e;
+            font-size: 13px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+.counter-frequency-rule .plus {
+            color: #64748b;
+            font-weight: 700;
+        }
+
+.counter-frequency-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+.counter-frequency-example {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 9px 10px;
+            border-radius: 9px;
+            background: #ffffff;
+            border: 1px solid #e0f2fe;
+        }
+
+.counter-frequency-jp {
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+.counter-frequency-reading {
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+.counter-frequency-zh {
+            color: #0369a1;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+/* 🔗 接續詞專屬字卡 */
+        .conj-type-badge {
+            background: rgba(14, 165, 233, .10) !important;
+            border-color: rgba(14, 165, 233, .30) !important;
+            color: #0369a1 !important;
+        }
+
+.conj-front-meaning {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 94%;
+            margin: 4px auto 12px auto;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid #0ea5e9;
+            background: #f0f9ff;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 650;
+            line-height: 1.6;
+            text-align: left;
+            box-sizing: border-box;
+            word-break: break-word;
+        }
+
+.conj-info-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #64748b;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+
+.conj-info-title {
+            font-size: 12px;
+            font-weight: 900;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+.conj-info-text {
+            color: #0f172a;
+            font-size: 13px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+.conj-usage-card {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-left: 4px solid #f97316;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+
+.conj-usage-title {
+            font-size: 12px;
+            font-weight: 900;
+            color: #c2410c;
+            margin-bottom: 4px;
+        }
+
+.conj-usage-text {
+            color: #7c2d12;
+            font-size: 13px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+/* 🔢 數詞規則指南 */
+        .counter-guide-launch {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #7dd3fc;
+            background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+            color: #0369a1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+.counter-guide-launch:hover {
+            border-color: #38bdf8;
+            background: #f0f9ff;
+        }
+
+.counter-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+.counter-guide-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+.counter-guide-card {
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #bae6fd;
+            background: #f8fbff;
+        }
+
+.counter-guide-title {
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 900;
+            margin-bottom: 7px;
+        }
+
+.counter-guide-text {
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.72;
+            white-space: pre-wrap;
+        }
+
+.counter-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            line-height: 1.68;
+        }
+
+/* 🔗 接續詞規則指南 */
+        .conj-guide-launch {
+            display: none;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #93c5fd;
+            background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+            color: #0369a1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 850;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+.conj-guide-launch:hover {
+            border-color: #60a5fa;
+            background: #f0f9ff;
+        }
+
+.conj-guide-intro {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.75;
+            margin-bottom: 12px;
+        }
+
+.conj-guide-hero {
+            border-radius: 16px;
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(135deg, #eff6ff, #f8fbff);
+            padding: 14px 14px 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 18px rgba(14, 165, 233, .08);
+        }
+
+.conj-guide-hero-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+.conj-guide-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+.conj-guide-main {
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: 950;
+            line-height: 1.2;
+            letter-spacing: .02em;
+        }
+
+.conj-guide-reading {
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+.conj-guide-hero-desc {
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.7;
+            padding-top: 8px;
+            border-top: 1px dashed #bfdbfe;
+        }
+
+.conj-guide-pronounce-btn {
+            border: 1px solid #f9a8d4;
+            background: #fff1f8;
+            color: #be185d;
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+.conj-guide-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+.conj-guide-card {
+            border-radius: 14px;
+            padding: 12px 13px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+.conj-guide-card.theme-blue {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+        }
+
+.conj-guide-card.theme-purple {
+            background: #f5f3ff;
+            border-color: #ddd6fe;
+        }
+
+.conj-guide-card.theme-green {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+.conj-guide-card.theme-orange {
+            background: #fff7ed;
+            border-color: #fed7aa;
+        }
+
+.conj-guide-title {
+            font-size: 14px;
+            font-weight: 900;
+            margin-bottom: 7px;
+        }
+
+.conj-guide-card.theme-blue .conj-guide-title { color: #0369a1; }
+
+.conj-guide-card.theme-purple .conj-guide-title { color: #6d28d9; }
+
+.conj-guide-card.theme-green .conj-guide-title { color: #15803d; }
+
+.conj-guide-card.theme-orange .conj-guide-title { color: #c2410c; }
+
+.conj-guide-text {
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.72;
+            white-space: pre-wrap;
+        }
+
+.conj-guide-chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+.conj-guide-chip {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: #ffffff;
+            border: 1px solid #fdba74;
+            color: #9a3412;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+.conj-guide-note {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.68;
+        }
+
+/* 🧩 接尾詞規則指南 */
+        .suffix-guide-launch{display:none;width:100%;margin-top:8px;border:1px solid #c4b5fd;background:linear-gradient(135deg,#f5f3ff,#faf5ff);color:#6d28d9;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;cursor:pointer;box-sizing:border-box}
+
+.suffix-guide-hero{border-radius:16px;border:1px solid #ddd6fe;background:linear-gradient(135deg,#f5f3ff,#faf5ff);padding:14px;margin-bottom:12px}
+
+.suffix-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.suffix-guide-badge{display:inline-flex;border-radius:999px;padding:6px 10px;background:#ede9fe;color:#6d28d9;font-size:11px;font-weight:900;margin-bottom:8px}
+
+.suffix-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.suffix-guide-reading{margin-top:4px;color:#7c3aed;font-size:14px;font-weight:800}
+
+.suffix-guide-pronounce-btn{border:1px solid #c4b5fd;background:#fff;color:#6d28d9;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+
+.suffix-guide-desc{margin-top:10px;padding-top:9px;border-top:1px dashed #ddd6fe;color:#475569;font-size:13px;line-height:1.7}
+
+.suffix-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.suffix-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.suffix-guide-card:nth-child(4n+1){background:#f0f9ff;border-color:#bae6fd}
+
+.suffix-guide-card:nth-child(4n+2){background:#f5f3ff;border-color:#ddd6fe}
+
+.suffix-guide-card:nth-child(4n+3){background:#f0fdf4;border-color:#bbf7d0}
+
+.suffix-guide-card:nth-child(4n+4){background:#fff7ed;border-color:#fed7aa}
+
+.suffix-guide-title{font-size:14px;font-weight:900;color:#334155;margin-bottom:7px}
+
+.suffix-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+/* 🧩 接尾詞專屬字卡 */
+        .suffix-type-badge {
+            background: #f3e8ff !important;
+            border-color: #d8b4fe !important;
+            color: #7e22ce !important;
+        }
+
+.suffix-front-meaning {
+            width: 94%;
+            margin: 6px auto 12px;
+            padding: 10px 12px;
+            border-radius: 11px;
+            border: 1px solid #ddd6fe;
+            border-left: 4px solid #8b5cf6;
+            background: #faf5ff;
+            color: #312e81;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.6;
+            text-align: left;
+            box-sizing: border-box;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+        }
+
+.suffix-detail-card {
+            border-radius: 11px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+.suffix-detail-title {
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 5px;
+            color: #475569;
+        }
+
+.suffix-detail-text {
+            font-size: 13px;
+            line-height: 1.72;
+            color: #1e293b;
+            white-space: pre-wrap;
+        }
+
+/* 🧩 接頭詞規則指南 */
+        .prefix-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #facc15;
+            background:linear-gradient(135deg,#fff7cc,#fef3c7);color:#92400e;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.prefix-guide-hero{
+            border-radius:16px;border:1px solid #fde68a;
+            background:linear-gradient(135deg,#fffef2,#fff7cc);
+            padding:14px;margin-bottom:12px
+        }
+
+.prefix-guide-hero-top{
+            display:flex;justify-content:space-between;align-items:flex-start;gap:12px
+        }
+
+.prefix-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fef3c7;
+            color:#92400e;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.prefix-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.prefix-guide-reading{margin-top:4px;color:#b45309;font-size:14px;font-weight:800}
+
+.prefix-guide-pronounce-btn{
+            border:1px solid #facc15;background:#fff;color:#92400e;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+
+.prefix-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #fde68a;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.prefix-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.prefix-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.prefix-guide-card:nth-child(5n+1){background:#fffef2;border-color:#fde68a}
+
+.prefix-guide-card:nth-child(5n+2){background:#f0f9ff;border-color:#bae6fd}
+
+.prefix-guide-card:nth-child(5n+3){background:#f0fdf4;border-color:#bbf7d0}
+
+.prefix-guide-card:nth-child(5n+4){background:#fff7ed;border-color:#fed7aa}
+
+.prefix-guide-card:nth-child(5n+5){background:#faf5ff;border-color:#ddd6fe}
+
+.prefix-guide-title{font-size:14px;font-weight:900;color:#334155;margin-bottom:7px}
+
+.prefix-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.prefix-guide-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.prefix-guide-chip{
+            display:inline-flex;align-items:center;border-radius:999px;padding:6px 10px;
+            background:#fff;border:1px solid #facc15;color:#92400e;font-size:12px;font-weight:800;cursor:pointer;transition:all .18s ease
+        }
+
+.prefix-guide-chip:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(245,158,11,.12)}
+
+.prefix-guide-chip.is-active{background:#f59e0b;color:#fff;border-color:#f59e0b}
+
+.prefix-type-badge{
+            background:#fff7cc !important;border-color:#facc15 !important;color:#92400e !important;
+        }
+
+.prefix-front-meaning{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #fde68a;border-left:4px solid #f59e0b;background:#fffef2;
+            color:#78350f;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+
+.prefix-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.prefix-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.prefix-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+/* 🧩 接頭詞可折疊分類 */
+        .prefix-accordion-wrap{display:flex;flex-direction:column;gap:12px}
+
+.prefix-accordion{
+            border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;background:#ffffff;
+            box-shadow:0 1px 0 rgba(15,23,42,.03)
+        }
+
+.prefix-accordion:nth-child(4n+1){border-color:#bbf7d0;background:#f0fdf4}
+
+.prefix-accordion:nth-child(4n+2){border-color:#fed7aa;background:#fff7ed}
+
+.prefix-accordion:nth-child(4n+3){border-color:#fecaca;background:#fef2f2}
+
+.prefix-accordion:nth-child(4n+4){border-color:#bfdbfe;background:#eff6ff}
+
+.prefix-accordion summary{
+            list-style:none;cursor:pointer;padding:14px 16px;font-size:18px;font-weight:900;color:#1e293b;
+            display:flex;align-items:center;justify-content:space-between;gap:12px
+        }
+
+.prefix-accordion summary::-webkit-details-marker{display:none}
+
+.prefix-accordion summary .prefix-acc-title{display:flex;align-items:center;gap:8px;line-height:1.4}
+
+.prefix-accordion summary .prefix-acc-arrow{font-size:16px;color:#64748b;transition:transform .2s ease}
+
+.prefix-accordion[open] summary .prefix-acc-arrow{transform:rotate(180deg)}
+
+.prefix-accordion-body{padding:0 16px 16px 16px;color:#334155;font-size:15px;line-height:1.9;white-space:pre-wrap}
+
+.prefix-accordion-body b{color:#1e293b}
+
+.prefix-accordion-hint{margin-top:6px;color:#64748b;font-size:12px;font-weight:700}
+
+/* 📚 學習進度：字卡快覽 */
+        .progress-item.stats-card-clickable {
+            cursor: pointer;
+            transition: transform .15s ease, border-color .15s ease, background .15s ease;
+        }
+
+.progress-item.stats-card-clickable:hover {
+            border-color: #38bdf8;
+            background: #f0f9ff;
+            transform: translateY(-1px);
+        }
+
+.progress-item.stats-card-clickable:focus-visible {
+            outline: 3px solid rgba(56,189,248,.35);
+            outline-offset: 2px;
+        }
+
+.stats-card-popup-box {
+            max-width: 540px;
+            background: #0f172a;
+        }
+
+.stats-card-popup-body {
+            padding: 14px;
+            overflow-y: auto;
+        }
+
+.stats-card-popup-hint {
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.55;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+#stats-card-popup-host .card-container {
+            margin: 0;
+            height: 500px;
+        }
+
+#stats-card-popup-host .card-nav-arrow,
+        #stats-card-popup-host .card-counter-fixed {
+            display: none !important;
+        }
+
+#stats-card-popup-host .card-face {
+            box-shadow: none;
+        }
+
+/* 📱 v10.9.1 手機字卡排版：避免內容彼此擠壓 */
+        @media (max-width: 600px) {
+            .card-container {
+                height: 610px;
+            }
+
+            .card-face {
+                padding: 54px 12px 54px 12px;
+            }
+
+            .card-front {
+                justify-content: flex-start;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-padding-bottom: 84px;
+            }
+
+            .card-front .card-body-wrapper {
+                padding: 0 24px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                box-sizing: border-box;
+            }
+
+            .front-main-title {
+                font-size: 29px;
+                line-height: 1.25;
+                margin-bottom: 8px;
+            }
+
+            .front-sub-title {
+                font-size: 14px;
+                line-height: 1.5;
+                margin-bottom: 14px;
+            }
+
+            .front-mean-box,
+            .noun-front-meaning,
+            .iadj-front-meaning,
+            .nadj-front-meaning,
+            .verb-front-meaning,
+            .conj-front-meaning,
+            .suffix-front-meaning,
+            .prefix-front-meaning,
+            .rentai-front-meaning,
+            .adv-front-meaning,
+            .fuku-front-meaning,
+            .aux-front-meaning,
+            .phrase-front-meaning,
+            .case-front-meaning,
+            .final-front-meaning {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 4px 0 16px 0 !important;
+                box-sizing: border-box;
+                display: block !important;
+                max-height: none !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+                -webkit-line-clamp: unset !important;
+                -webkit-box-orient: initial !important;
+                white-space: pre-wrap !important;
+            }
+
+            .btn-tts {
+                margin-top: 2px;
+                margin-bottom: 14px;
+            }
+
+            .progress-text {
+                margin-top: 4px;
+                margin-bottom: 8px;
+                line-height: 1.45;
+            }
+
+            .card-counter-fixed {
+                top: 12px;
+            }
+
+            .card-nav-arrow {
+                top: 52%;
+            }
+
+            .hint {
+                bottom: 16px;
+            }
+
+            /* 學習進度 popup 裡的同一張字卡，也同步使用較高的手機高度 */
+            #stats-card-popup-host .card-container {
+                height: 610px;
+            }
+        }
+
+/* 🧷 連體詞規則指南 */
+        .rentai-guide-launch{display:none;width:100%;margin-top:8px;border:1px solid #86efac;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);color:#166534;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;cursor:pointer;box-sizing:border-box}
+
+.rentai-guide-hero{border-radius:16px;border:1px solid #bbf7d0;background:linear-gradient(135deg,#f0fdf4,#f8fffb);padding:14px;margin-bottom:12px}
+
+.rentai-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.rentai-guide-badge{display:inline-flex;border-radius:999px;padding:6px 10px;background:#dcfce7;color:#166534;font-size:11px;font-weight:900;margin-bottom:8px}
+
+.rentai-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.rentai-guide-reading{margin-top:4px;color:#15803d;font-size:14px;font-weight:800}
+
+.rentai-guide-pronounce-btn{border:1px solid #86efac;background:#fff;color:#166534;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+
+.rentai-guide-desc{margin-top:10px;padding-top:9px;border-top:1px dashed #bbf7d0;color:#475569;font-size:13px;line-height:1.7}
+
+.rentai-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.rentai-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.rentai-guide-card.theme-blue{background:#f0f9ff;border-color:#bae6fd}
+
+.rentai-guide-card.theme-purple{background:#f5f3ff;border-color:#ddd6fe}
+
+.rentai-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+
+.rentai-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+
+.rentai-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+
+.rentai-guide-card.theme-blue .rentai-guide-title{color:#0369a1}
+
+.rentai-guide-card.theme-purple .rentai-guide-title{color:#6d28d9}
+
+.rentai-guide-card.theme-green .rentai-guide-title{color:#15803d}
+
+.rentai-guide-card.theme-orange .rentai-guide-title{color:#c2410c}
+
+.rentai-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.rentai-guide-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.rentai-guide-chip{display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;border:1px solid #86efac;color:#166534;font-size:12px;font-weight:800}
+
+.rentai-type-badge{background:#dcfce7 !important;border-color:#86efac !important;color:#166534 !important}
+
+.rentai-front-meaning{width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;border:1px solid #bbf7d0;border-left:4px solid #22c55e;background:#f0fdf4;color:#14532d;font-size:13px;font-weight:700;line-height:1.6;text-align:left;box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+
+.rentai-detail-card{border-radius:11px;padding:10px 12px;margin-bottom:12px;border:1px solid #e2e8f0;background:#f8fafc}
+
+.rentai-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.rentai-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+/* 🧭 副詞＆疑問表現指南 */
+        .adv-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #c4b5fd;
+            background:linear-gradient(135deg,#f5f3ff,#eef2ff);color:#6d28d9;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.adv-guide-hero{
+            border-radius:16px;border:1px solid #ddd6fe;
+            background:linear-gradient(135deg,#f5f3ff,#f8fafc);
+            padding:14px;margin-bottom:12px
+        }
+
+.adv-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.adv-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#ede9fe;
+            color:#6d28d9;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.adv-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.adv-guide-reading{margin-top:4px;color:#7c3aed;font-size:14px;font-weight:800}
+
+.adv-guide-pronounce-btn{
+            border:1px solid #c4b5fd;background:#fff;color:#6d28d9;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+
+.adv-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #ddd6fe;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.adv-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.adv-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.adv-guide-card.theme-purple{background:#f5f3ff;border-color:#ddd6fe}
+
+.adv-guide-card.theme-blue{background:#f0f9ff;border-color:#bae6fd}
+
+.adv-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+
+.adv-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+
+.adv-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+
+.adv-guide-card.theme-purple .adv-guide-title{color:#6d28d9}
+
+.adv-guide-card.theme-blue .adv-guide-title{color:#0369a1}
+
+.adv-guide-card.theme-green .adv-guide-title{color:#15803d}
+
+.adv-guide-card.theme-orange .adv-guide-title{color:#c2410c}
+
+.adv-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.adv-guide-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.adv-guide-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #c4b5fd;color:#6d28d9;font-size:12px;font-weight:800
+        }
+
+/* 🧭 副詞＆疑問表現專屬字卡 */
+        .adv-type-badge{
+            background:#ede9fe !important;border-color:#c4b5fd !important;color:#6d28d9 !important
+        }
+
+.adv-function-chip{
+            display:inline-flex;align-items:center;justify-content:center;
+            margin:4px auto 10px;padding:6px 10px;border-radius:999px;
+            background:#fff7ed;border:1px solid #fdba74;color:#9a3412;
+            font-size:12px;font-weight:900;max-width:92%;box-sizing:border-box
+        }
+
+.adv-front-meaning{
+            width:94%;margin:4px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #ddd6fe;border-left:4px solid #8b5cf6;background:#faf5ff;
+            color:#312e81;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+
+.adv-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.adv-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.adv-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+/* 🧩 副助詞使用指南 */
+        .fuku-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #f9a8d4;
+            background:linear-gradient(135deg,#fdf2f8,#fff1f2);color:#be185d;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.fuku-guide-hero{
+            border-radius:16px;border:1px solid #fbcfe8;
+            background:linear-gradient(135deg,#fdf2f8,#fff7ed);
+            padding:14px;margin-bottom:12px
+        }
+
+.fuku-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.fuku-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fce7f3;
+            color:#be185d;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.fuku-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.fuku-guide-reading{margin-top:4px;color:#db2777;font-size:14px;font-weight:800}
+
+.fuku-guide-pronounce-btn{
+            border:1px solid #f9a8d4;background:#fff;color:#be185d;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+
+.fuku-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #fbcfe8;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.fuku-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.fuku-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.fuku-guide-card.theme-pink{background:#fdf2f8;border-color:#fbcfe8}
+
+.fuku-guide-card.theme-blue{background:#f0f9ff;border-color:#bae6fd}
+
+.fuku-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+
+.fuku-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+
+.fuku-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+
+.fuku-guide-card.theme-pink .fuku-guide-title{color:#be185d}
+
+.fuku-guide-card.theme-blue .fuku-guide-title{color:#0369a1}
+
+.fuku-guide-card.theme-green .fuku-guide-title{color:#15803d}
+
+.fuku-guide-card.theme-orange .fuku-guide-title{color:#c2410c}
+
+.fuku-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.fuku-guide-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.fuku-guide-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #f9a8d4;color:#be185d;font-size:12px;font-weight:800
+        }
+
+/* 🧩 副助詞專屬字卡 */
+        .fuku-type-badge{
+            background:#fce7f3 !important;border-color:#f9a8d4 !important;color:#be185d !important
+        }
+
+.fuku-front-meaning{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #fbcfe8;border-left:4px solid #ec4899;background:#fdf2f8;
+            color:#831843;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+
+.fuku-usage-card{
+            border-radius:12px;padding:11px 12px;margin-bottom:12px;
+            background:#fff7ed;border:1px solid #fdba74;
+        }
+
+.fuku-usage-title{
+            font-size:12px;font-weight:900;color:#c2410c;margin-bottom:7px
+        }
+
+.fuku-usage-formula{
+            font-size:14px;line-height:1.75;font-weight:900;color:#7c2d12;
+            white-space:pre-wrap;word-break:break-word
+        }
+
+.fuku-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.fuku-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.fuku-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+/* <span class="aux-emoji">✨</span> 助動詞使用指南 */
+        .aux-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #93c5fd;
+            background:linear-gradient(135deg,#eff6ff,#eef2ff);color:#1d4ed8;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.aux-guide-hero{
+            border-radius:16px;border:1px solid #bfdbfe;
+            background:linear-gradient(135deg,#eff6ff,#f8fafc);
+            padding:14px;margin-bottom:12px
+        }
+
+.aux-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.aux-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#dbeafe;
+            color:#1d4ed8;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.aux-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.aux-guide-reading{margin-top:4px;color:#2563eb;font-size:14px;font-weight:800}
+
+.aux-guide-pronounce-btn{
+            border:1px solid #93c5fd;background:#fff;color:#1d4ed8;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+
+.aux-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #bfdbfe;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.aux-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.aux-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.aux-guide-card.theme-blue{background:#eff6ff;border-color:#bfdbfe}
+
+.aux-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+
+.aux-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+
+.aux-guide-card.theme-purple{background:#f5f3ff;border-color:#ddd6fe}
+
+.aux-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+
+.aux-guide-card.theme-blue .aux-guide-title{color:#1d4ed8}
+
+.aux-guide-card.theme-green .aux-guide-title{color:#15803d}
+
+.aux-guide-card.theme-orange .aux-guide-title{color:#c2410c}
+
+.aux-guide-card.theme-purple .aux-guide-title{color:#6d28d9}
+
+.aux-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.aux-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.aux-compare-box{
+            border-radius:12px;padding:11px;border:1px solid #e2e8f0;background:#fff
+        }
+
+.aux-compare-title{font-size:13px;font-weight:900;margin-bottom:6px}
+
+.aux-compare-text{font-size:12px;line-height:1.65;color:#475569}
+
+.aux-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.aux-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #93c5fd;color:#1d4ed8;font-size:12px;font-weight:800
+        }
+
+/* ✨ 助動詞專屬字卡 */
+        .aux-type-badge{
+            background:#dbeafe !important;border-color:#93c5fd !important;color:#1d4ed8 !important
+        }
+
+.aux-sense-chip{
+            display:inline-flex;align-items:center;justify-content:center;
+            margin:4px auto 10px;padding:6px 10px;border-radius:999px;
+            background:#fff7ed;border:1px solid #fdba74;color:#9a3412;
+            font-size:12px;font-weight:900;max-width:92%;box-sizing:border-box
+        }
+
+.aux-front-meaning{
+            width:94%;margin:4px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #bfdbfe;border-left:4px solid #3b82f6;background:#eff6ff;
+            color:#1e3a8a;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+
+.aux-usage-card{
+            border-radius:12px;padding:11px 12px;margin-bottom:12px;
+            background:#fff7ed;border:1px solid #fdba74
+        }
+
+.aux-usage-title{font-size:12px;font-weight:900;color:#c2410c;margin-bottom:7px}
+
+.aux-usage-formula{
+            font-size:14px;line-height:1.75;font-weight:900;color:#7c2d12;
+            white-space:pre-wrap;word-break:break-word
+        }
+
+.aux-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.aux-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.aux-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+/* v10.13.1：避免部分手機把較新的 emoji 顯示成方框 */
+        .aux-emoji{
+            font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+            font-style:normal;
+            font-weight:400;
+            display:inline-block;
+            line-height:1;
+            vertical-align:-0.08em;
+        }
+
+/* 🎓 文法專屬字卡：正面精簡、背面詳解 */
+        .grammar-type-badge{
+            background:#fef3c7 !important;
+            border-color:#facc15 !important;
+            color:#92400e !important;
+        }
+
+.grammar-front-box{
+            width:94%;
+            margin:6px auto 12px;
+            padding:10px 12px;
+            border-radius:12px;
+            border:1px solid #fde68a;
+            border-left:4px solid #f59e0b;
+            background:#fffbeb;
+            box-sizing:border-box;
+            text-align:left;
+        }
+
+.grammar-front-summary{
+            color:#78350f;
+            font-size:14px;
+            font-weight:850;
+            line-height:1.55;
+            margin-bottom:8px;
+        }
+
+.grammar-front-formula{
+            display:block;
+            width:100%;
+            box-sizing:border-box;
+            padding:8px 10px;
+            border-radius:9px;
+            background:#fff;
+            border:1px solid #fed7aa;
+            color:#9a3412;
+            font-size:12px;
+            font-weight:900;
+            line-height:1.55;
+            white-space:pre-wrap;
+            word-break:break-word;
+        }
+
+.grammar-detail-card{
+            border-radius:11px;
+            padding:10px 12px;
+            margin-bottom:12px;
+            border:1px solid #e2e8f0;
+            background:#f8fafc;
+        }
+
+.grammar-detail-title{
+            font-size:12px;
+            font-weight:900;
+            margin-bottom:5px;
+            color:#475569;
+        }
+
+.grammar-detail-text{
+            font-size:13px;
+            line-height:1.72;
+            color:#1e293b;
+            white-space:pre-wrap;
+        }
+
+.grammar-formula-card{
+            border-radius:12px;
+            padding:11px 12px;
+            margin-bottom:12px;
+            background:#fff7ed;
+            border:1px solid #fdba74;
+        }
+
+.grammar-formula-title{
+            font-size:12px;
+            font-weight:900;
+            color:#c2410c;
+            margin-bottom:7px;
+        }
+
+.grammar-formula-text{
+            font-size:14px;
+            line-height:1.75;
+            font-weight:900;
+            color:#7c2d12;
+            white-space:pre-wrap;
+            word-break:break-word;
+        }
+
+/* 💬 片語＆慣用表現使用指南 */
+        .phrase-guide-launch{display:none;width:100%;margin-top:8px;border:1px solid #67e8f9;background:linear-gradient(135deg,#ecfeff,#eff6ff);color:#0e7490;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;cursor:pointer;box-sizing:border-box}
+
+.phrase-guide-hero{border-radius:16px;border:1px solid #a5f3fc;background:linear-gradient(135deg,#ecfeff,#f8fafc);padding:14px;margin-bottom:12px}
+
+.phrase-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.phrase-guide-badge{display:inline-flex;border-radius:999px;padding:6px 10px;background:#cffafe;color:#0e7490;font-size:11px;font-weight:900;margin-bottom:8px}
+
+.phrase-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.phrase-guide-reading{margin-top:4px;color:#0891b2;font-size:14px;font-weight:800}
+
+.phrase-guide-pronounce-btn{border:1px solid #67e8f9;background:#fff;color:#0e7490;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+
+.phrase-guide-desc{margin-top:10px;padding-top:9px;border-top:1px dashed #a5f3fc;color:#475569;font-size:13px;line-height:1.7}
+
+.phrase-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.phrase-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.phrase-guide-card.theme-blue{background:#eff6ff;border-color:#bfdbfe}
+
+.phrase-guide-card.theme-cyan{background:#ecfeff;border-color:#a5f3fc}
+
+.phrase-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+
+.phrase-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+
+.phrase-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+
+.phrase-guide-card.theme-blue .phrase-guide-title{color:#1d4ed8}
+
+.phrase-guide-card.theme-cyan .phrase-guide-title{color:#0e7490}
+
+.phrase-guide-card.theme-green .phrase-guide-title{color:#15803d}
+
+.phrase-guide-card.theme-orange .phrase-guide-title{color:#c2410c}
+
+.phrase-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.phrase-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.phrase-chip{display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;border:1px solid #67e8f9;color:#0e7490;font-size:12px;font-weight:800}
+
+.phrase-type-badge{background:#cffafe !important;border-color:#67e8f9 !important;color:#0e7490 !important}
+
+.phrase-front-meaning{width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;border:1px solid #a5f3fc;border-left:4px solid #06b6d4;background:#ecfeff;color:#164e63;font-size:13px;font-weight:700;line-height:1.6;text-align:left;box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+
+.phrase-detail-card{border-radius:11px;padding:10px 12px;margin-bottom:12px;border:1px solid #e2e8f0;background:#f8fafc}
+
+.phrase-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.phrase-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+.phrase-usage-card{border-radius:12px;padding:11px 12px;margin-bottom:12px;background:#f0f9ff;border:1px solid #7dd3fc}
+
+.phrase-usage-title{font-size:12px;font-weight:900;color:#0369a1;margin-bottom:7px}
+
+.phrase-usage-text{font-size:13px;line-height:1.75;font-weight:800;color:#0c4a6e;white-space:pre-wrap;word-break:break-word}
+
+/* 🧭 格助詞使用指南 */
+        .case-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #86efac;
+            background:linear-gradient(135deg,#f0fdf4,#ecfeff);color:#166534;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.case-guide-hero{
+            border-radius:16px;border:1px solid #bbf7d0;
+            background:linear-gradient(135deg,#f0fdf4,#f8fafc);
+            padding:14px;margin-bottom:12px
+        }
+
+.case-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.case-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#dcfce7;
+            color:#166534;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.case-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.case-guide-reading{margin-top:4px;color:#15803d;font-size:14px;font-weight:800}
+
+.case-guide-pronounce-btn{
+            border:1px solid #86efac;background:#fff;color:#166534;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+
+.case-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #bbf7d0;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.case-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.case-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.case-guide-card.theme-green{background:#f0fdf4;border-color:#bbf7d0}
+
+.case-guide-card.theme-blue{background:#eff6ff;border-color:#bfdbfe}
+
+.case-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+
+.case-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+
+.case-guide-card.theme-green .case-guide-title{color:#15803d}
+
+.case-guide-card.theme-blue .case-guide-title{color:#1d4ed8}
+
+.case-guide-card.theme-orange .case-guide-title{color:#c2410c}
+
+.case-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.case-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.case-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #86efac;color:#166534;font-size:12px;font-weight:800
+        }
+
+.case-compare-wrap{display:flex;flex-direction:column;gap:10px}
+
+.case-compare{
+            border:1px solid #dbeafe;border-radius:14px;background:#fff;overflow:hidden
+        }
+
+.case-compare summary{
+            list-style:none;cursor:pointer;padding:12px 14px;font-weight:900;color:#1e3a8a;
+            display:flex;align-items:center;justify-content:space-between;gap:8px
+        }
+
+.case-compare summary::-webkit-details-marker{display:none}
+
+.case-compare-arrow{color:#64748b;transition:transform .2s ease}
+
+.case-compare[open] .case-compare-arrow{transform:rotate(180deg)}
+
+.case-compare-body{padding:0 14px 14px}
+
+.case-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.case-side{
+            border-radius:12px;padding:10px;border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.case-side-title{font-size:14px;font-weight:900;margin-bottom:6px}
+
+.case-side-desc{font-size:12px;line-height:1.65;color:#475569}
+
+.case-memory{
+            margin-top:10px;padding:9px 10px;border-radius:10px;background:#fff7ed;
+            border-left:4px solid #f59e0b;color:#7c2d12;font-size:12px;font-weight:800;line-height:1.6
+        }
+
+/* 🧭 格助詞專屬字卡 */
+        .case-type-badge{
+            background:#dcfce7 !important;border-color:#86efac !important;color:#166534 !important
+        }
+
+.case-function-chip{
+            display:inline-flex;align-items:center;justify-content:center;
+            margin:4px auto 10px;padding:6px 10px;border-radius:999px;
+            background:#eff6ff;border:1px solid #93c5fd;color:#1d4ed8;
+            font-size:12px;font-weight:900;max-width:92%;box-sizing:border-box
+        }
+
+.case-front-meaning{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #bbf7d0;border-left:4px solid #22c55e;background:#f0fdf4;
+            color:#14532d;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+
+.case-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.case-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.case-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+.case-usage-card{
+            border-radius:12px;padding:11px 12px;margin-bottom:12px;
+            background:#eff6ff;border:1px solid #93c5fd
+        }
+
+.case-usage-title{font-size:12px;font-weight:900;color:#1d4ed8;margin-bottom:7px}
+
+.case-usage-text{font-size:14px;line-height:1.75;font-weight:900;color:#1e3a8a;white-space:pre-wrap;word-break:break-word}
+
+/* 💭 終助詞＆句尾表現使用指南 */
+        .final-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #c4b5fd;
+            background:linear-gradient(135deg,#f5f3ff,#eef2ff);color:#6d28d9;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.final-guide-hero{
+            border-radius:16px;border:1px solid #ddd6fe;
+            background:linear-gradient(135deg,#f5f3ff,#f8fafc);
+            padding:14px;margin-bottom:12px
+        }
+
+.final-guide-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+
+.final-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#ede9fe;
+            color:#6d28d9;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.final-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.final-guide-reading{margin-top:4px;color:#7c3aed;font-size:14px;font-weight:800}
+
+.final-guide-pronounce-btn{
+            border:1px solid #c4b5fd;background:#fff;color:#6d28d9;border-radius:999px;
+            padding:9px 14px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap
+        }
+
+.final-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #ddd6fe;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.final-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.final-guide-card{border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0}
+
+.final-guide-card.theme-purple{background:#f5f3ff;border-color:#ddd6fe}
+
+.final-guide-card.theme-blue{background:#eff6ff;border-color:#bfdbfe}
+
+.final-guide-card.theme-orange{background:#fff7ed;border-color:#fed7aa}
+
+.final-guide-title{font-size:14px;font-weight:900;margin-bottom:7px;color:#334155}
+
+.final-guide-card.theme-purple .final-guide-title{color:#6d28d9}
+
+.final-guide-card.theme-blue .final-guide-title{color:#1d4ed8}
+
+.final-guide-card.theme-orange .final-guide-title{color:#c2410c}
+
+.final-guide-text{color:#334155;font-size:13px;line-height:1.72;white-space:pre-wrap}
+
+.final-chip-wrap{display:flex;flex-wrap:wrap;gap:8px}
+
+.final-chip{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fff;
+            border:1px solid #c4b5fd;color:#6d28d9;font-size:12px;font-weight:800
+        }
+
+.final-compare{
+            border-radius:12px;border:1px solid #dbeafe;background:#fff;padding:11px
+        }
+
+.final-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.final-side{
+            border-radius:10px;padding:10px;background:#f8fafc;border:1px solid #e2e8f0
+        }
+
+.final-side-title{font-size:13px;font-weight:900;margin-bottom:6px}
+
+.final-side-text{font-size:12px;line-height:1.65;color:#475569}
+
+.final-memory{
+            margin-top:10px;padding:9px 10px;border-radius:10px;background:#fff7ed;
+            border-left:4px solid #f59e0b;color:#7c2d12;font-size:12px;font-weight:800;line-height:1.6
+        }
+
+/* 💭 終助詞＆句尾表現專屬字卡 */
+        .final-type-badge{
+            background:#ede9fe !important;border-color:#c4b5fd !important;color:#6d28d9 !important
+        }
+
+.final-sense-chip{
+            display:inline-flex;align-items:center;justify-content:center;
+            margin:4px auto 10px;padding:6px 10px;border-radius:999px;
+            background:#fff7ed;border:1px solid #fdba74;color:#9a3412;
+            font-size:12px;font-weight:900;max-width:92%;box-sizing:border-box
+        }
+
+.final-front-meaning{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #ddd6fe;border-left:4px solid #8b5cf6;background:#faf5ff;
+            color:#312e81;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:-webkit-box;-webkit-box-orient:vertical;
+            -webkit-line-clamp:3;overflow:hidden
+        }
+
+.final-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.final-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.final-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+.final-usage-card{
+            border-radius:12px;padding:11px 12px;margin-bottom:12px;
+            background:#eff6ff;border:1px solid #93c5fd
+        }
+
+.final-usage-title{font-size:12px;font-weight:900;color:#1d4ed8;margin-bottom:7px}
+
+.final-usage-text{font-size:14px;line-height:1.75;font-weight:900;color:#1e3a8a;white-space:pre-wrap;word-break:break-word}
+
+/* 🧠 原因・理由・目的表現比較（文法頁專題） */
+        .reason-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #fbbf24;
+            background:linear-gradient(135deg,#fffbeb,#fff7ed);color:#92400e;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:850;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.reason-guide-hero{
+            border-radius:16px;border:1px solid #fde68a;
+            background:linear-gradient(135deg,#fffbeb,#fff7ed);
+            padding:14px;margin-bottom:12px
+        }
+
+.reason-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fef3c7;
+            color:#92400e;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.reason-guide-main{font-size:22px;font-weight:950;color:#0f172a;line-height:1.25}
+
+.reason-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #fde68a;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.reason-quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+
+.reason-quick-card{
+            border-radius:12px;padding:10px;border:1px solid #e2e8f0;background:#fff
+        }
+
+.reason-quick-word{font-size:17px;font-weight:950;color:#0f172a;margin-bottom:4px}
+
+.reason-quick-label{font-size:12px;font-weight:850;line-height:1.55;color:#475569}
+
+.reason-section{
+            border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0;
+            margin-bottom:10px
+        }
+
+.reason-section.blue{background:#eff6ff;border-color:#bfdbfe}
+
+.reason-section.green{background:#f0fdf4;border-color:#bbf7d0}
+
+.reason-section.purple{background:#f5f3ff;border-color:#ddd6fe}
+
+.reason-section-title{font-size:14px;font-weight:900;margin-bottom:8px;color:#334155}
+
+.reason-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+.reason-compare-side{background:#fff;border:1px solid #e2e8f0;border-radius:11px;padding:10px}
+
+.reason-compare-side strong{display:block;margin-bottom:5px}
+
+.reason-compare-side div{font-size:12px;line-height:1.65;color:#475569}
+
+.reason-memory{
+            margin-top:9px;padding:8px 10px;border-radius:9px;background:#fff7ed;
+            border-left:4px solid #f59e0b;color:#7c2d12;font-size:12px;font-weight:800;line-height:1.6
+        }
+
+.reason-detail{
+            border:1px solid #e2e8f0;border-radius:12px;background:#fff;overflow:hidden;margin-bottom:8px
+        }
+
+.reason-detail summary{
+            list-style:none;cursor:pointer;padding:11px 12px;font-weight:900;color:#334155;
+            display:flex;justify-content:space-between;align-items:center;gap:8px
+        }
+
+.reason-detail summary::-webkit-details-marker{display:none}
+
+.reason-detail-body{padding:0 12px 12px}
+
+.reason-field{
+            border-radius:10px;padding:9px 10px;margin-top:8px;background:#f8fafc;
+            border:1px solid #e2e8f0
+        }
+
+.reason-field-title{font-size:11px;font-weight:900;color:#64748b;margin-bottom:4px}
+
+.reason-field-text{font-size:12px;line-height:1.7;color:#334155;white-space:pre-wrap}
+
+/* v10.18.1：原因／目的比較入口只放在相關文法字卡 */
+        .grammar-related-compare-btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:6px;
+            margin:8px auto 0;
+            padding:8px 12px;
+            border-radius:999px;
+            border:1px solid #fbbf24;
+            background:#fffbeb;
+            color:#92400e;
+            font-size:12px;
+            font-weight:900;
+            cursor:pointer;
+            box-sizing:border-box;
+        }
+
+.grammar-related-compare-btn:hover{
+            background:#fef3c7;
+        }
+
+/* 👹 て形大魔王攻略指南 */
+        .te-guide-launch{
+            display:none;width:100%;margin-top:8px;border:1px solid #fca5a5;
+            background:linear-gradient(135deg,#fff1f2,#fff7ed);color:#b91c1c;
+            border-radius:10px;padding:10px 12px;font-size:13px;font-weight:900;
+            cursor:pointer;box-sizing:border-box
+        }
+
+.te-guide-hero{
+            border-radius:16px;border:1px solid #fecaca;
+            background:linear-gradient(135deg,#fff1f2,#fff7ed);
+            padding:14px;margin-bottom:12px
+        }
+
+.te-guide-badge{
+            display:inline-flex;border-radius:999px;padding:6px 10px;background:#fee2e2;
+            color:#b91c1c;font-size:11px;font-weight:900;margin-bottom:8px
+        }
+
+.te-guide-main{font-size:24px;font-weight:950;color:#0f172a;line-height:1.2}
+
+.te-guide-desc{
+            margin-top:10px;padding-top:9px;border-top:1px dashed #fecaca;
+            color:#475569;font-size:13px;line-height:1.7
+        }
+
+.te-guide-grid{display:flex;flex-direction:column;gap:10px}
+
+.te-guide-section{
+            border-radius:14px;padding:12px 13px;border:1px solid #e2e8f0;background:#fff
+        }
+
+.te-guide-title{font-size:14px;font-weight:900;margin-bottom:8px;color:#334155}
+
+.te-group-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+.te-group-card{
+            border-radius:12px;padding:10px;border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.te-group-name{font-size:13px;font-weight:950;margin-bottom:6px}
+
+.te-group-list{font-size:12px;line-height:1.7;color:#475569}
+
+.te-compare{
+            border-radius:12px;border:1px solid #dbeafe;background:#eff6ff;padding:11px
+        }
+
+.te-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.te-side{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px}
+
+.te-side-title{font-size:13px;font-weight:900;margin-bottom:5px}
+
+.te-side-text{font-size:12px;line-height:1.65;color:#475569}
+
+.te-memory{
+            margin-top:10px;padding:9px 10px;border-radius:10px;background:#fff7ed;
+            border-left:4px solid #f59e0b;color:#7c2d12;font-size:12px;font-weight:850;line-height:1.6
+        }
+
+/* 👹 て形大魔王專屬字卡 */
+        .te-type-badge{
+            background:#fee2e2 !important;border-color:#fca5a5 !important;color:#b91c1c !important
+        }
+
+.te-sense-chip{
+            display:inline-flex;align-items:center;justify-content:center;
+            margin:4px auto 10px;padding:6px 10px;border-radius:999px;
+            background:#fff7ed;border:1px solid #fdba74;color:#9a3412;
+            font-size:12px;font-weight:900;max-width:92%;box-sizing:border-box
+        }
+
+.te-front-box{
+            width:94%;margin:6px auto 12px;padding:10px 12px;border-radius:11px;
+            border:1px solid #fecaca;border-left:4px solid #ef4444;background:#fff1f2;
+            color:#7f1d1d;font-size:13px;font-weight:700;line-height:1.6;text-align:left;
+            box-sizing:border-box;display:block
+        }
+
+.te-front-formula{
+            margin-top:8px;padding:8px 10px;border-radius:9px;background:#fff;
+            border:1px solid #fed7aa;color:#9a3412;font-size:12px;font-weight:900;
+            line-height:1.6;white-space:pre-wrap
+        }
+
+.te-detail-card{
+            border-radius:11px;padding:10px 12px;margin-bottom:12px;
+            border:1px solid #e2e8f0;background:#f8fafc
+        }
+
+.te-detail-title{font-size:12px;font-weight:900;margin-bottom:5px;color:#475569}
+
+.te-detail-text{font-size:13px;line-height:1.72;color:#1e293b;white-space:pre-wrap}
+
+/* 🎩 します敬語擴充 */
+        .suru-keigo-wrap{
+            margin-top:12px;
+            border-radius:12px;
+            border:1px solid #ddd6fe;
+            background:#faf5ff;
+            overflow:hidden;
+        }
+
+.suru-keigo-summary{
+            list-style:none;
+            cursor:pointer;
+            padding:11px 12px;
+            font-size:13px;
+            font-weight:900;
+            color:#6d28d9;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+        }
+
+.suru-keigo-summary::-webkit-details-marker{display:none}
+
+.suru-keigo-body{padding:0 12px 12px}
+
+.suru-keigo-ladder{
+            display:flex;
+            flex-direction:column;
+            gap:7px;
+            margin-bottom:10px;
+        }
+
+.suru-keigo-step{
+            border-radius:10px;
+            border:1px solid #e2e8f0;
+            background:#fff;
+            padding:9px 10px;
+        }
+
+.suru-keigo-step-title{
+            font-size:13px;
+            font-weight:900;
+            color:#0f172a;
+            margin-bottom:3px;
+        }
+
+.suru-keigo-step-meta{
+            font-size:11px;
+            font-weight:800;
+            color:#7c3aed;
+            margin-bottom:4px;
+        }
+
+.suru-keigo-step-text{
+            font-size:12px;
+            line-height:1.65;
+            color:#475569;
+            white-space:pre-wrap;
+        }
+
+.suru-keigo-note{
+            margin-top:8px;
+            padding:8px 10px;
+            border-radius:9px;
+            background:#fff7ed;
+            border-left:4px solid #f59e0b;
+            color:#7c2d12;
+            font-size:12px;
+            line-height:1.6;
+            font-weight:800;
+        }
