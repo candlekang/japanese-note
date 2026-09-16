@@ -4,8 +4,8 @@
  * 之後改版本號、回報 API、Firebase 或 Google Sheet URL，優先從這裡修改。
  */
 
-const APP_VERSION = 'v10.42.0';
-const APP_UPDATE_NOTE = '網站安全模組化 Phase 5.5｜將 EXP、階級、學習進度、每日修煉委託與大魔王關卡搬到 js/rpg.js；其他功能維持原狀';
+const APP_VERSION = 'v10.42.1';
+const APP_UPDATE_NOTE = 'Hotfix｜修正 RPG 模組載入順序，避免 initBossTestMode 尚未載入就被呼叫，恢復今日必學與字卡資料初始化';
 
 const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
