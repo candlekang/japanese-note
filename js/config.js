@@ -4,8 +4,8 @@
  * 之後改版本號、回報 API、Firebase 或 Google Sheet URL，優先從這裡修改。
  */
 
-const APP_VERSION = 'v10.37.0';
-const APP_UPDATE_NOTE = '網站安全模組化 Phase 4.1｜版本、問題回報 API、Firebase 與 Google Sheet 資料來源集中到 js/config.js；功能邏輯不變';
+const APP_VERSION = 'v10.38.0';
+const APP_UPDATE_NOTE = '網站安全模組化 Phase 5.1｜將全站智慧搜尋功能搬到 js/search.js；只搬移搜尋邏輯，不變更搜尋排序與操作行為';
 
 const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
