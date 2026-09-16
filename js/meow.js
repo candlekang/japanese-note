@@ -2,48 +2,65 @@
     const PET_KEY='jp_rpg_pet_state';
     const MEOW_TEST_MODE = new URLSearchParams(window.location.search).get('meowtest') === '1';
 
-    const walkFrames=['./assets/meow/meow-walk-1.png?v=10.36.1','./assets/meow/meow-walk-2.png?v=10.36.1'];
-    const lazyFrames=['./assets/meow/meow-lazy-1.png?v=10.36.1','./assets/meow/meow-lazy-2.png?v=10.36.1'];
-    const sleepFrames=['./assets/meow/meow-sleep-1.png?v=10.36.1','./assets/meow/meow-sleep-2.png?v=10.36.1'];
+    const walkFrames=['./assets/meow/meow-walk-1.png?v=10.36.2','./assets/meow/meow-walk-2.png?v=10.36.2'];
+    const lazyFrames=['./assets/meow/meow-lazy-1.png?v=10.36.2','./assets/meow/meow-lazy-2.png?v=10.36.2'];
+    const sleepFrames=['./assets/meow/meow-sleep-1.png?v=10.36.2','./assets/meow/meow-sleep-2.png?v=10.36.2'];
     const reactionImages={
-        happy:'./assets/meow/meow-reaction-happy.png?v=10.36.1',
-        smug:'./assets/meow/meow-reaction-smug.png?v=10.36.1',
-        arms:'./assets/meow/meow-reaction-arms-crossed.png?v=10.36.1',
-        mischief:'./assets/meow/meow-reaction-mischief.png?v=10.36.1',
-        wave:'./assets/meow/meow-reaction-wave.png?v=10.36.1',
-        teaching:'./assets/meow/meow-reaction-teaching.png?v=10.36.1',
-        feed:'./assets/meow/meow-interact-feed.png?v=10.36.1',
-        pat:'./assets/meow/meow-interact-pat.png?v=10.36.1',
-        cheer:'./assets/meow/meow-interact-cheer.png?v=10.36.1'
+        happy:'./assets/meow/meow-reaction-happy.png?v=10.36.2',
+        smug:'./assets/meow/meow-reaction-smug.png?v=10.36.2',
+        arms:'./assets/meow/meow-reaction-arms-crossed.png?v=10.36.2',
+        mischief:'./assets/meow/meow-reaction-mischief.png?v=10.36.2',
+        wave:'./assets/meow/meow-reaction-wave.png?v=10.36.2',
+        teaching:'./assets/meow/meow-reaction-teaching.png?v=10.36.2',
+        feed:'./assets/meow/meow-interact-feed.png?v=10.36.2',
+        pat:'./assets/meow/meow-interact-pat.png?v=10.36.2',
+        cheer:'./assets/meow/meow-interact-cheer.png?v=10.36.2'
     };
     const interactionFrames={
         snack:[
-            './assets/meow/meow-interact-feed.png?v=10.36.1',
-            './assets/meow/meow-interact-feed-2.png?v=10.36.1'
+            './assets/meow/meow-interact-feed.png?v=10.36.2',
+            './assets/meow/meow-interact-feed-2.png?v=10.36.2'
         ],
         pet:[
-            './assets/meow/meow-interact-pat.png?v=10.36.1',
-            './assets/meow/meow-interact-pat-2.png?v=10.36.1'
+            './assets/meow/meow-interact-pat.png?v=10.36.2',
+            './assets/meow/meow-interact-pat-2.png?v=10.36.2'
         ],
         cheer:[
-            './assets/meow/meow-interact-cheer.png?v=10.36.1',
-            './assets/meow/meow-interact-cheer-2.png?v=10.36.1'
+            './assets/meow/meow-interact-cheer.png?v=10.36.2',
+            './assets/meow/meow-interact-cheer-2.png?v=10.36.2'
         ]
     };
+
+    const MEOW_PRELOAD_ASSETS = [
+        ...walkFrames,
+        ...lazyFrames,
+        ...sleepFrames,
+        ...interactionFrames.snack,
+        ...interactionFrames.pet,
+        ...interactionFrames.cheer
+    ];
+
+    function preloadMeowAssets(){
+        MEOW_PRELOAD_ASSETS.forEach(src=>{
+            const img = new Image();
+            img.decoding = 'async';
+            img.src = src;
+        });
+    }
 
     // v10.31：改成真正「長期養成」的十階進化。
     // 目前約 3000 EXP 只會在 Lv.2，不會一下就滿。
     const LEVELS=[
-        {level:1,min:0,      title:'幼幼監工喵',       desc:'什麼都沒有，只有一張欠揍的臉。', img:'./assets/meow/meow-lv1-basic.png?v=10.36.1'},
-        {level:2,min:3000,   title:'單字卡助教喵',     desc:'開始拿單字卡到處巡堂。',           img:'./assets/meow/meow-lv2-flashcard.png?v=10.36.1'},
-        {level:3,min:7000,   title:'勤學書包喵',       desc:'掛上小包包，假裝很有學生氣。',     img:'./assets/meow/meow-lv3-student-bag.png?v=10.36.1'},
-        {level:4,min:12000,  title:'眼鏡講師喵',       desc:'戴上圓眼鏡，嫌棄感增加 30%。',     img:'./assets/meow/meow-lv4-glasses.png?v=10.36.1'},
-        {level:5,min:20000,  title:'教鞭講師喵',       desc:'正式拿起教鞭與課本監督你。',       img:'./assets/meow/meow-lv5-pointer-book.png?v=10.36.1'},
-        {level:6,min:32000,  title:'學霸喵師',         desc:'開始有學霸光環，講話更臭屁。',     img:'./assets/meow/meow-lv6-scholar.png?v=10.36.1'},
-        {level:7,min:48000,  title:'學術導師喵',       desc:'學術氣場上線，已經很會指使人。',   img:'./assets/meow/meow-lv7-academic.png?v=10.36.1'},
-        {level:8,min:70000,  title:'畢業名師喵',       desc:'戴上學士帽，準備對你說教。',       img:'./assets/meow/meow-lv8-graduate.png?v=10.36.1'},
-        {level:9,min:100000, title:'星光教授喵',       desc:'教授級監工，眼神已經看透一切。',   img:'./assets/meow/meow-lv9-star-teacher.png?v=10.36.1'},
-        {level:10,min:150000,title:'傳說喵喵教授',     desc:'目前最高階。你竟然真的讀到這裡。', img:'./assets/meow/meow-lv10-professor.png?v=10.36.1'}
+        {level:1,min:0,      title:'幼幼監工喵',       desc:'什麼都沒有，只有一張欠揍的臉。', img:'./assets/meow/meow-lv1-basic.png?v=10.36.2'},
+        {level:2,min:3000,   title:'單字卡助教喵',     desc:'開始拿單字卡到處巡堂。',           img:'./assets/meow/meow-lv2-flashcard.png?v=10.36.2'},
+        {level:3,min:7000,   title:'勤學書包喵',       desc:'掛上小包包，假裝很有學生氣。',     img:'./assets/meow/meow-lv3-student-bag.png?v=10.36.2'},
+        {level:4,min:12000,  title:'眼鏡講師喵',       desc:'戴上圓眼鏡，嫌棄感增加 30%。',     img:'./assets/meow/meow-lv4-glasses.png?v=10.36.2'},
+        {level:5,min:20000,  title:'教鞭講師喵',       desc:'正式拿起教鞭與課本監督你。',       img:'./assets/meow/meow-lv5-pointer-book.png?v=10.36.2'},
+        {level:6,min:32000,  title:'學霸喵師',         desc:'開始有學霸光環，講話更臭屁。',     img:'./assets/meow/meow-lv6-scholar.png?v=10.36.2'},
+        {level:7,min:48000,  title:'學術導師喵',       desc:'學術氣場上線，已經很會指使人。',   img:'./assets/meow/meow-lv7-academic.png?v=10.36.2'},
+        {level:8,min:70000,  title:'畢業名師喵',       desc:'戴上學士帽，準備對你說教。',       img:'./assets/meow/meow-lv8-graduate.png?v=10.36.2'},
+        {level:9,min:100000, title:'星光教授喵',       desc:'教授級監工，眼神已經看透一切。',   img:'./assets/meow/meow-lv9-star-teacher.png?v=10.36.2'},
+        {level:10,min:150000,title:'傳說喵喵教授',     desc:'目前最高階。你竟然真的讀到這裡。', img:'./assets/meow/meow-lv10-professor.png?v=10.36.2'}
     ];
 
     const reactionLines={
@@ -329,7 +346,7 @@
             isSleeping=true;
             startSleep();
             showBubble(pick(['……Zzz。不要吵本喵。','本喵先睡，醒了再嫌你。','今天的監工額度用完了，先睡。']),3500);
-        },75000);
+        },30000);
     }
 
     function recordStudy(source){
@@ -442,6 +459,7 @@
     ['pointerdown','keydown','touchstart','scroll'].forEach(e=>window.addEventListener(e,resetIdle,{passive:true}));
 
     window.addEventListener('load',()=>{
+        preloadMeowAssets();
         const sprite=document.getElementById('meow-teacher-sprite');if(sprite)sprite.src=defaultSprite();
         renderPetVitals(getPetState());
         setTimeout(roam,900);
