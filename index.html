@@ -22,7 +22,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-        <link rel="stylesheet" href="./css/app.css?v=10.35.1">
+        <link rel="stylesheet" href="./css/app.css?v=10.35.2">
 </head>
 <body>
 
@@ -1579,8 +1579,8 @@
 
 <script>
     // 🛠️ 單一版本資訊來源：之後每次改版只更新這裡即可
-    const APP_VERSION = 'v10.35.1';
-    const APP_UPDATE_NOTE = '網站安全模組化 Phase 2｜將 app.css 依職責拆成 base、cards、meow、mobile 四個模組，app.css 改為安全入口檔';
+    const APP_VERSION = 'v10.35.2';
+    const APP_UPDATE_NOTE = '測驗資料防呆修正｜避免綜合大亂鬥把學習優先度、功能欄等誤當中文答案；只使用可辨識的語意欄位出題';
     const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
     function renderAppVersion() {
@@ -8309,9 +8309,42 @@
     }
 
     function getQuizZhText(word) {
-        const idx = word.rawHeaders.findIndex(h => h.includes('意思') || h.includes('中文'));
-        if (idx !== -1 && word.rawCols[idx]) return word.rawCols[idx];
-        return word.rawCols[4] || word.rawCols[2] || '';
+        if (!word || !Array.isArray(word.rawHeaders) || !Array.isArray(word.rawCols)) return '';
+
+        const headers = word.rawHeaders.map(h => (h || '').trim());
+
+        // 第一層：真正的中文語意欄位。
+        const primaryKeys = ['中文意思', '意思', '中文翻譯', '中文', '翻譯', '意義', '語意', '解釋'];
+        for (const key of primaryKeys) {
+            const idx = headers.findIndex(h => h.includes(key));
+            const val = idx !== -1 ? (word.rawCols[idx] || '').trim() : '';
+            if (val) return val;
+        }
+
+        // 第二層：部分文法類別沒有「意思」欄，而用功用／定義表示核心語意。
+        const semanticKeys = ['定義與功能', '核心定義', '功用', '功能'];
+        for (const key of semanticKeys) {
+            const idx = headers.findIndex(h => h.includes(key));
+            const val = idx !== -1 ? (word.rawCols[idx] || '').trim() : '';
+            if (val) return val;
+        }
+
+        // 不再用固定欄位位置 rawCols[4]/rawCols[2] 猜答案。
+        // 各工作表欄位順序不同，這正是「學習優先度」被誤當答案的來源。
+        return '';
+    }
+
+    function isQuizEligibleWord(word) {
+        if (!word || word.isIntroCard || !word.jp || !word.jp.trim()) return false;
+        const meaning = getQuizZhText(word).trim();
+        if (!meaning) return false;
+
+        // 防止純 metadata 被當成答案。
+        if (/^[★☆]{2,}/.test(meaning)) return false;
+        if (/^[★☆\s]+(?:高|中|低)?優先/.test(meaning)) return false;
+        if (/^(高|中|低)優先$/.test(meaning)) return false;
+
+        return true;
     }
 
     function getQuizExampleText(word) {
@@ -8327,7 +8360,7 @@
             return;
         }
 
-        const validQuizPool = fullSourceList.filter(w => !w.isIntroCard);
+        const validQuizPool = fullSourceList.filter(isQuizEligibleWord);
         if (validQuizPool.length < 4) {
             alert('這個分頁的單字少於 4 個，無法產生四選一測驗喔！');
             setMode('review');
@@ -8356,7 +8389,7 @@
     }
 
     function startQuiz(infiniteMode = false, forceWild = false) {
-        const pool = fullSourceList.filter(w => !w.isIntroCard);
+        const pool = fullSourceList.filter(isQuizEligibleWord);
         if (pool.length < 4) {
             alert('⏳ 單字庫正在全力加速傳送中！請稍微等我一下下嘛～( ＞＜ )✨');
             setMode('review');
@@ -8410,6 +8443,11 @@
         }
 
         const currentWord = quizList[quizIndex];
+        if (!isQuizEligibleWord(currentWord)) {
+            quizIndex++;
+            renderQuizQuestion();
+            return;
+        }
         currentCorrectAnswer = currentWord;
         currentCorrectAnswer.hasQuizzedThisTime = false;
         selectedOptionData = null; 
@@ -8455,7 +8493,7 @@
         document.getElementById('btn-submit-answer').style.display = 'none'; 
         document.getElementById('btn-next-quiz').style.display = 'none';
 
-        const pool = fullSourceList.filter(w => !w.isIntroCard);
+        const pool = fullSourceList.filter(isQuizEligibleWord);
         let wrongCandidates = pool.filter(word => {
             if (word.jp === currentWord.jp) return false;
             
