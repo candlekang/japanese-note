@@ -4,8 +4,8 @@
  * 之後改版本號、回報 API、Firebase 或 Google Sheet URL，優先從這裡修改。
  */
 
-const APP_VERSION = 'v10.43.0';
-const APP_UPDATE_NOTE = '網站安全模組化 Phase 6.1｜將共用字卡、例句與測驗日文發音功能搬到 js/audio.js；功能邏輯不變';
+const APP_VERSION = 'v10.44.0';
+const APP_UPDATE_NOTE = '智慧搜尋全文索引升級｜除了字卡與中文意思，也可搜尋例句、翻譯、補充與文法說明；搜尋結果顯示命中來源與片段';
 
 const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
