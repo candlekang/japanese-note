@@ -324,6 +324,25 @@
         jumpToCategory(sheetKey, wordJp);
     }
 
+
+    function restoreSearchResultsOnFocus() {
+        const input = document.getElementById('searchInput');
+        if (!input) return;
+
+        input.addEventListener('focus', () => {
+            const currentValue = input.value.trim();
+            if (currentValue) {
+                handleSearch(currentValue);
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', restoreSearchResultsOnFocus, { once: true });
+    } else {
+        restoreSearchResultsOnFocus();
+    }
+
     document.addEventListener('click', (e) => {
         const searchBox = document.querySelector('.search-container');
         if (searchBox && !searchBox.contains(e.target)) {

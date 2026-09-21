@@ -4,8 +4,8 @@
  * 之後改版本號、回報 API、Firebase 或 Google Sheet URL，優先從這裡修改。
  */
 
-const APP_VERSION = 'v10.44.0';
-const APP_UPDATE_NOTE = '智慧搜尋全文索引升級｜除了字卡與中文意思，也可搜尋例句、翻譯、補充與文法說明；搜尋結果顯示命中來源與片段';
+const APP_VERSION = 'v10.44.1';
+const APP_UPDATE_NOTE = '智慧搜尋互動修正｜搜尋框保留文字時，重新點回搜尋框會自動恢復顯示搜尋結果，不需重新輸入';
 
 const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbyUm1thtwdwyCY3TrN7yk7Klclxs9cztFk_nx7oCg6NYucDf_uc5y0QMoggWAHXJ1Xmxg/exec';
 
